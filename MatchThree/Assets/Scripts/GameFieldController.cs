@@ -17,7 +17,7 @@ public class GameFieldController : MonoBehaviour
     public Action FilledGameBoard;
     [SerializeField] private Grid _grid;
     [SerializeField] private GameObject _itemPrefab;
-   
+
     [SerializeField] private List<ItemSettingsProvider> _allVariantsItemsCollections;
     [SerializeField] private Transform _parent;
 
@@ -53,7 +53,11 @@ public class GameFieldController : MonoBehaviour
                 var position = _grid.CellToLocal(new Vector3Int(i, j));
                 var tile = Instantiate(_itemPrefab, _parent);
                 tile.transform.localPosition = position + _grid.cellGap;
-                    //tile.transform.DOScale()
+
+                var targetScale = tile.transform.localScale;
+                tile.transform.localScale = Vector3.zero;
+                tile.transform.DOScale(targetScale, 0.3f).SetDelay(0.2f);
+
                 _itemsList[i, j] = tile.GetComponent<Item>();
             }
         }
@@ -65,16 +69,61 @@ public class GameFieldController : MonoBehaviour
 /* 1. смотрим, где есть свободные ячейки                                                            done
    1a. получаем их координаты                                                                       done
    2. все элементы, которые находятся сверху над свободными позициями, должны упасть вниз
+      а) создаю несколько массивов (максимум _row). Это будут колонны, участвующие в падении
+      б) далее надо добавить в List<> те спрайты, которые
+         находятся ВЫШЕ последнего значения Vector2Int.y в этой колонке.
+         Нужно сохранить 2 поля: количество пустых ячеек в этой колонке
+
    3. после тотального падения, надо найти координаты новых свободных ячеек
    4. и наконец, надо заполнить игровое поле
  }*/
     private void FallDownItems()
     {
         var emptyCoordinates = GetEmptyCellsGridsCoordinates();
-       
     }
 
-    private List<Vector2Int> GetEmptyCellsGridsCoordinates() // done
+    public List<Vector2Int> GetItemsCoordinatesForFalling(List<Vector2Int> emptyCoordinates)//done
+    {
+        List<Vector2Int> returnList = new();
+        Queue<Vector2Int> queueCoordinates = new();
+        for (int i = 0; i < emptyCoordinates.Count; i++)
+        {
+            queueCoordinates.Enqueue(emptyCoordinates.ElementAt(i));
+        }
+
+        Vector2Int currentEmptyCoordinate;
+        Vector2Int nextEmptyCoordinate;
+        
+        while (queueCoordinates.Count > 0)
+        {
+            currentEmptyCoordinate = queueCoordinates.Dequeue();
+            if (queueCoordinates.Count > 0)
+            {
+                nextEmptyCoordinate = queueCoordinates.Peek();
+
+                if (currentEmptyCoordinate.x != nextEmptyCoordinate.x)
+                {
+                    int row = currentEmptyCoordinate.x;
+                    for (int j = currentEmptyCoordinate.y + 1; j < _column; j++)
+                    {
+                        returnList.Add((new Vector2Int(row, j)));
+                    }
+                }
+            }
+            else
+            {
+                int row = currentEmptyCoordinate.x;
+                for (int j = currentEmptyCoordinate.y + 1; j < _column; j++)
+                {
+                    returnList.Add((new Vector2Int(row, j)));
+                } 
+            }
+        }
+
+        return returnList;
+    }
+
+    public List<Vector2Int> GetEmptyCellsGridsCoordinates() // done
     {
         List<Vector2Int> emptyCellsCoordinates = new();
 

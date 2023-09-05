@@ -32,6 +32,16 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            var x = _gameFieldController.GetEmptyCellsGridsCoordinates();
+            _gameFieldController.GetItemsCoordinatesForFalling(x);
+
+            foreach (var X in x)
+            {
+                Debug.Log(X);
+            }
+        }
         if (Input.GetMouseButtonDown(0))
         {
             var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
