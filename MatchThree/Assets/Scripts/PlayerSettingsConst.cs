@@ -1,6 +1,6 @@
 using System.Numerics;
 
-public class PlayerSettingsConst 
+public class PlayerSettingsConst
 {
     public static readonly string GAME_FIELD_ROW = "GAME_FIELD_ROW";
     public static readonly string GAME_FIELD_COLUMN = "GAME_FIELD_COLUMN";

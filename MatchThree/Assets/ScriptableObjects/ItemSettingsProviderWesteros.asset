@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8dbde6e19deebe1429922977374b1eb4, type: 3}
+  m_Name: ItemSettingsProviderWesteros
+  m_EditorClassIdentifier: 
+  _itemsList:
+  - {fileID: 11400000, guid: 2c4f0ee6baac375429d295d44e713ce5, type: 2}
+  - {fileID: 11400000, guid: fc20e3f914c7204479d513f2dbfdd1d4, type: 2}
+  - {fileID: 11400000, guid: 4aa15540a300e614a9e8f3a94681f253, type: 2}
+  - {fileID: 11400000, guid: d79ce1bcc63ea2b4684eb9af316ec466, type: 2}
+  - {fileID: 11400000, guid: 765166fae61f24141a843b05261fa010, type: 2}
+  - {fileID: 11400000, guid: e6592040cc219ef419db0eabf73cdfab, type: 2}
+  - {fileID: 11400000, guid: 92892be703d2c6a49b7015bde62f3dbb, type: 2}

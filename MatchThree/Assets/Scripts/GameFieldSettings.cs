@@ -3,47 +3,68 @@ using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameFieldSettings : MonoBehaviour
 {
     public Action GameSettingsAccepted;
+    
     public Action<int, int> GameFieldRawSizeChanged;
     public Action<int, int> GameFieldColumnSizeChanged;
 
     private int _rowSize = 4;
     private int _columnSize = 6;
 
-    [SerializeField]
-    private TextMeshProUGUI _rowSizeText;
-    [SerializeField]
-    private TextMeshProUGUI _columnSizeText;
-    [SerializeField]
-    private TextMeshProUGUI _attentionText;
+    [SerializeField] private TextMeshProUGUI _rowSizeText;
+    [SerializeField] private TextMeshProUGUI _columnSizeText;
+    [SerializeField] private TextMeshProUGUI _attentionText;
 
-    [SerializeField]
-    private SpriteRenderer _background;
+    [SerializeField] private SpriteRenderer _background;
 
-    [SerializeField]
-    private Canvas _settingsCanvas;
+    [SerializeField] private Canvas _settingsCanvas;
+    [SerializeField] private Canvas _invalidCanvas;
 
-    [SerializeField]
-    private Button _bearsSet;
-    [SerializeField]
-    private Button _cakesSet;
-    [SerializeField]
-    private Button _stuffSet;
+    [SerializeField] private Button _bearsSet;
+    [SerializeField] private Button _cakesSet;
+    [SerializeField] private Button _stuffSet;
 
-    private Coroutine _currentSetActiveAttentionCoruotine;
+    private Coroutine _currentSetActiveAttention;
 
     private void Awake()
     {
         _attentionText.enabled = false;
-        PlayerPrefs.SetInt(PlayerSettingsConst.GAME_FIELD_ROW, 4);
-        PlayerPrefs.SetInt(PlayerSettingsConst.GAME_FIELD_COLUMN, 6);
+        PlayerPrefs.SetInt(PlayerSettingsConst.GAME_FIELD_ROW, _rowSize);
+        PlayerPrefs.SetInt(PlayerSettingsConst.GAME_FIELD_COLUMN, _columnSize);
         PlayerPrefs.Save();
+        _invalidCanvas.enabled = false;
+        StartCoroutine(CheckValidateWindowAspect());
     }
-    #region public methods, use on ScreenSettings Menu, setup in Unity Editor. Responsibility: change gameField sizes
+
+    private IEnumerator CheckValidateWindowAspect()
+    {
+        var width = Screen.width;
+        var height = Screen.height;
+        var currentScreenSize = width.ToString() + "x" + height.ToString();
+        if (!currentScreenSize.Equals(PlayerSettingsConst.SCREEN_SIZE))
+        {
+            _settingsCanvas.enabled = false;
+            _invalidCanvas.enabled = true;
+        }
+
+
+        yield return new WaitUntil(() => PlayerSettingsConst.SCREEN_SIZE == currentScreenSize);
+    }
+
+    [UsedImplicitly]
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(0);
+    }
+
+
+    #region public methods, use in ScreenSettings Menu, setup in Unity Editor. Responsibility: change gameField sizes
+
     [UsedImplicitly]
     public void IncreaseRowSize()
     {
@@ -53,13 +74,15 @@ public class GameFieldSettings : MonoBehaviour
         }
         else
         {
-            if (_currentSetActiveAttentionCoruotine != null)
+            if (_currentSetActiveAttention != null)
             {
-                StopCoroutine(_currentSetActiveAttentionCoruotine);
+                StopCoroutine(_currentSetActiveAttention);
                 _attentionText.enabled = false;
             }
-            _currentSetActiveAttentionCoruotine = StartCoroutine(ActivateAttentionText());
+
+            _currentSetActiveAttention = StartCoroutine(ActivateAttentionText());
         }
+
         _rowSizeText.text = _rowSize.ToString();
         PlayerPrefs.SetInt(PlayerSettingsConst.GAME_FIELD_ROW, _rowSize);
         PlayerPrefs.Save();
@@ -76,19 +99,22 @@ public class GameFieldSettings : MonoBehaviour
         }
         else
         {
-            if (_currentSetActiveAttentionCoruotine != null)
+            if (_currentSetActiveAttention != null)
             {
-                StopCoroutine(_currentSetActiveAttentionCoruotine);
+                StopCoroutine(_currentSetActiveAttention);
                 _attentionText.enabled = false;
             }
-            _currentSetActiveAttentionCoruotine = StartCoroutine(ActivateAttentionText());
+
+            _currentSetActiveAttention = StartCoroutine(ActivateAttentionText());
         }
+
         _rowSizeText.text = _rowSize.ToString();
         PlayerPrefs.SetInt(PlayerSettingsConst.GAME_FIELD_ROW, _rowSize);
         PlayerPrefs.Save();
 
         GameFieldRawSizeChanged?.Invoke(_rowSize, _columnSize);
     }
+
     [UsedImplicitly]
     public void IncreaseColumnSize()
     {
@@ -98,19 +124,22 @@ public class GameFieldSettings : MonoBehaviour
         }
         else
         {
-            if (_currentSetActiveAttentionCoruotine != null)
+            if (_currentSetActiveAttention != null)
             {
-                StopCoroutine(_currentSetActiveAttentionCoruotine);
+                StopCoroutine(_currentSetActiveAttention);
                 _attentionText.enabled = false;
             }
-            _currentSetActiveAttentionCoruotine = StartCoroutine(ActivateAttentionText());
+
+            _currentSetActiveAttention = StartCoroutine(ActivateAttentionText());
         }
+
         _columnSizeText.text = _columnSize.ToString();
         PlayerPrefs.SetInt(PlayerSettingsConst.GAME_FIELD_COLUMN, _columnSize);
         PlayerPrefs.Save();
 
         GameFieldColumnSizeChanged?.Invoke(_rowSize, _columnSize);
     }
+
     [UsedImplicitly]
     public void DecreaseColumnSize()
     {
@@ -120,22 +149,25 @@ public class GameFieldSettings : MonoBehaviour
         }
         else
         {
-            if (_currentSetActiveAttentionCoruotine != null)
+            if (_currentSetActiveAttention != null)
             {
-                StopCoroutine(_currentSetActiveAttentionCoruotine);
+                StopCoroutine(_currentSetActiveAttention);
                 _attentionText.enabled = false;
             }
-            _currentSetActiveAttentionCoruotine = StartCoroutine(ActivateAttentionText());
+
+            _currentSetActiveAttention = StartCoroutine(ActivateAttentionText());
         }
+
         _columnSizeText.text = _columnSize.ToString();
         PlayerPrefs.SetInt(PlayerSettingsConst.GAME_FIELD_COLUMN, _columnSize);
         PlayerPrefs.Save();
 
         GameFieldColumnSizeChanged?.Invoke(_rowSize, _columnSize);
     }
+
     #endregion
 
-   
+
     [UsedImplicitly]
     public void AcceptSettings()
     {
@@ -149,25 +181,30 @@ public class GameFieldSettings : MonoBehaviour
     }
 
     #region public methods, save playing sets, setup in Unity Editor
+
     [UsedImplicitly]
-    public void SaveBearsSet()
+    public void SaveAutoSet()
     {
-        PlayerPrefs.SetInt(PlayerSettingsConst.PLAYING_SET, 1);
+        PlayerPrefs.SetInt(PlayerSettingsConst.PLAYING_SET, 0);
         PlayerPrefs.Save();
     }
+
     [UsedImplicitly]
-    public void SaveCakesSet()
+    public void SaveWesterosSet()
     {
         PlayerPrefs.SetInt(PlayerSettingsConst.PLAYING_SET, 2);
         PlayerPrefs.Save();
     }
+
     [UsedImplicitly]
-    public void SaveStuffSet()
+    public void SaveForexSet()
     {
-        PlayerPrefs.SetInt(PlayerSettingsConst.PLAYING_SET, 3);
+        PlayerPrefs.SetInt(PlayerSettingsConst.PLAYING_SET, 1);
         PlayerPrefs.Save();
     }
+
     #endregion
+
     private IEnumerator ActivateAttentionText()
     {
         _attentionText.enabled = true;
@@ -175,4 +212,5 @@ public class GameFieldSettings : MonoBehaviour
         _attentionText.enabled = false;
     }
 
+   
 }

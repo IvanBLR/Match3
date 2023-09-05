@@ -1,26 +1,116 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using DG.Tweening;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Windows;
+using Input = UnityEngine.Input;
+using Random = System.Random;
 
 public class GameFieldController : MonoBehaviour
 {
-    [SerializeField]
-    private Grid _grid;
+    public Action TouchedTheItem;
 
-    [SerializeField]
-    private ScriptableObjects[] _playingSets;// не надо так. Ќадо из PlayerSetttings брать название сета
+    public Action InitializationActualItemsCompleted;
+    public Action FilledGameBoard;
+    [SerializeField] private Grid _grid;
+    [SerializeField] private GameObject _itemPrefab;
+   
+    [SerializeField] private List<ItemSettingsProvider> _allVariantsItemsCollections;
+    [SerializeField] private Transform _parent;
 
-    private void Update()
+    private List<ItemScriptableObject> _actualItemsList;
+    private Item[,] _itemsList;
+    private int _itemCollectionsNumber;
+    private int _row;
+    private int _column;
+
+    private void Start()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        // _gameFieldSettings.GameSettingsAccepted += InitializeActualItemsListClassFields;      € их подписал ->
+        // _gameFieldSettings.GameSettingsAccepted += FillGameBoardWithTiles;                    в √еймћенеджере
+    }
+
+    public void InitializeActualItemsListClassFields() // done
+    {
+        _actualItemsList = GetActualItemsList();
+        _row = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_ROW);
+        _column = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_COLUMN);
+        _parent.position = _grid.transform.position;
+        _itemsList = new Item[_row, _column];
+
+        InitializationActualItemsCompleted?.Invoke();
+    }
+
+    public void FillGameBoardWithTiles() // done
+    {
+        for (int i = 0; i < _row; i++)
         {
-            for (int i = 0; i < _grid.transform.childCount; i++)
+            for (int j = 0; j < _column; j++)
             {
-                var child = _grid.transform.GetChild(i);
-                child.name = i.ToString();
-                child.hideFlags = HideFlags.None;
-                Debug.Log(_grid.transform.GetChild(i).name, _grid.transform.GetChild(i));
+                var position = _grid.CellToLocal(new Vector3Int(i, j));
+                var tile = Instantiate(_itemPrefab, _parent);
+                tile.transform.localPosition = position + _grid.cellGap;
+                    //tile.transform.DOScale()
+                _itemsList[i, j] = tile.GetComponent<Item>();
             }
         }
+
+        FilledGameBoard?.Invoke();
+    }
+
+
+/* 1. смотрим, где есть свободные €чейки                                                            done
+   1a. получаем их координаты                                                                       done
+   2. все элементы, которые наход€тс€ сверху над свободными позици€ми, должны упасть вниз
+   3. после тотального падени€, надо найти координаты новых свободных €чеек
+   4. и наконец, надо заполнить игровое поле
+ }*/
+    private void FallDownItems()
+    {
+        var emptyCoordinates = GetEmptyCellsGridsCoordinates();
+       
+    }
+
+    private List<Vector2Int> GetEmptyCellsGridsCoordinates() // done
+    {
+        List<Vector2Int> emptyCellsCoordinates = new();
+
+        for (int i = 0; i < _itemsList.GetLength(0); i++)
+        {
+            for (int j = 0; j < _itemsList.GetLength(1); j++)
+            {
+                var currentItem = _itemsList[i, j];
+                if (currentItem == null)
+                {
+                    var emptyPosition = new Vector2Int(i, j);
+                    emptyCellsCoordinates.Add(emptyPosition);
+                }
+            }
+        }
+
+        return emptyCellsCoordinates;
+    }
+
+    private List<ItemScriptableObject> GetActualItemsList() //done
+    {
+        _itemCollectionsNumber = PlayerPrefs.GetInt(PlayerSettingsConst.PLAYING_SET);
+        List<ItemScriptableObject> actualItemsListForReturn = new();
+        Random random = new Random();
+        var actualItemSettingsProvider = _allVariantsItemsCollections.ElementAt(_itemCollectionsNumber);
+        var actualItemsCollection = actualItemSettingsProvider.ItemsList;
+        int[] unicIndexes = Enumerable.Range(0, actualItemsCollection.Count)
+            .OrderBy(x => random.Next())
+            .Take(5)
+            .ToArray();
+        for (int i = 0; i < 5; i++)
+        {
+            int index = unicIndexes[i];
+            actualItemsListForReturn.Add(actualItemsCollection.ElementAt(index));
+        }
+
+        return actualItemsListForReturn;
     }
 }
