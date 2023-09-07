@@ -34,13 +34,7 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            var x = _gameFieldController.GetEmptyCellsGridsCoordinates();
-            _gameFieldController.GetItemsCoordinatesForFalling(x);
-
-            foreach (var X in x)
-            {
-                Debug.Log(X);
-            }
+            _gameFieldController.FallDownItems();
         }
         if (Input.GetMouseButtonDown(0))
         {

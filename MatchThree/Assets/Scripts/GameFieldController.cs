@@ -27,6 +27,9 @@ public class GameFieldController : MonoBehaviour
     private int _row;
     private int _column;
 
+
+    private List<List<Vector3Int>> Z = new();
+
     private void Start()
     {
         // _gameFieldSettings.GameSettingsAccepted += InitializeActualItemsListClassFields;      я их подписал ->
@@ -66,34 +69,57 @@ public class GameFieldController : MonoBehaviour
     }
 
 
-/* 1. смотрим, где есть свободные ячейки                                                            done
-   1a. получаем их координаты                                                                       done
+/* 1. смотрим, где есть свободные ячейки                                                                                 done
+   1a. получаем их координаты                                                                                            done
    2. все элементы, которые находятся сверху над свободными позициями, должны упасть вниз
-      а) создаю несколько массивов (максимум _row). Это будут колонны, участвующие в падении
-      б) далее надо добавить в List<> те спрайты, которые
-         находятся ВЫШЕ последнего значения Vector2Int.y в этой колонке.
-         Нужно сохранить 2 поля: количество пустых ячеек в этой колонке
-
+   2a. найти координаты этих Элементов.                                                                                  done
+   2б. Надо как-то разделить элементы-для-падения на колонки, чтобы анимация вычислялась для каждой колонки отдельно
    3. после тотального падения, надо найти координаты новых свободных ячеек
    4. и наконец, надо заполнить игровое поле
  }*/
-    private void FallDownItems()
+    public void FallDownItems() //                                                                   need check it
     {
-        var emptyCoordinates = GetEmptyCellsGridsCoordinates();
+       // var X = GetAllEmptyCoordinates();
+       // for (int i = 0; i < X.Count; i++)
+       // for (int j = 0; j < X[i].Count; j++)
+       //     Debug.Log(X[i][j]);
+
+
+        // var emptyCoordinates = GetEmptyCoordinatesInGridNotation();
+        // var itemCoordinatesForFalling = GetItemsCoordinatesForFallingInGridNotation(emptyCoordinates);
+//
+        // //List<Vector3> newEmptyCoordinates = new();
+//
+//
+        // if (emptyCoordinates.Count >= itemCoordinatesForFalling.Count)
+        // {
+        //     for (int i = 0; i < emptyCoordinates.Count; i++)
+        //     {
+        //         var tileForFalling = _itemsList[itemCoordinatesForFalling.ElementAt(i).x,
+        //             itemCoordinatesForFalling.ElementAt(i).y];
+//
+        //         var targetPositionWorld = _grid.CellToWorld(emptyCoordinates[i]);
+//
+        //         tileForFalling.transform.DOMove(targetPositionWorld, 1f);
+        //     }
+        // }
+        // else
+        // {
+        // }
     }
 
-    public List<Vector2Int> GetItemsCoordinatesForFalling(List<Vector2Int> emptyCoordinates)//done
+    private List<Vector3Int> GetItemsCoordinatesForFallingInGridNotation(List<Vector3Int> emptyCoordinates) // done
     {
-        List<Vector2Int> returnList = new();
-        Queue<Vector2Int> queueCoordinates = new();
+        List<Vector3Int> returnList = new();
+        Queue<Vector3Int> queueCoordinates = new();
         for (int i = 0; i < emptyCoordinates.Count; i++)
         {
             queueCoordinates.Enqueue(emptyCoordinates.ElementAt(i));
         }
 
-        Vector2Int currentEmptyCoordinate;
-        Vector2Int nextEmptyCoordinate;
-        
+        Vector3Int currentEmptyCoordinate;
+        Vector3Int nextEmptyCoordinate;
+
         while (queueCoordinates.Count > 0)
         {
             currentEmptyCoordinate = queueCoordinates.Dequeue();
@@ -103,38 +129,69 @@ public class GameFieldController : MonoBehaviour
 
                 if (currentEmptyCoordinate.x != nextEmptyCoordinate.x)
                 {
-                    int row = currentEmptyCoordinate.x;
-                    for (int j = currentEmptyCoordinate.y + 1; j < _column; j++)
+                    var row = currentEmptyCoordinate.x;
+                    for (var j = currentEmptyCoordinate.y + 1; j < _column; j++)
                     {
-                        returnList.Add((new Vector2Int(row, j)));
+                        returnList.Add((new Vector3Int(row, j)));
                     }
                 }
             }
             else
             {
-                int row = currentEmptyCoordinate.x;
-                for (int j = currentEmptyCoordinate.y + 1; j < _column; j++)
+                var row = currentEmptyCoordinate.x;
+                for (var j = currentEmptyCoordinate.y + 1; j < _column; j++)
                 {
-                    returnList.Add((new Vector2Int(row, j)));
-                } 
+                    returnList.Add((new Vector3Int(row, j)));
+                }
             }
         }
 
         return returnList;
     }
 
-    public List<Vector2Int> GetEmptyCellsGridsCoordinates() // done
+    private List<List<Vector3Int>> GetAllEmptyCoordinates() // done. Use it 
     {
-        List<Vector2Int> emptyCellsCoordinates = new();
+        List<List<Vector3Int>> returnList = new();
+
+        int currentIndex = 0;
+
+        for (int i = currentIndex; i < _row; i++)
+        {
+            var currentList = GetEmptyCoordinatesInCurrentColumnInGridNotation(i);
+            returnList.Add(currentList);
+        }
+
+        return returnList;
+    }
+
+    private List<Vector3Int> GetEmptyCoordinatesInCurrentColumnInGridNotation(int rowIndex) // done. Use it 
+    {
+        List<Vector3Int> arrayForReturn = new();
+        for (int j = 0; j < _column; j++)
+        {
+            var currentItem = _itemsList[rowIndex, j];
+            if (currentItem.GetComponent<SpriteRenderer>().enabled == false)
+            {
+                var emptyPosition = new Vector3Int(rowIndex, j);
+                arrayForReturn.Add(emptyPosition);
+            }
+        }
+
+        return arrayForReturn;
+    }
+
+    private List<Vector3Int> GetEmptyCoordinatesInGridNotation() // done, but dont' use it
+    {
+        List<Vector3Int> emptyCellsCoordinates = new();
 
         for (int i = 0; i < _itemsList.GetLength(0); i++)
         {
             for (int j = 0; j < _itemsList.GetLength(1); j++)
             {
                 var currentItem = _itemsList[i, j];
-                if (currentItem == null)
+                if (currentItem.GetComponent<SpriteRenderer>().enabled == false)
                 {
-                    var emptyPosition = new Vector2Int(i, j);
+                    var emptyPosition = new Vector3Int(i, j);
                     emptyCellsCoordinates.Add(emptyPosition);
                 }
             }
