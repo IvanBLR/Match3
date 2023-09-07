@@ -79,12 +79,17 @@ public class GameFieldController : MonoBehaviour
  }*/
     public void FallDownItems() //                                                                   need check it
     {
-       // var X = GetAllEmptyCoordinates();
-       // for (int i = 0; i < X.Count; i++)
-       // for (int j = 0; j < X[i].Count; j++)
-       //     Debug.Log(X[i][j]);
-
-
+        var X = GetAllEmptyCoordinates();
+        var Q = GetItemsCoordinatesForFalling(X);
+        for (int i = 0; i < Q.Count; i++)
+        {
+            for (int j = 0; j < Q[i].Count; j++)
+            {
+                Debug.Log(Q[i][j]);
+            }
+        }
+//
+        //  Debug.Log($"all amount = {Q[0].Count}");
         // var emptyCoordinates = GetEmptyCoordinatesInGridNotation();
         // var itemCoordinatesForFalling = GetItemsCoordinatesForFallingInGridNotation(emptyCoordinates);
 //
@@ -108,41 +113,59 @@ public class GameFieldController : MonoBehaviour
         // }
     }
 
-    private List<Vector3Int> GetItemsCoordinatesForFallingInGridNotation(List<Vector3Int> emptyCoordinates) // done
+    private List<List<Vector3Int>> GetItemsCoordinatesForFalling(List<List<Vector3Int>> allEmptyCoordinates) // done
     {
-        List<Vector3Int> returnList = new();
-        Queue<Vector3Int> queueCoordinates = new();
-        for (int i = 0; i < emptyCoordinates.Count; i++)
+        List<List<Vector3Int>> returnList = new();
+        Queue<List<Vector3Int>> globalQueueListCoordinates = new();
+
+        for (int i = 0; i < allEmptyCoordinates.Count; i++)
         {
-            queueCoordinates.Enqueue(emptyCoordinates.ElementAt(i));
+            globalQueueListCoordinates.Enqueue(allEmptyCoordinates[i]);
         }
 
-        Vector3Int currentEmptyCoordinate;
-        Vector3Int nextEmptyCoordinate;
+        List<Vector3Int> currentListWithEmptyCoordinates = new();
 
-        while (queueCoordinates.Count > 0)
+        while (globalQueueListCoordinates.Count > 0)
         {
-            currentEmptyCoordinate = queueCoordinates.Dequeue();
-            if (queueCoordinates.Count > 0)
-            {
-                nextEmptyCoordinate = queueCoordinates.Peek();
+            currentListWithEmptyCoordinates = globalQueueListCoordinates.Dequeue();
+            List<Vector3Int> listForReturnList = new();
+            Queue<Vector3Int> currentQueue = new();
 
-                if (currentEmptyCoordinate.x != nextEmptyCoordinate.x)
+            for (int j = 0; j < currentListWithEmptyCoordinates.Count; j++)
+            {
+                currentQueue.Enqueue(currentListWithEmptyCoordinates[j]);
+            }
+
+            while (currentQueue.Count > 0)
+            {
+                Vector3Int currentPoint = currentQueue.Dequeue();
+                Vector3Int nextPoint;
+                while (currentQueue.Count > 0)
                 {
-                    var row = currentEmptyCoordinate.x;
-                    for (var j = currentEmptyCoordinate.y + 1; j < _column; j++)
+                    nextPoint = currentQueue.Dequeue();
+                    if (nextPoint.y - currentPoint.y == 1)
                     {
-                        returnList.Add((new Vector3Int(row, j)));
+                        currentPoint = nextPoint;
+                    }
+                    else
+                    {
+                        int start = currentPoint.y + 1;
+                        int end = nextPoint.y - 1;
+                        for (int index = start; index <= end; index++)
+                        {
+                            listForReturnList.Add(new Vector3Int(currentPoint.x, index));
+                        }
+
+                        currentPoint = nextPoint;
                     }
                 }
-            }
-            else
-            {
-                var row = currentEmptyCoordinate.x;
-                for (var j = currentEmptyCoordinate.y + 1; j < _column; j++)
+
+                for (int y = currentPoint.y + 1; y < _column; y++)
                 {
-                    returnList.Add((new Vector3Int(row, j)));
+                    listForReturnList.Add(new Vector3Int(currentPoint.x, y));
                 }
+
+                returnList.Add(listForReturnList);
             }
         }
 
