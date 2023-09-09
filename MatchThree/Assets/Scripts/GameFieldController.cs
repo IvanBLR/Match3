@@ -22,7 +22,7 @@ public class GameFieldController : MonoBehaviour
     [SerializeField] private Transform _parent;
 
     private List<ItemScriptableObject> _actualItemsList;
-    private Item[,] _itemsList;
+    private Item[,] _itemsMatrixArray;
     private int _itemCollectionsNumber;
     private int _row;
     private int _column;
@@ -42,7 +42,7 @@ public class GameFieldController : MonoBehaviour
         _row = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_ROW);
         _column = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_COLUMN);
         _parent.position = _grid.transform.position;
-        _itemsList = new Item[_row, _column];
+        _itemsMatrixArray = new Item[_row, _column];
 
         InitializationActualItemsCompleted?.Invoke();
     }
@@ -61,7 +61,7 @@ public class GameFieldController : MonoBehaviour
                 tile.transform.localScale = Vector3.zero;
                 tile.transform.DOScale(targetScale, 0.3f).SetDelay(0.2f);
 
-                _itemsList[i, j] = tile.GetComponent<Item>();
+                _itemsMatrixArray[i, j] = tile.GetComponent<Item>();
             }
         }
 
@@ -71,63 +71,63 @@ public class GameFieldController : MonoBehaviour
 
 /* 1. смотрим, где есть свободные ячейки                                                                                 done
    1a. получаем их координаты                                                                                            done
-   2. все элементы, которые находятся сверху над свободными позициями, должны упасть вниз
+   2. все элементы, которые находятся сверху над свободными позициями, должны упасть вниз                                done
    2a. найти координаты этих Элементов.                                                                                  done
-   2б. Надо как-то разделить элементы-для-падения на колонки, чтобы анимация вычислялась для каждой колонки отдельно
+   2б. Надо как-то разделить элементы-для-падения на колонки, чтобы анимация вычислялась для каждой колонки отдельно     done
+   
    3. после тотального падения, надо найти координаты новых свободных ячеек
    4. и наконец, надо заполнить игровое поле
  }*/
-    public void FallDownItems() //                                                                   need check it
+    public void FallDownItems() //                                         done
     {
-        var X = GetAllEmptyCoordinates();
-        var Q = GetItemsCoordinatesForFalling(X);
-        for (int i = 0; i < Q.Count; i++)
+        var emptyCoordinates = GetAllEmptyCoordinates();
+        var itemCoordinatesForFalling = GetItemsCoordinatesForFalling(emptyCoordinates); 
+
+        for (int i = 0; i < emptyCoordinates.Count; i++)
         {
-            for (int j = 0; j < Q[i].Count; j++)
+            if (emptyCoordinates[i].Count == 0)
             {
-                Debug.Log(Q[i][j]);
+                continue;
+            }
+            else
+            {
+                List<Vector3Int> newEmptyCoordinates = emptyCoordinates[i]; 
+
+                for (int k = 0; k < itemCoordinatesForFalling[i].Count; k++) 
+                {
+                    newEmptyCoordinates.Add(itemCoordinatesForFalling[i][k]);
+                }
+
+                var sortedCoordinates = newEmptyCoordinates.OrderBy(vector => vector.y).ToList();
+
+                for (int n = 0; n < itemCoordinatesForFalling[i].Count; n++)
+                {
+                    var tileForFalling =
+                        _itemsMatrixArray[itemCoordinatesForFalling[i][n].x,
+                            itemCoordinatesForFalling[i][n].y]; // right
+                    var targetPoint = sortedCoordinates[n];
+                    tileForFalling.transform.DOMove(_grid.CellToWorld(targetPoint), 0.5f);
+                }
             }
         }
-//
-        //  Debug.Log($"all amount = {Q[0].Count}");
-        // var emptyCoordinates = GetEmptyCoordinatesInGridNotation();
-        // var itemCoordinatesForFalling = GetItemsCoordinatesForFallingInGridNotation(emptyCoordinates);
-//
-        // //List<Vector3> newEmptyCoordinates = new();
-//
-//
-        // if (emptyCoordinates.Count >= itemCoordinatesForFalling.Count)
-        // {
-        //     for (int i = 0; i < emptyCoordinates.Count; i++)
-        //     {
-        //         var tileForFalling = _itemsList[itemCoordinatesForFalling.ElementAt(i).x,
-        //             itemCoordinatesForFalling.ElementAt(i).y];
-//
-        //         var targetPositionWorld = _grid.CellToWorld(emptyCoordinates[i]);
-//
-        //         tileForFalling.transform.DOMove(targetPositionWorld, 1f);
-        //     }
-        // }
-        // else
-        // {
-        // }
     }
 
     private List<List<Vector3Int>> GetItemsCoordinatesForFalling(List<List<Vector3Int>> allEmptyCoordinates) // done
     {
-        List<List<Vector3Int>> returnList = new();
-        Queue<List<Vector3Int>> globalQueueListCoordinates = new();
+        List<List<Vector3Int>> finalReturnList = new();
+        Queue<List<Vector3Int>> globalQueueWithListCoordinates = new();
 
         for (int i = 0; i < allEmptyCoordinates.Count; i++)
         {
-            globalQueueListCoordinates.Enqueue(allEmptyCoordinates[i]);
+            globalQueueWithListCoordinates.Enqueue(allEmptyCoordinates[i]); // Count == _row
         }
+
 
         List<Vector3Int> currentListWithEmptyCoordinates = new();
 
-        while (globalQueueListCoordinates.Count > 0)
+        while (globalQueueWithListCoordinates.Count > 0)
         {
-            currentListWithEmptyCoordinates = globalQueueListCoordinates.Dequeue();
+            currentListWithEmptyCoordinates = globalQueueWithListCoordinates.Dequeue();
             List<Vector3Int> listForReturnList = new();
             Queue<Vector3Int> currentQueue = new();
 
@@ -164,12 +164,12 @@ public class GameFieldController : MonoBehaviour
                 {
                     listForReturnList.Add(new Vector3Int(currentPoint.x, y));
                 }
-
-                returnList.Add(listForReturnList);
             }
+
+            finalReturnList.Add(listForReturnList);
         }
 
-        return returnList;
+        return finalReturnList;
     }
 
     private List<List<Vector3Int>> GetAllEmptyCoordinates() // done. Use it 
@@ -192,7 +192,7 @@ public class GameFieldController : MonoBehaviour
         List<Vector3Int> arrayForReturn = new();
         for (int j = 0; j < _column; j++)
         {
-            var currentItem = _itemsList[rowIndex, j];
+            var currentItem = _itemsMatrixArray[rowIndex, j];
             if (currentItem.GetComponent<SpriteRenderer>().enabled == false)
             {
                 var emptyPosition = new Vector3Int(rowIndex, j);
@@ -203,26 +203,10 @@ public class GameFieldController : MonoBehaviour
         return arrayForReturn;
     }
 
-    private List<Vector3Int> GetEmptyCoordinatesInGridNotation() // done, but dont' use it
-    {
-        List<Vector3Int> emptyCellsCoordinates = new();
-
-        for (int i = 0; i < _itemsList.GetLength(0); i++)
-        {
-            for (int j = 0; j < _itemsList.GetLength(1); j++)
-            {
-                var currentItem = _itemsList[i, j];
-                if (currentItem.GetComponent<SpriteRenderer>().enabled == false)
-                {
-                    var emptyPosition = new Vector3Int(i, j);
-                    emptyCellsCoordinates.Add(emptyPosition);
-                }
-            }
-        }
-
-        return emptyCellsCoordinates;
-    }
-
+    /// <summary>
+    /// return choose player's set with 5 random element.
+    /// After fill the game field with this elements
+    /// </summary>
     private List<ItemScriptableObject> GetActualItemsList() //done
     {
         _itemCollectionsNumber = PlayerPrefs.GetInt(PlayerSettingsConst.PLAYING_SET);
@@ -237,7 +221,7 @@ public class GameFieldController : MonoBehaviour
         for (int i = 0; i < 5; i++)
         {
             int index = unicIndexes[i];
-            actualItemsListForReturn.Add(actualItemsCollection.ElementAt(index));
+            actualItemsListForReturn.Add(actualItemsCollection[index]);
         }
 
         return actualItemsListForReturn;
