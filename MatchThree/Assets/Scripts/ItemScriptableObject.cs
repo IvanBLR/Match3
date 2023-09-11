@@ -8,13 +8,13 @@ public class ItemScriptableObject : ScriptableObject
     public Sprite Icon
     {
         get => _icon;
-        set { }
+        set { _icon = value; }
     }
 
     public int NameID
     {
         get => _nameID;
-        set { }
+        set { _nameID = value; }
     }
 
     [SerializeField] private Sprite _icon;

@@ -1,10 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Item : MonoBehaviour
 {
-    public ItemScriptableObject ItemSettings => _itemScriptableObject;
+    public ItemScriptableObject ItemSettings
+    {
+        get
+        {
+            return _itemScriptableObject;
+        }
+        set
+        {
+            _itemScriptableObject = value;
+        }
+    }
     
     [SerializeField]
     private ItemScriptableObject _itemScriptableObject;
