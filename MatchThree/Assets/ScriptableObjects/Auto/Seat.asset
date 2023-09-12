@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Seat
   m_EditorClassIdentifier: 
   _icon: {fileID: 21300000, guid: e9e66bca0c0d5814f811567510dcd823, type: 3}
-  _nameID: 8
+  _nameID: 9

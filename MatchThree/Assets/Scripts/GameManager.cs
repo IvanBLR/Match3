@@ -11,11 +11,15 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Grid _grid;
 
     private Vector2 _offset;
+    private Vector3 _hitPoint;
+    private Vector3 _pointUp;
+    private Vector3 _delta;
+    private Vector3Int _hitPointInGridsCoordinate;
 
     private void Awake() //                                                  done
     {
         _gameFieldSettings.GameSettingsAccepted += _gameFieldController.InitializeActualItemsListClassFields;
-        _gameFieldSettings.GameSettingsAccepted += _gameFieldController.FillGameBoardWithTiles;
+        _gameFieldSettings.GameSettingsAccepted += _gameFieldController.FillGameBoardWithTilesFirstTimeOnly;
         _gameFieldSettings.GameFieldRawSizeChanged += _emptyGameField.GenerateGameField;
         _gameFieldSettings.GameFieldColumnSizeChanged += _emptyGameField.GenerateGameField;
 
@@ -35,22 +39,57 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.A))
         {
             _gameFieldController.FallDownItems();
+            _gameFieldController.Check();
         }
+
         if (Input.GetMouseButtonDown(0))
         {
-            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
-            if (hit.collider != null)
+            CalculateHitPointCoordinate();
+        }
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            _pointUp = Input.mousePosition;
+            _delta = _pointUp - _hitPoint;
+
+            if (Mathf.Abs(_delta.x) > Mathf.Abs(_delta.y)) // horisontal
             {
-                var hitWorldCoordinates = hit.point;
-                var hitGridCoordinates = _grid.WorldToCell(hitWorldCoordinates + _offset);
-
-
-                /* тут надо вызывать метод из GameFieldController -> GetEmptyCellsGridsPositions(),
-                 * в котором получаем координаты пустых ячеек.
-                 * Используем либо Action, либо напрямую вызываем через ссылку на GameFieldController
-                 */
+                if (_delta.x > 0) // to right
+                {
+                    _gameFieldController.Swap(_hitPointInGridsCoordinate.x, _hitPointInGridsCoordinate.y,
+                        new Vector2Int(1, 0));
+                }
+                else // to left
+                {
+                    _gameFieldController.Swap(_hitPointInGridsCoordinate.x, _hitPointInGridsCoordinate.y,
+                        new Vector2Int(-1, 0));
+                }
             }
+            else // vertical
+            {
+                if (_delta.y > 0) // to up
+                {
+                    _gameFieldController.Swap(_hitPointInGridsCoordinate.x, _hitPointInGridsCoordinate.y,
+                        new Vector2Int(0, 1));
+                }
+                else // to down
+                {
+                    _gameFieldController.Swap(_hitPointInGridsCoordinate.x, _hitPointInGridsCoordinate.y,
+                        new Vector2Int(0, -1));
+                }
+            }
+        }
+    }
+
+    private void CalculateHitPointCoordinate()
+    {
+        _hitPoint = Input.mousePosition;
+        var ray = Camera.main.ScreenPointToRay(_hitPoint);
+        RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
+        if (hit.collider != null)
+        {
+            var hitWorldCoordinates = hit.point;
+            _hitPointInGridsCoordinate = _grid.WorldToCell(hitWorldCoordinates + _offset);
         }
     }
 
@@ -58,9 +97,9 @@ public class GameManager : MonoBehaviour
     {
         _gameFieldController.InitializationActualItemsCompleted -= DestroyAction;
         _gameFieldController.FilledGameBoard -= DestroyAction;
-        _gameFieldController.FilledGameBoard -= _gameFieldController.FillGameBoardWithTiles;
+        _gameFieldController.FilledGameBoard -= _gameFieldController.FillGameBoardWithTilesFirstTimeOnly;
         _gameFieldSettings.GameSettingsAccepted -= _gameFieldController.InitializeActualItemsListClassFields;
-        _gameFieldSettings.GameSettingsAccepted -= _gameFieldController.FillGameBoardWithTiles;
+        _gameFieldSettings.GameSettingsAccepted -= _gameFieldController.FillGameBoardWithTilesFirstTimeOnly;
         _gameFieldSettings.GameFieldRawSizeChanged -= _emptyGameField.GenerateGameField;
         _gameFieldSettings.GameFieldColumnSizeChanged -= _emptyGameField.GenerateGameField;
     }

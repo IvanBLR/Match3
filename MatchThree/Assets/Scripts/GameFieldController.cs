@@ -26,9 +26,12 @@ public class GameFieldController : MonoBehaviour
     private SpriteRenderer[,] _spriteRenderersMatrix;
     private Item[,] _itemsMatrix;
     private bool[,] _currentEmptiesCells;
+    private bool _canStartNewSwapAnimation = true;
+    private float _delay = 0.1f;
     private int _itemCollectionsNumber;
     private int _row;
     private int _column;
+
 
     private void Start()
     {
@@ -52,7 +55,7 @@ public class GameFieldController : MonoBehaviour
         InitializationActualItemsCompleted?.Invoke();
     }
 
-    public void FillGameBoardWithTiles() // update, need check it
+    public void FillGameBoardWithTilesFirstTimeOnly() // done 
     {
         for (int i = 0; i < _row; i++)
         {
@@ -67,18 +70,24 @@ public class GameFieldController : MonoBehaviour
 
                 int indexCurrentSettings = GetCurrentSettingsIndex(i, j);
                 var currentSettings = _actualItemsList[indexCurrentSettings];
-                
+
                 _itemsMatrix[i, j].ItemSettings = currentSettings; // am I need both?
                 _spriteRenderersMatrix[i, j].sprite = currentSettings.Icon; // am I need both?
 
-
                 var targetScale = tile.transform.localScale;
                 tile.transform.localScale = Vector3.zero;
-                tile.transform.DOScale(targetScale, 0.3f).SetDelay(0.2f);
+                tile.transform.DOScale(targetScale, 0.3f).SetDelay(_delay);
             }
         }
 
         FilledGameBoard?.Invoke();
+    }
+
+    public void Check()
+    {
+        _itemsMatrix[3, 3].transform.position = Vector3.zero;
+
+        Debug.Log(_itemsMatrix[3, 3].transform.position == _spriteRenderersMatrix[3, 3].transform.position);
     }
 
     private int[] GetActualNameID()
@@ -90,9 +99,12 @@ public class GameFieldController : MonoBehaviour
         }
 
         return actualNameID;
-    } // done
+    } // done. Вспомогательный метод
 
-    private int GetCurrentSettingsIndex(int x, int y)// done
+    /// <summary>
+    ///  Метод помогает заполнить пустые ячейки, вернув нужный settingsIndex, оторый гарантирует, что нигде не будет match-3
+    /// /// </summary>
+    private int GetCurrentSettingsIndex(int x, int y) // done.
     {
         Random random = new Random();
         HashSet<int> checkList = new();
@@ -144,9 +156,15 @@ public class GameFieldController : MonoBehaviour
 
 
    3а. после тотального падения, надо найти координаты новых свободных ячеек (я использую   _currentEmptiesCells)         done
-   3б. нужно проверить, нет ли совпадений матч-3
+   3б. нужно проверить, нет ли совпадений матч-3                                                                         done
    4. и наконец, надо заполнить игровое поле
+   5. после заполнения игрового поля нужно не забыть _currentEmptiesCells[,] присвоить значения false
  }*/
+
+
+    /// <summary>
+    /// Метод падения элементов. После очередного падения этот метод нужно вызывать снова
+    /// </summary>
     public void FallDownItems() //                                         done
     {
         var emptyCoordinates = GetAllEmptyCoordinates();
@@ -183,10 +201,15 @@ public class GameFieldController : MonoBehaviour
                 }
             }
         }
+
+        GetMatchThreeOrMore();
     }
 
+    /// <summary>
+    /// Вспомогательный метод. Попутно заполняет _currentEmptiesCells[,] 
+    /// </summary>
     private void FallingAnimation(List<List<Vector3Int>> itemCoordinatesForFalling, int i, int j,
-        List<Vector3Int> sortedCoordinates) //                                                               done
+        List<Vector3Int> sortedCoordinates) //  done. 
     {
         var tileForFalling =
             _spriteRenderersMatrix[itemCoordinatesForFalling[i][j].x,
@@ -200,6 +223,9 @@ public class GameFieldController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// метод заполняет _currentEmptiesCells[,] нужными значениями после каждого падения Элементов
+    /// </summary>
     private void FillCurrentEmptiesCellsArray(Vector3Int point, bool isFirst = false) // done
     {
         if (isFirst)
@@ -294,6 +320,9 @@ public class GameFieldController : MonoBehaviour
         return returnList;
     }
 
+    /// <summary>
+    /// вспомогательный метод
+    /// </summary>
     private List<Vector3Int> GetEmptyCoordinatesInCurrentColumnInGridNotation(int rowIndex) // done. Use it 
     {
         List<Vector3Int> arrayForReturn = new();
@@ -309,7 +338,6 @@ public class GameFieldController : MonoBehaviour
 
         return arrayForReturn;
     }
-
 
     private HashSet<Vector3Int> GetMatchThreeOrMore() // done 
     {
@@ -335,6 +363,9 @@ public class GameFieldController : MonoBehaviour
         return returnHashSet;
     }
 
+    /// <summary>
+    /// метод дополнительной проверки корректности полученных координат Match-3
+    /// </summary>
     private void CheckValidate(HashSet<Vector3Int> currentPointsForDestroy, HashSet<Vector3Int> returnHashSet)
     {
         if (currentPointsForDestroy.Count > 2)
@@ -353,7 +384,7 @@ public class GameFieldController : MonoBehaviour
         pointsForDestroy.Add(new Vector3Int(x, y));
         for (int j = y + 1; j < _column; j++)
         {
-            int currentID = _itemsMatrix[x, j].ItemSettings.NameID; // падает ошибка IndexOutOfRange
+            int currentID = _itemsMatrix[x, j].ItemSettings.NameID;
             if (currentID == ID)
             {
                 pointsForDestroy.Add(new Vector3Int(x, j));
@@ -406,6 +437,47 @@ public class GameFieldController : MonoBehaviour
         }
     }
 
+    public void Swap(int x, int y, Vector2Int direction)
+    {
+        if (direction == new Vector2(1, 0) && x < _row - 1) // to right
+        {
+            if (_canStartNewSwapAnimation)
+            {
+                SwapAnimation(x, y, direction);
+
+                // вызываем метод GetMatch3
+            }
+        }
+
+        if (direction == new Vector2(-1, 0) && x > 0) // to left
+        {
+            if (_canStartNewSwapAnimation)
+            {
+                SwapAnimation(x, y, direction);
+            }
+        }
+
+        if (direction == new Vector2(0, 1) && y < _column - 1) // to up
+        {
+            SwapAnimation(x, y, direction);
+        }
+
+        if (direction == new Vector2(0, -1) && y > 0) // to down
+        {
+            SwapAnimation(x, y, direction);
+        }
+    }
+
+    private void SwapAnimation(int x, int y, Vector2Int direction)
+    {
+        _canStartNewSwapAnimation = false;
+        var currentTilePosition = _itemsMatrix[x, y].transform.position;
+        var swapTileCoordinate = _itemsMatrix[x + direction.x, y + direction.y].transform.position;
+
+        _itemsMatrix[x, y].transform.DOMove(swapTileCoordinate, 0.3f).SetDelay(_delay);
+        _itemsMatrix[x + direction.x, y + direction.y].transform.DOMove(currentTilePosition, 0.3f).SetDelay(_delay)
+            .OnComplete(() => _canStartNewSwapAnimation = true);
+    }
 
     /// <summary>
     /// return choose player's set with 5 random element.
