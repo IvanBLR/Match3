@@ -202,7 +202,7 @@ public class GameFieldController : MonoBehaviour
             }
         }
 
-        GetMatchThreeOrMore();
+        GetMatchThreeOrMore(); // am I need it there?
     }
 
     /// <summary>
@@ -374,9 +374,9 @@ public class GameFieldController : MonoBehaviour
             {
                 returnHashSet.Add(point);
             }
-
-            currentPointsForDestroy.Clear();
         }
+
+        currentPointsForDestroy.Clear(); // изначально эта строчка была в блоке if
     }
 
     private void CheckVertical(int x, int y, int ID, HashSet<Vector3Int> pointsForDestroy)
@@ -439,13 +439,23 @@ public class GameFieldController : MonoBehaviour
 
     public void Swap(int x, int y, Vector2Int direction)
     {
+        HashSet<Vector3Int> match3 = new();
         if (direction == new Vector2(1, 0) && x < _row - 1) // to right
         {
             if (_canStartNewSwapAnimation)
             {
                 SwapAnimation(x, y, direction);
+                match3 = GetMatchThreeOrMore();
 
-                // вызываем метод GetMatch3
+                Debug.Log(450 + " " + match3.Count);
+                if (match3.Count > 0)
+                {
+                    StartCoroutine(DeleteMatchThree(match3));
+                }
+                else
+                {
+                    SwapAnimation(x, y, direction); 
+                }
             }
         }
 
@@ -454,22 +464,98 @@ public class GameFieldController : MonoBehaviour
             if (_canStartNewSwapAnimation)
             {
                 SwapAnimation(x, y, direction);
+                match3 = GetMatchThreeOrMore();
+
+                if (match3.Count > 0)
+                {
+                    StartCoroutine(DeleteMatchThree(match3));
+                }
+                else
+                {
+                    SwapAnimation(x, y, direction); 
+                }
             }
         }
 
         if (direction == new Vector2(0, 1) && y < _column - 1) // to up
         {
             SwapAnimation(x, y, direction);
+            match3 = GetMatchThreeOrMore();
+
+            if (match3.Count > 0)
+            {
+                StartCoroutine(DeleteMatchThree(match3));
+            }
+            else
+            {
+                SwapAnimation(x, y, direction); 
+            }
         }
 
         if (direction == new Vector2(0, -1) && y > 0) // to down
         {
             SwapAnimation(x, y, direction);
+            match3 = GetMatchThreeOrMore();
+
+            if (match3.Count > 0)
+            {
+                StartCoroutine(DeleteMatchThree(match3));
+            }
+            else
+            {
+                SwapAnimation(x, y, direction); 
+            }
+        }
+    }
+
+    private IEnumerator DeleteMatchThree(HashSet<Vector3Int> setForDelete)
+    {
+        yield return new WaitForSeconds(0.5f);
+        foreach (var point in setForDelete)
+        {
+            int x = point.x;
+            int y = point.y;
+
+            var localScale = _spriteRenderersMatrix[x, y].transform.localScale;
+            _spriteRenderersMatrix[x, y].transform.DOScale(Vector3.zero, 0.3f)
+                .OnComplete(() => _spriteRenderersMatrix[x, y].enabled = false);
+
+            _spriteRenderersMatrix[x, y].transform.localScale = localScale;
         }
     }
 
     private void SwapAnimation(int x, int y, Vector2Int direction)
     {
+        _canStartNewSwapAnimation = false;
+        var currentTileCoordinate = _itemsMatrix[x, y].transform.position;
+        var swapTileCoordinate = _itemsMatrix[x + direction.x, y + direction.y].transform.position;
+
+        _itemsMatrix[x, y].transform.DOMove(swapTileCoordinate, 0.3f).SetDelay(_delay);
+        _itemsMatrix[x + direction.x, y + direction.y].transform.DOMove(currentTileCoordinate, 0.3f).SetDelay(_delay)
+            .OnComplete(() => _canStartNewSwapAnimation = true);
+
+        /* при свапе Ёлементов нужно не только мен€ть их трансформ.позишн, но и их положение в _itemsMatrix[,].
+         * ћы ведь получаем Ёлемент по числам i & j, которые потом переводим в координаты грида.
+         * “.е. у нас в [,] Ёлемент под индексом [0,3] мен€ет свой трансформ.позишн, но положение в [,] он сохранил!
+         * —оответственно, при очередным обращении к [,] мы получим некорректные данные.
+         * ћы ожидаем, что Ёлемент под индексом [0,3] имеет такие же координаты,
+         * но у нас после свапа этот Ёлемент имеет уже другие координаты.
+         * ѕоэтому после свапа нужно через var temp изменить положение свапнутых Ёлемент в массиве,
+         * поместив их в новые €чейки [,]. –еализаци€ ниже
+         * */
+        var tempItem = _itemsMatrix[x, y];
+        var tempSpriteRenderer = _spriteRenderersMatrix[x, y];
+        _itemsMatrix[x, y] = _itemsMatrix[x + direction.x, y + direction.y];
+        _spriteRenderersMatrix[x, y] = _spriteRenderersMatrix[x + direction.x, y + direction.y];
+        _itemsMatrix[x + direction.x, y + direction.y] = tempItem;
+        _spriteRenderersMatrix[x + direction.x, y + direction.y] = tempSpriteRenderer;
+    }
+
+    private void SwapAnimationBack(int x, int y, Vector2Int direction)
+    {
+        direction.x *= -1;
+        direction.y *= -1;
+
         _canStartNewSwapAnimation = false;
         var currentTilePosition = _itemsMatrix[x, y].transform.position;
         var swapTileCoordinate = _itemsMatrix[x + direction.x, y + direction.y].transform.position;
@@ -477,6 +563,22 @@ public class GameFieldController : MonoBehaviour
         _itemsMatrix[x, y].transform.DOMove(swapTileCoordinate, 0.3f).SetDelay(_delay);
         _itemsMatrix[x + direction.x, y + direction.y].transform.DOMove(currentTilePosition, 0.3f).SetDelay(_delay)
             .OnComplete(() => _canStartNewSwapAnimation = true);
+
+        /* при свапе Ёлементов нужно не только мен€ть их трансформ.позишн, но и их положение в _itemsMatrix[,].
+         * ћы ведь получаем Ёлемент по числам i & j, которые потом переводим в координаты грида.
+         * “.е. у нас в [,] Ёлемент под индексом [0,3] мен€ет свой трансформ.позишн, но положение в [,] он сохранил!
+         * —оответственно, при очередным обращении к [,] мы получим некорректные данные.
+         * ћы ожидаем, что Ёлемент под индексом [0,3] имеет такие же координаты,
+         * но у нас после свапа этот Ёлемент имеет уже другие координаты.
+         * ѕоэтому после свапа нужно через var temp изменить положение свапнутых Ёлемент в массиве,
+         * поместив их в новые €чейки [,]. –еализаци€ ниже
+         * */
+        var tempItem = _itemsMatrix[x, y];
+        var tempSpriteRenderer = _spriteRenderersMatrix[x, y];
+        _itemsMatrix[x, y] = _itemsMatrix[x + direction.x, y + direction.y];
+        _spriteRenderersMatrix[x, y] = _spriteRenderersMatrix[x + direction.x, y + direction.y];
+        _itemsMatrix[x + direction.x, y + direction.y] = tempItem;
+        _spriteRenderersMatrix[x + direction.x, y + direction.y] = tempSpriteRenderer;
     }
 
     /// <summary>

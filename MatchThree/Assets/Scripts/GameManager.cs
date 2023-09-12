@@ -9,13 +9,15 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameFieldSettings _gameFieldSettings;
     [SerializeField] private EmptyGameField _emptyGameField;
     [SerializeField] private Grid _grid;
-
+    
+    private const float _minClickInterval = 0.4f;
+    private float _click;
     private Vector2 _offset;
     private Vector3 _hitPoint;
     private Vector3 _pointUp;
     private Vector3 _delta;
     private Vector3Int _hitPointInGridsCoordinate;
-
+   
     private void Awake() //                                                  done
     {
         _gameFieldSettings.GameSettingsAccepted += _gameFieldController.InitializeActualItemsListClassFields;
@@ -36,18 +38,21 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            _gameFieldController.FallDownItems();
-            _gameFieldController.Check();
-        }
+        _click += Time.deltaTime;
+       // if (Input.GetKeyDown(KeyCode.A))
+       // {
+       //     _gameFieldController.FallDownItems();
+       //     _gameFieldController.Check();
+       // }
 
-        if (Input.GetMouseButtonDown(0))
+      
+        if (Input.GetMouseButtonDown(0) && _click >= _minClickInterval)
         {
             CalculateHitPointCoordinate();
+            _click = 0;
         }
 
-        if (Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButtonUp(0) && _click >= _minClickInterval)
         {
             _pointUp = Input.mousePosition;
             _delta = _pointUp - _hitPoint;
