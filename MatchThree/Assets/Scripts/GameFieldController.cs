@@ -473,21 +473,21 @@ public class GameFieldController : MonoBehaviour
         {
             SwapAnimation(raycastHitDown, raycastHitUp, x, y, direction);
             match3 = GetMatchThreeOrMore();
-            
+
             if (match3.Count > 0)
             {
                 StartCoroutine(DeleteMatchThree(match3));
             }
             else
             {
-                //  Debug.Log("right direction, case ELSE. It meens there is NO match-3");
-                //  SwapAnimation(x, y, direction);
+                Debug.Log("right direction, start Coroutine");
+
+                StartCoroutine(ReturnAnimation(raycastHitDown, raycastHitUp, x, y, direction));
             }
         }
 
         if (direction == new Vector2(-1, 0)) // to left
         {
-           
             SwapAnimation(raycastHitDown, raycastHitUp, x, y, direction);
             match3 = GetMatchThreeOrMore();
 
@@ -497,8 +497,9 @@ public class GameFieldController : MonoBehaviour
             }
             else
             {
-                //Debug.Log("left direction, case ELSE. It meens there is NO match-3");
-                //  SwapAnimation(x, y, direction);
+                Debug.Log("left direction, start Coroutine");
+
+                StartCoroutine(ReturnAnimation(raycastHitDown, raycastHitUp, x, y, direction));
             }
         }
 
@@ -513,8 +514,9 @@ public class GameFieldController : MonoBehaviour
             }
             else
             {
-                // SwapAnimation(x, y, direction);
-                // Debug.Log("up direction, case ELSE. It meens there is NO match-3");
+                Debug.Log("up direction, start Coroutine");
+
+                StartCoroutine(ReturnAnimation(raycastHitDown, raycastHitUp, x, y, direction));
             }
         }
 
@@ -529,13 +531,21 @@ public class GameFieldController : MonoBehaviour
             }
             else
             {
-                // Debug.Log($"down direction, case ELSE. It meens there is NO match-3, x = {x}, y = {y}, direction = {direction}");
-                //   SwapAnimation(x, y, direction);
+                Debug.Log("down direction, start Coroutine");
+
+                StartCoroutine(ReturnAnimation(raycastHitDown, raycastHitUp, x, y, direction));
             }
         }
     }
 
-    private IEnumerator DeleteMatchThree(HashSet<Vector3Int> setForDelete) // need re-build
+    private IEnumerator ReturnAnimation(RaycastHit2D hitDown, RaycastHit2D hitUp, int x, int y, Vector2Int direction)
+    {
+        yield return null;
+        yield return new WaitForSeconds(_delay + 0.3f);
+        SwapAnimation(hitDown, hitUp, x, y, direction);
+    }
+
+    private IEnumerator DeleteMatchThree(HashSet<Vector3Int> setForDelete) // need re-build?
     {
         yield return new WaitForSeconds(0.5f);
         foreach (var point in setForDelete)
@@ -552,23 +562,36 @@ public class GameFieldController : MonoBehaviour
     }
 
     private void SwapAnimation(RaycastHit2D hitDown, RaycastHit2D hitUp, int x, int y,
-            Vector2Int direction) // не совсем корректно. Бывают свапы по диагонали
+        Vector2Int direction) // done?
     {
         if (hitDown.collider != null && hitUp.collider != null)
         {
+            Debug.Log("           _____________________ ");
+            Debug.Log($"itemMatrix[x, y].sprite is {_itemsMatrix[x, y].ItemSettings.Icon.name}");
+            Debug.Log(
+                $"itemMatrix[x + dir.x, y + dir.y].sprite is {_itemsMatrix[x + direction.x, y + direction.y].ItemSettings.Icon.name}");
             RectTransform firstTile = (RectTransform)hitDown.transform; // maybe easy Transform?
             RectTransform secondTile = (RectTransform)hitUp.transform; // maybe easy Transform?
 
             firstTile.DOMove(secondTile.position, 0.3f).SetDelay(_delay);
             secondTile.DOMove(firstTile.position, 0.3f).SetDelay(_delay);
 
+            Debug.Log("     _________________                 ");
+
             var tempItem = _itemsMatrix[x, y];
-            _itemsMatrix[x, y] = _itemsMatrix[x + direction.x, y + direction.y];
+            _itemsMatrix[x, y] =
+                _itemsMatrix
+                    [x + direction.x, y + direction.y]; // после возврата на исходные позиции -> IndexOutOfRangeEx
             _itemsMatrix[x + direction.x, y + direction.y] = tempItem;
 
             var tempSpriteRenderer = _spriteRenderersMatrix[x, y];
-            _spriteRenderersMatrix[x, y] = _spriteRenderersMatrix[x + direction.x, y + direction.y];
-            _spriteRenderersMatrix[x + direction.x, y + direction.y] = tempSpriteRenderer;
+            _spriteRenderersMatrix[x, y] = _spriteRenderersMatrix[x + direction.x, y + direction.y]; // не надо нажимать
+            _spriteRenderersMatrix[x + direction.x, y + direction.y] = tempSpriteRenderer; // alt + enter
+
+
+            Debug.Log($"itemMatrix[x, y].sprite is {_itemsMatrix[x, y].ItemSettings.Icon.name}");
+            Debug.Log(
+                $"itemMatrix[x + dir.x, y + dir.y].sprite is {_itemsMatrix[x + direction.x, y + direction.y].ItemSettings.Icon.name}");
         }
     }
 
