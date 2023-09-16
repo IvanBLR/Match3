@@ -3319,9 +3319,9 @@ MonoBehaviour:
   _background: {fileID: 247021328}
   _settingsCanvas: {fileID: 1930906206}
   _invalidCanvas: {fileID: 654414776}
-  _bearsSet: {fileID: 1793543138}
-  _cakesSet: {fileID: 1814679981}
-  _stuffSet: {fileID: 387440211}
+  _autoSet: {fileID: 1793543138}
+  _westerosSet: {fileID: 1814679981}
+  _forexSet: {fileID: 387440211}
 --- !u!4 &1970425240
 Transform:
   m_ObjectHideFlags: 0

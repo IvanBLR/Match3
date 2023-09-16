@@ -2,14 +2,17 @@ using JetBrains.Annotations;
 using System;
 using System.Collections;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class GameFieldSettings : MonoBehaviour
 {
     public Action GameSettingsAccepted;
-    
+
     public Action<int, int> GameFieldRawSizeChanged;
     public Action<int, int> GameFieldColumnSizeChanged;
 
@@ -25,10 +28,19 @@ public class GameFieldSettings : MonoBehaviour
     [SerializeField] private Canvas _settingsCanvas;
     [SerializeField] private Canvas _invalidCanvas;
 
-    [SerializeField] private Button _bearsSet;
-    [SerializeField] private Button _cakesSet;
-    [SerializeField] private Button _stuffSet;
+    [FormerlySerializedAs("_bearsSet")] [SerializeField]
+    private Button _autoSet;
 
+    [FormerlySerializedAs("_cakesSet")] [SerializeField]
+    private Button _westerosSet;
+
+    [FormerlySerializedAs("_stuffSet")] [SerializeField]
+    private Button _forexSet;
+
+  //  private Button _selectedButton;
+//
+  //  private Color _highlightColor;
+  //  private Color _normalColor;
     private Coroutine _currentSetActiveAttention;
 
     private void Awake()
@@ -40,6 +52,40 @@ public class GameFieldSettings : MonoBehaviour
         _invalidCanvas.enabled = false;
         StartCoroutine(CheckValidateWindowAspect());
     }
+
+  //  private void Start()
+  //  {
+  //      _autoSet.onClick.AddListener(() => OnButtonClick(_autoSet));
+  //      _westerosSet.onClick.AddListener(() => OnButtonClick(_westerosSet));
+  //      _forexSet.onClick.AddListener(() => OnButtonClick(_forexSet));
+  //  }
+//
+  //  [UsedImplicitly]
+  //  private UnityAction OnButtonClick(Button autoSet)
+  //  {
+  //      if (_selectedButton != null)
+  //      {
+  //          SetButtonHighlightState(_selectedButton, false);
+  //      }
+//
+  //      _selectedButton = autoSet;
+  //      SetButtonHighlightState(_selectedButton, true);
+  //      return null;
+  //  }
+//
+  //  private void SetButtonHighlightState(Button button, bool isHighlighted)
+  //  {
+  //      Image buttonImage = button.GetComponent<Image>();
+//
+  //      if (isHighlighted)
+  //      {
+  //          buttonImage.color = _highlightColor;
+  //      }
+  //      else
+  //      {
+  //          buttonImage.color = _normalColor;
+  //      }
+  //  }
 
     private IEnumerator CheckValidateWindowAspect()
     {
@@ -211,6 +257,4 @@ public class GameFieldSettings : MonoBehaviour
         yield return new WaitForSeconds(0.4f);
         _attentionText.enabled = false;
     }
-
-   
 }

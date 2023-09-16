@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Schema;
 using DG.Tweening;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -32,6 +33,18 @@ public class GameFieldController : MonoBehaviour
     private int _row;
     private int _column;
 
+
+    public Item[,] IIII => _itemsMatrix;
+
+
+    /*
+     * кароч, что надо сделать. Нужно использовать луч, получать компонент Item, оттуда получать уже nameID,
+     * и таким образом проводить сравнение на Матч3. Причем сравнивать Э нужно только в трёх направлениях!
+     * Создаём лист<> SpriteRenderer, в нём меняем Э по индексу. И через этот же лист ищем матч3.
+     * Оставляем прежние методы. Первичное заполнение игрового поля работает корректно, а большего и не требуется.
+     * Пишем новый код
+     *
+     */
 
     private void Start()
     {
@@ -71,8 +84,8 @@ public class GameFieldController : MonoBehaviour
                 int indexCurrentSettings = GetCurrentSettingsIndex(i, j);
                 var currentSettings = _actualItemsList[indexCurrentSettings];
 
-                _itemsMatrix[i, j].ItemSettings = currentSettings; // am I need both?
-                _spriteRenderersMatrix[i, j].sprite = currentSettings.Icon; // am I need both?
+                _itemsMatrix[i, j].ItemSettings = currentSettings;
+                _spriteRenderersMatrix[i, j].sprite = currentSettings.Icon;
 
                 var targetScale = tile.transform.localScale;
                 tile.transform.localScale = Vector3.zero;
@@ -85,9 +98,22 @@ public class GameFieldController : MonoBehaviour
 
     public void Check()
     {
-        _itemsMatrix[3, 3].transform.position = Vector3.zero;
+        for (int i = 0; i < _itemsMatrix.GetLength((0)); i++)
+        {
+            for (int j = 0; j < _itemsMatrix.GetLength((1)); j++)
+            {
+                //  Debug.Log(_itemsMatrix[i, j].transform.position);
+            }
+        }
+    }
 
-        Debug.Log(_itemsMatrix[3, 3].transform.position == _spriteRenderersMatrix[3, 3].transform.position);
+    public void SSS()
+    {
+        //int amount = _parent.childCount;
+        //for (int i = 0; i < amount; i++)
+        //{
+        //    _tiles.Add(_parent.GetChild(i).gameObject);
+        //}
     }
 
     private int[] GetActualNameID()
@@ -161,7 +187,6 @@ public class GameFieldController : MonoBehaviour
    5. после заполнения игрового поля нужно не забыть _currentEmptiesCells[,] присвоить значения false
  }*/
 
-
     /// <summary>
     /// Метод падения элементов. После очередного падения этот метод нужно вызывать снова
     /// </summary>
@@ -209,7 +234,7 @@ public class GameFieldController : MonoBehaviour
     /// Вспомогательный метод. Попутно заполняет _currentEmptiesCells[,] 
     /// </summary>
     private void FallingAnimation(List<List<Vector3Int>> itemCoordinatesForFalling, int i, int j,
-        List<Vector3Int> sortedCoordinates) //  done. 
+        List<Vector3Int> sortedCoordinates) //  done? перемещается ли transform.Position?
     {
         var tileForFalling =
             _spriteRenderersMatrix[itemCoordinatesForFalling[i][j].x,
@@ -339,7 +364,7 @@ public class GameFieldController : MonoBehaviour
         return arrayForReturn;
     }
 
-    private HashSet<Vector3Int> GetMatchThreeOrMore() // done 
+    private HashSet<Vector3Int> GetMatchThreeOrMore() // need re-build
     {
         HashSet<Vector3Int> returnHashSet = new();
         HashSet<Vector3Int> currentPointsForDestroy = new();
@@ -366,7 +391,8 @@ public class GameFieldController : MonoBehaviour
     /// <summary>
     /// метод дополнительной проверки корректности полученных координат Match-3
     /// </summary>
-    private void CheckValidate(HashSet<Vector3Int> currentPointsForDestroy, HashSet<Vector3Int> returnHashSet)
+    private void
+        CheckValidate(HashSet<Vector3Int> currentPointsForDestroy, HashSet<Vector3Int> returnHashSet) // need re-build
     {
         if (currentPointsForDestroy.Count > 2)
         {
@@ -376,10 +402,10 @@ public class GameFieldController : MonoBehaviour
             }
         }
 
-        currentPointsForDestroy.Clear(); // изначально эта строчка была в блоке if
+        currentPointsForDestroy.Clear();
     }
 
-    private void CheckVertical(int x, int y, int ID, HashSet<Vector3Int> pointsForDestroy)
+    private void CheckVertical(int x, int y, int ID, HashSet<Vector3Int> pointsForDestroy) // need re-build
     {
         pointsForDestroy.Add(new Vector3Int(x, y));
         for (int j = y + 1; j < _column; j++)
@@ -408,7 +434,7 @@ public class GameFieldController : MonoBehaviour
         }
     }
 
-    private void CheckHorizontal(int x, int y, int ID, HashSet<Vector3Int> pointsForDestroy)
+    private void CheckHorizontal(int x, int y, int ID, HashSet<Vector3Int> pointsForDestroy) //need re-build
     {
         pointsForDestroy.Add(new Vector3Int(x, y));
         for (int i = x + 1; i < _row; i++)
@@ -437,49 +463,32 @@ public class GameFieldController : MonoBehaviour
         }
     }
 
-    public void Swap(int x, int y, Vector2Int direction)
+
+    public void Swap(RaycastHit2D raycastHitDown, RaycastHit2D raycastHitUp, int x, int y,
+        Vector2Int direction) // need re-build
     {
         HashSet<Vector3Int> match3 = new();
-        if (direction == new Vector2(1, 0) && x < _row - 1) // to right
-        {
-            if (_canStartNewSwapAnimation)
-            {
-                SwapAnimation(x, y, direction);
-                match3 = GetMatchThreeOrMore();
 
-                Debug.Log(450 + " " + match3.Count);
-                if (match3.Count > 0)
-                {
-                    StartCoroutine(DeleteMatchThree(match3));
-                }
-                else
-                {
-                    SwapAnimation(x, y, direction); 
-                }
+        if (direction == new Vector2(1, 0)) // to right
+        {
+            SwapAnimation(raycastHitDown, raycastHitUp, x, y, direction);
+            match3 = GetMatchThreeOrMore();
+            
+            if (match3.Count > 0)
+            {
+                StartCoroutine(DeleteMatchThree(match3));
+            }
+            else
+            {
+                //  Debug.Log("right direction, case ELSE. It meens there is NO match-3");
+                //  SwapAnimation(x, y, direction);
             }
         }
 
-        if (direction == new Vector2(-1, 0) && x > 0) // to left
+        if (direction == new Vector2(-1, 0)) // to left
         {
-            if (_canStartNewSwapAnimation)
-            {
-                SwapAnimation(x, y, direction);
-                match3 = GetMatchThreeOrMore();
-
-                if (match3.Count > 0)
-                {
-                    StartCoroutine(DeleteMatchThree(match3));
-                }
-                else
-                {
-                    SwapAnimation(x, y, direction); 
-                }
-            }
-        }
-
-        if (direction == new Vector2(0, 1) && y < _column - 1) // to up
-        {
-            SwapAnimation(x, y, direction);
+           
+            SwapAnimation(raycastHitDown, raycastHitUp, x, y, direction);
             match3 = GetMatchThreeOrMore();
 
             if (match3.Count > 0)
@@ -488,13 +497,14 @@ public class GameFieldController : MonoBehaviour
             }
             else
             {
-                SwapAnimation(x, y, direction); 
+                //Debug.Log("left direction, case ELSE. It meens there is NO match-3");
+                //  SwapAnimation(x, y, direction);
             }
         }
 
-        if (direction == new Vector2(0, -1) && y > 0) // to down
+        if (direction == new Vector2(0, 1)) // to up
         {
-            SwapAnimation(x, y, direction);
+            SwapAnimation(raycastHitDown, raycastHitUp, x, y, direction);
             match3 = GetMatchThreeOrMore();
 
             if (match3.Count > 0)
@@ -503,12 +513,29 @@ public class GameFieldController : MonoBehaviour
             }
             else
             {
-                SwapAnimation(x, y, direction); 
+                // SwapAnimation(x, y, direction);
+                // Debug.Log("up direction, case ELSE. It meens there is NO match-3");
+            }
+        }
+
+        if (direction == new Vector2(0, -1)) // to down
+        {
+            SwapAnimation(raycastHitDown, raycastHitUp, x, y, direction);
+            match3 = GetMatchThreeOrMore();
+
+            if (match3.Count > 0)
+            {
+                StartCoroutine(DeleteMatchThree(match3));
+            }
+            else
+            {
+                // Debug.Log($"down direction, case ELSE. It meens there is NO match-3, x = {x}, y = {y}, direction = {direction}");
+                //   SwapAnimation(x, y, direction);
             }
         }
     }
 
-    private IEnumerator DeleteMatchThree(HashSet<Vector3Int> setForDelete)
+    private IEnumerator DeleteMatchThree(HashSet<Vector3Int> setForDelete) // need re-build
     {
         yield return new WaitForSeconds(0.5f);
         foreach (var point in setForDelete)
@@ -524,31 +551,32 @@ public class GameFieldController : MonoBehaviour
         }
     }
 
-    private void SwapAnimation(int x, int y, Vector2Int direction)
+    private void SwapAnimation(RaycastHit2D hitDown, RaycastHit2D hitUp, int x, int y,
+            Vector2Int direction) // не совсем корректно. Бывают свапы по диагонали
     {
-        _canStartNewSwapAnimation = false;
-        var currentTileCoordinate = _itemsMatrix[x, y].transform.position;
-        var swapTileCoordinate = _itemsMatrix[x + direction.x, y + direction.y].transform.position;
+        if (hitDown.collider != null && hitUp.collider != null)
+        {
+            RectTransform firstTile = (RectTransform)hitDown.transform; // maybe easy Transform?
+            RectTransform secondTile = (RectTransform)hitUp.transform; // maybe easy Transform?
 
-        _itemsMatrix[x, y].transform.DOMove(swapTileCoordinate, 0.3f).SetDelay(_delay);
-        _itemsMatrix[x + direction.x, y + direction.y].transform.DOMove(currentTileCoordinate, 0.3f).SetDelay(_delay)
-            .OnComplete(() => _canStartNewSwapAnimation = true);
+            firstTile.DOMove(secondTile.position, 0.3f).SetDelay(_delay);
+            secondTile.DOMove(firstTile.position, 0.3f).SetDelay(_delay);
 
-        /* при свапе Элементов нужно не только менять их трансформ.позишн, но и их положение в _itemsMatrix[,].
-         * Мы ведь получаем Элемент по числам i & j, которые потом переводим в координаты грида.
-         * Т.е. у нас в [,] Элемент под индексом [0,3] меняет свой трансформ.позишн, но положение в [,] он сохранил!
-         * Соответственно, при очередным обращении к [,] мы получим некорректные данные.
-         * Мы ожидаем, что Элемент под индексом [0,3] имеет такие же координаты,
-         * но у нас после свапа этот Элемент имеет уже другие координаты.
-         * Поэтому после свапа нужно через var temp изменить положение свапнутых Элемент в массиве,
-         * поместив их в новые ячейки [,]. Реализация ниже
-         * */
-        var tempItem = _itemsMatrix[x, y];
-        var tempSpriteRenderer = _spriteRenderersMatrix[x, y];
-        _itemsMatrix[x, y] = _itemsMatrix[x + direction.x, y + direction.y];
-        _spriteRenderersMatrix[x, y] = _spriteRenderersMatrix[x + direction.x, y + direction.y];
-        _itemsMatrix[x + direction.x, y + direction.y] = tempItem;
-        _spriteRenderersMatrix[x + direction.x, y + direction.y] = tempSpriteRenderer;
+            var tempItem = _itemsMatrix[x, y];
+            _itemsMatrix[x, y] = _itemsMatrix[x + direction.x, y + direction.y];
+            _itemsMatrix[x + direction.x, y + direction.y] = tempItem;
+
+            var tempSpriteRenderer = _spriteRenderersMatrix[x, y];
+            _spriteRenderersMatrix[x, y] = _spriteRenderersMatrix[x + direction.x, y + direction.y];
+            _spriteRenderersMatrix[x + direction.x, y + direction.y] = tempSpriteRenderer;
+        }
+    }
+
+    private void CorrectPosition(Vector3 coordinate) // ни на что не влияет. Надо как-то мначе исправлять 0.0499999 по Х
+    {
+        coordinate.x = (float)Math.Round(coordinate.x, 2);
+        coordinate.y = (float)Math.Round(coordinate.y, 2);
+        coordinate.z = (float)Math.Round(coordinate.z, 2);
     }
 
     private void SwapAnimationBack(int x, int y, Vector2Int direction)
@@ -573,12 +601,12 @@ public class GameFieldController : MonoBehaviour
          * Поэтому после свапа нужно через var temp изменить положение свапнутых Элемент в массиве,
          * поместив их в новые ячейки [,]. Реализация ниже
          * */
-        var tempItem = _itemsMatrix[x, y];
-        var tempSpriteRenderer = _spriteRenderersMatrix[x, y];
-        _itemsMatrix[x, y] = _itemsMatrix[x + direction.x, y + direction.y];
-        _spriteRenderersMatrix[x, y] = _spriteRenderersMatrix[x + direction.x, y + direction.y];
-        _itemsMatrix[x + direction.x, y + direction.y] = tempItem;
-        _spriteRenderersMatrix[x + direction.x, y + direction.y] = tempSpriteRenderer;
+        // var tempItem = _itemsMatrix[x, y];
+        // var tempSpriteRenderer = _spriteRenderersMatrix[x, y];
+        // _itemsMatrix[x, y] = _itemsMatrix[x + direction.x, y + direction.y];
+        // _spriteRenderersMatrix[x, y] = _spriteRenderersMatrix[x + direction.x, y + direction.y];
+        // _itemsMatrix[x + direction.x, y + direction.y] = tempItem;
+        // _spriteRenderersMatrix[x + direction.x, y + direction.y] = tempSpriteRenderer;
     }
 
     /// <summary>
