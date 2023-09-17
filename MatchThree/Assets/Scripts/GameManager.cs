@@ -45,8 +45,8 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.A))
         {
             //_gameFieldController.FallDownItems();
-            _gameFieldController.SSS();
-            _gameFieldController.Check();
+           // _gameFieldController.SSS();
+            //_gameFieldController.Check();
         }
 
 
@@ -68,13 +68,7 @@ public class GameManager : MonoBehaviour
 
             int deltaX = _hitPointUp.x - _hitPointDown.x;
             int deltaY = _hitPointUp.y - _hitPointDown.y;
-            //Debug.Log($"deltaX = {deltaX}, deltaY = {deltaY}, hitPointDown.x = {_hitPointDown.x}, hitPointUp.x = {_hitPointUp.x}, hitPointDown.y = {_hitPointDown.y}, hitPointUp.y = {_hitPointUp.y}");
-
-
-            // _delta = _hitPointUp - _hitPointDown;
-
-            //_raycastHit2Dsecond = Physics2D.Raycast()
-
+           
             if (Math.Abs(deltaX) > Math.Abs(deltaY)) // horisontal swap
             {
                 if (deltaX == 1 && deltaY == 0) // to right

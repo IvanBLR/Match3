@@ -12,8 +12,6 @@ using Random = System.Random;
 
 public class GameFieldController : MonoBehaviour
 {
-    public Action TouchedTheItem;
-
     public Action InitializationActualItemsCompleted;
     public Action FilledGameBoard;
     [SerializeField] private Grid _grid;
@@ -26,30 +24,11 @@ public class GameFieldController : MonoBehaviour
     private int[] _actualNameID = new int[5];
     private SpriteRenderer[,] _spriteRenderersMatrix;
     private Item[,] _itemsMatrix;
-    private bool[,] _currentEmptiesCells;
-    private bool _canStartNewSwapAnimation = true;
+
     private readonly float _delay = 0.1f;
     private int _itemCollectionsNumber;
     private int _row;
     private int _column;
-
-
-    public Item[,] IIII => _itemsMatrix;
-
-
-    /*
-     * кароч, что надо сделать. Нужно использовать луч, получать компонент Item, оттуда получать уже nameID,
-     * и таким образом проводить сравнение на Матч3. Причем сравнивать Э нужно только в трёх направлениях!
-     * Создаём лист<> SpriteRenderer, в нём меняем Э по индексу. И через этот же лист ищем матч3.
-     * Оставляем прежние методы. Первичное заполнение игрового поля работает корректно, а большего и не требуется.
-     *
-
-
-
-
-     * Пишем новый код падения элементов
-     *
-     */
 
     private void Start()
     {
@@ -67,8 +46,6 @@ public class GameFieldController : MonoBehaviour
         _parent.position = _grid.transform.position;
         _spriteRenderersMatrix = new SpriteRenderer[_row, _column];
         _itemsMatrix = new Item[_row, _column];
-        _currentEmptiesCells = new bool[_row, _column]; // свободна ячейка? -> true, иначе false.
-        // x и y являются координатами для Vector3Int
 
         InitializationActualItemsCompleted?.Invoke();
     }
@@ -101,27 +78,117 @@ public class GameFieldController : MonoBehaviour
         FilledGameBoard?.Invoke();
     }
 
-    public void Check()
+    public void Swap(RaycastHit2D hitDown, RaycastHit2D hitUp, int x, int y, Vector2Int direction) // done
     {
-        for (int i = 0; i < _itemsMatrix.GetLength((0)); i++)
+        HashSet<Vector3Int> match3 = new();
+
+        if (direction == new Vector2(1, 0)) // to right
         {
-            for (int j = 0; j < _itemsMatrix.GetLength((1)); j++)
+            SwapAnimation(hitDown, hitUp, x, y, direction);
+            match3 = GetMatchThreeOrMore();
+
+            if (match3.Count > 0)
             {
-                //  Debug.Log(_itemsMatrix[i, j].transform.position);
+                StartCoroutine(RestoreGameField(match3));
+            }
+            else
+            {
+                StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
+            }
+        }
+
+        if (direction == new Vector2(-1, 0)) // to left
+        {
+            SwapAnimation(hitDown, hitUp, x, y, direction);
+            match3 = GetMatchThreeOrMore();
+
+            if (match3.Count > 0)
+            {
+                StartCoroutine(RestoreGameField(match3));
+            }
+            else
+            {
+                StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
+            }
+        }
+
+        if (direction == new Vector2(0, 1)) // to up
+        {
+            SwapAnimation(hitDown, hitUp, x, y, direction);
+            match3 = GetMatchThreeOrMore();
+
+            if (match3.Count > 0)
+            {
+                StartCoroutine(RestoreGameField(match3));
+            }
+            else
+            {
+                StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
+            }
+        }
+
+        if (direction == new Vector2(0, -1)) // to down
+        {
+            SwapAnimation(hitDown, hitUp, x, y, direction);
+            match3 = GetMatchThreeOrMore();
+
+            if (match3.Count > 0)
+            {
+                StartCoroutine(RestoreGameField(match3));
+            }
+            else
+            {
+                StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
             }
         }
     }
 
-    public void SSS()
+    private void SwapAnimation(RaycastHit2D hitDown, RaycastHit2D hitUp, int x, int y,
+        Vector2Int direction) // done
     {
-        //int amount = _parent.childCount;
-        //for (int i = 0; i < amount; i++)
-        //{
-        //    _tiles.Add(_parent.GetChild(i).gameObject);
-        //}
+        if (hitDown.collider != null && hitUp.collider != null)
+        {
+            RectTransform firstTile = (RectTransform)hitDown.transform; // maybe easy Transform?
+            RectTransform secondTile = (RectTransform)hitUp.transform; // maybe easy Transform?
+
+            firstTile.DOMove(secondTile.position, 0.3f).SetDelay(_delay);
+            secondTile.DOMove(firstTile.position, 0.3f).SetDelay(_delay);
+
+            var tempItem = _itemsMatrix[x, y];
+            _itemsMatrix[x, y] = _itemsMatrix[x + direction.x, y + direction.y]; // не надо нажимать
+            _itemsMatrix[x + direction.x, y + direction.y] = tempItem; // alt + enter
+
+            var tempSpriteRenderer = _spriteRenderersMatrix[x, y];
+            _spriteRenderersMatrix[x, y] = _spriteRenderersMatrix[x + direction.x, y + direction.y]; // не надо нажимать
+            _spriteRenderersMatrix[x + direction.x, y + direction.y] = tempSpriteRenderer; // alt + enter
+        }
     }
 
-    private int[] GetActualNameID()
+    /// <summary>
+    /// return choose player's set with 5 random element.
+    /// After -> fill the gameField with the elements
+    /// </summary>
+    private List<ItemScriptableObject> GetActualItemsList() //done
+    {
+        _itemCollectionsNumber = PlayerPrefs.GetInt(PlayerSettingsConst.PLAYING_SET);
+        List<ItemScriptableObject> actualItemsListForReturn = new();
+        Random random = new Random();
+        var actualItemSettingsProvider = _allVariantsItemsCollections.ElementAt(_itemCollectionsNumber);
+        var actualItemsCollection = actualItemSettingsProvider.ItemsList;
+        int[] unicIndexes = Enumerable.Range(0, actualItemsCollection.Count)
+            .OrderBy(x => random.Next())
+            .Take(5)
+            .ToArray();
+        for (int i = 0; i < 5; i++)
+        {
+            int index = unicIndexes[i];
+            actualItemsListForReturn.Add(actualItemsCollection[index]);
+        }
+
+        return actualItemsListForReturn;
+    }
+
+    private int[] GetActualNameID() // done. Вспомогательный метод
     {
         int[] actualNameID = new int[5];
         for (int i = 0; i < 5; i++)
@@ -130,10 +197,10 @@ public class GameFieldController : MonoBehaviour
         }
 
         return actualNameID;
-    } // done. Вспомогательный метод
+    }
 
     /// <summary>
-    ///  Метод помогает заполнить пустые ячейки, вернув нужный settingsIndex, оторый гарантирует, что нигде не будет match-3
+    ///  Метод помогает заполнить пустые ячейки, вернув нужный IndexSettings, kоторый гарантирует, что нигде не будет match-3
     /// /// </summary>
     private int GetCurrentSettingsIndex(int x, int y) // done.
     {
@@ -173,40 +240,35 @@ public class GameFieldController : MonoBehaviour
         {
             int index = random.Next(0, 5);
             currentID = _actualNameID[index];
-            if (checkList.Contains(currentID))
-                continue;
-            else return index;
+            if (!checkList.Contains(currentID)) return index;
         }
     }
 
-/* 1. смотрим, где есть свободные ячейки                                                                                 done
-   1a. получаем их координаты                                                                                            done
-   2. все элементы, которые находятся сверху над свободными позициями, должны упасть вниз                                done
-   2a. найти координаты этих Элементов.                                                                                  done
-   2б. Надо как-то разделить элементы-для-падения на колонки, чтобы анимация вычислялась для каждой колонки отдельно     done
+    private void DeleteMatchThree(HashSet<Vector3Int> setForDelete) // done
+    {
+        foreach (var point in setForDelete)
+        {
+            int x = point.x;
+            int y = point.y;
 
+            var localScale = _spriteRenderersMatrix[x, y].transform.localScale;
+            _spriteRenderersMatrix[x, y].transform.DOScale(Vector3.zero, 0.3f)
+                .OnComplete(() =>
+                {
+                    _spriteRenderersMatrix[x, y].gameObject.SetActive(false);
+                    _spriteRenderersMatrix[x, y].transform.localScale = localScale;
+                });
+        }
+    }
 
-   3а. после тотального падения, надо найти координаты новых свободных ячеек (я использую   _currentEmptiesCells)         done
-   3б. нужно проверить, нет ли совпадений матч-3                                                                         done
-   4. и наконец, надо заполнить игровое поле
-   5. после заполнения игрового поля нужно не забыть _currentEmptiesCells[,] присвоить значения false
- }*/
-
-    /// <summary>
-    /// Метод падения элементов. После очередного падения этот метод нужно вызывать снова
-    /// </summary>
-    public void FallDownItems() //                                         done
+    private void FallDownItems() //                                         done
     {
         var emptyCoordinates = GetAllEmptyCoordinates();
         var itemCoordinatesForFalling = GetItemsCoordinatesForFalling(emptyCoordinates);
 
         for (int i = 0; i < emptyCoordinates.Count; i++)
         {
-            if (emptyCoordinates[i].Count == 0)
-            {
-                continue;
-            }
-            else
+            if (emptyCoordinates[i].Count != 0)
             {
                 List<Vector3Int> newEmptyCoordinates = emptyCoordinates[i];
 
@@ -224,22 +286,12 @@ public class GameFieldController : MonoBehaviour
                         FallingAnimation(itemCoordinatesForFalling, i, n, sortedCoordinates);
                     }
                 }
-              //  else
-              //  {
-              //      var firstEmptyCell = emptyCoordinates[i][0];
-              //      FillCurrentEmptiesCellsArray(firstEmptyCell, true);
-              //  }
             }
         }
-
-        //  GetMatchThreeOrMore(); // am I need it there?
     }
 
-    /// <summary>
-    /// Вспомогательный метод. Попутно заполняет _currentEmptiesCells[,] 
-    /// </summary>
     private void FallingAnimation(List<List<Vector3Int>> coordinatesForFalling, int i, int j,
-        List<Vector3Int> sortedCoordinates) //                done? 
+        List<Vector3Int> sortedCoordinates) // done
     {
         var firstPoint = coordinatesForFalling[i][j];
         var secondPoint = sortedCoordinates[j];
@@ -257,32 +309,27 @@ public class GameFieldController : MonoBehaviour
         var tempItem = _itemsMatrix[firstPoint.x, firstPoint.y];
         _itemsMatrix[firstPoint.x, firstPoint.y] = _itemsMatrix[secondPoint.x, secondPoint.y];
         _itemsMatrix[secondPoint.x, secondPoint.y] = tempItem;
-
-       // if (coordinatesForFalling[i].Count - j == 1)
-       // {
-       //     FillCurrentEmptiesCellsArray(sortedCoordinates[j]);
-       // }
     }
 
-    /// <summary>
-    /// метод заполняет _currentEmptiesCells[,] нужными значениями после каждого падения Элементов
-    /// </summary>
-    private void FillCurrentEmptiesCellsArray(Vector3Int point, bool isFirst = false) // done
+
+    private void FillEmptyCellsAfterMatch3() // done
     {
-        if (isFirst)
+        var emptyCells = GetAllEmptyCoordinates();
+        HashSet<int> ID = new();
+        Random random = new Random();
+
+        for (int i = 0; i < emptyCells.Count; i++)
         {
-            int x = point.x;
-            for (int y = point.y; y < _column; y++)
+            for (int j = 0; j < emptyCells[i].Count; j++)
             {
-                _currentEmptiesCells[x, y] = true;
-            }
-        }
-        else
-        {
-            int x = point.x;
-            for (int y = point.y + 1; y < _column; y++)
-            {
-                _currentEmptiesCells[x, y] = true;
+                int x = emptyCells[i][j].x;
+                int y = emptyCells[i][j].y;
+
+                int currentSettingsIndex = GetCurrentSettingsIndex(x, y);
+                _spriteRenderersMatrix[x, y].gameObject.SetActive(true);
+
+                _itemsMatrix[x, y].ItemSettings = _actualItemsList[currentSettingsIndex];
+                _spriteRenderersMatrix[x, y].sprite = _itemsMatrix[x, y].ItemSettings.Icon;
             }
         }
     }
@@ -350,9 +397,7 @@ public class GameFieldController : MonoBehaviour
     {
         List<List<Vector3Int>> returnList = new();
 
-        int currentIndex = 0;
-
-        for (int i = currentIndex; i < _row; i++)
+        for (int i = 0; i < _row; i++)
         {
             var currentList = GetEmptyCoordinatesInCurrentColumnInGridNotation(i);
             returnList.Add(currentList);
@@ -370,7 +415,7 @@ public class GameFieldController : MonoBehaviour
         for (int j = 0; j < _column; j++)
         {
             var currentSpriteRenderer = _spriteRenderersMatrix[rowIndex, j];
-            if (currentSpriteRenderer.enabled == false)
+            if (!currentSpriteRenderer.gameObject.activeSelf) //currentSpriteRenderer.enabled == false)
             {
                 var emptyPosition = new Vector3Int(rowIndex, j);
                 arrayForReturn.Add(emptyPosition);
@@ -380,7 +425,7 @@ public class GameFieldController : MonoBehaviour
         return arrayForReturn;
     }
 
-    private HashSet<Vector3Int> GetMatchThreeOrMore() // done?
+    private HashSet<Vector3Int> GetMatchThreeOrMore() // done
     {
         HashSet<Vector3Int> returnHashSet = new();
         HashSet<Vector3Int> currentPointsForDestroy = new();
@@ -389,7 +434,7 @@ public class GameFieldController : MonoBehaviour
         {
             for (int j = 0; j < _column; j++)
             {
-                if (_spriteRenderersMatrix[i, j].enabled == true) //if (!_currentEmptiesCells[i, j])
+                if (_spriteRenderersMatrix[i, j].gameObject.activeSelf) //enabled == true)
                 {
                     int currentSpriteId = _itemsMatrix[i, j].ItemSettings.NameID;
                     CheckVertical(i, j, currentSpriteId, currentPointsForDestroy);
@@ -407,7 +452,7 @@ public class GameFieldController : MonoBehaviour
     /// <summary>
     /// метод дополнительной проверки корректности полученных координат Match-3
     /// </summary>
-    private void CheckValidate(HashSet<Vector3Int> currentPointsForDestroy, HashSet<Vector3Int> returnHashSet) //done? 
+    private void CheckValidate(HashSet<Vector3Int> currentPointsForDestroy, HashSet<Vector3Int> returnHashSet) //done 
     {
         if (currentPointsForDestroy.Count > 2)
         {
@@ -426,7 +471,7 @@ public class GameFieldController : MonoBehaviour
         for (int j = y + 1; j < _column; j++)
         {
             int currentID = _itemsMatrix[x, j].ItemSettings.NameID;
-            if (currentID == ID && _spriteRenderersMatrix[x, j].enabled == true)
+            if (currentID == ID && _spriteRenderersMatrix[x, j].gameObject.activeSelf) //enabled == true)
             {
                 pointsForDestroy.Add(new Vector3Int(x, j));
             }
@@ -436,7 +481,7 @@ public class GameFieldController : MonoBehaviour
         for (int j = y - 1; j >= 0; j--)
         {
             int currentID = _itemsMatrix[x, j].ItemSettings.NameID;
-            if (currentID == ID && _spriteRenderersMatrix[x, j].enabled == true)
+            if (currentID == ID && _spriteRenderersMatrix[x, j].gameObject.activeSelf) //enabled == true)
             {
                 pointsForDestroy.Add(new Vector3Int(x, j));
             }
@@ -455,7 +500,7 @@ public class GameFieldController : MonoBehaviour
         for (int i = x + 1; i < _row; i++)
         {
             int currentID = _itemsMatrix[i, y].ItemSettings.NameID;
-            if (currentID == ID && _spriteRenderersMatrix[i, y].enabled == true)
+            if (currentID == ID && _spriteRenderersMatrix[i, y].gameObject.activeSelf) //enabled == true)
             {
                 pointsForDestroy.Add(new Vector3Int(i, y));
             }
@@ -465,7 +510,7 @@ public class GameFieldController : MonoBehaviour
         for (int i = x - 1; i >= 0; i--)
         {
             int currentID = _itemsMatrix[i, y].ItemSettings.NameID;
-            if (currentID == ID && _spriteRenderersMatrix[i, y].enabled == true)
+            if (currentID == ID && _spriteRenderersMatrix[i, y].gameObject.activeSelf) //enabled == true)
             {
                 pointsForDestroy.Add(new Vector3Int(i, y));
             }
@@ -479,158 +524,28 @@ public class GameFieldController : MonoBehaviour
     }
 
 
-    public void Swap(RaycastHit2D raycastHitDown, RaycastHit2D raycastHitUp, int x, int y,
-        Vector2Int direction) // done?
-    {
-        HashSet<Vector3Int> match3 = new();
-
-        if (direction == new Vector2(1, 0)) // to right
-        {
-            SwapAnimation(raycastHitDown, raycastHitUp, x, y, direction);
-            match3 = GetMatchThreeOrMore();
-
-            if (match3.Count > 0)
-            {
-                StartCoroutine(GameFieldRestoration(match3));
-            }
-            else
-            {
-                StartCoroutine(ReturnAnimation(raycastHitDown, raycastHitUp, x, y, direction));
-            }
-        }
-
-        if (direction == new Vector2(-1, 0)) // to left
-        {
-            SwapAnimation(raycastHitDown, raycastHitUp, x, y, direction);
-            match3 = GetMatchThreeOrMore();
-
-            if (match3.Count > 0)
-            {
-                StartCoroutine(GameFieldRestoration(match3));
-            }
-            else
-            {
-                StartCoroutine(ReturnAnimation(raycastHitDown, raycastHitUp, x, y, direction));
-            }
-        }
-
-        if (direction == new Vector2(0, 1)) // to up
-        {
-            SwapAnimation(raycastHitDown, raycastHitUp, x, y, direction);
-            match3 = GetMatchThreeOrMore();
-
-            if (match3.Count > 0)
-            {
-                StartCoroutine(GameFieldRestoration(match3));
-            }
-            else
-            {
-                StartCoroutine(ReturnAnimation(raycastHitDown, raycastHitUp, x, y, direction));
-            }
-        }
-
-        if (direction == new Vector2(0, -1)) // to down
-        {
-            SwapAnimation(raycastHitDown, raycastHitUp, x, y, direction);
-            match3 = GetMatchThreeOrMore();
-
-            if (match3.Count > 0)
-            {
-                StartCoroutine(GameFieldRestoration(match3));
-            }
-            else
-            {
-                StartCoroutine(ReturnAnimation(raycastHitDown, raycastHitUp, x, y, direction));
-            }
-        }
-    }
-
-    private IEnumerator GameFieldRestoration(HashSet<Vector3Int> match3) // ?
+    private IEnumerator RestoreGameField(HashSet<Vector3Int> match3) // need re-build
     {
         yield return new WaitForSeconds(0.3f + _delay);
         DeleteMatchThree(match3);
-        yield return new WaitForSeconds(0.3f + _delay); 
+        yield return new WaitForSeconds(0.3f + _delay);
         FallDownItems();
         yield return new WaitForSeconds(0.5f + _delay);
-        
+
         var newMatch3 = GetMatchThreeOrMore();
         if (newMatch3.Count > 2)
         {
-            StartCoroutine(GameFieldRestoration(match3));
+            StartCoroutine(RestoreGameField(match3));
         }
+
+        FillEmptyCellsAfterMatch3();
     }
 
-    private IEnumerator ReturnAnimation(RaycastHit2D hitDown, RaycastHit2D hitUp, int x, int y, Vector2Int direction)
+    private IEnumerator
+        SwapBackAnimation(RaycastHit2D hitDown, RaycastHit2D hitUp, int x, int y, Vector2Int direction) //done
     {
         yield return null; // is it right?
         yield return new WaitForSeconds(_delay + 0.3f); // is it right?
         SwapAnimation(hitDown, hitUp, x, y, direction);
-    }
-
-    private void DeleteMatchThree(HashSet<Vector3Int> setForDelete) // done?
-    {
-        foreach (var point in setForDelete)
-        {
-            int x = point.x;
-            int y = point.y;
-
-            var localScale = _spriteRenderersMatrix[x, y].transform.localScale;
-            _spriteRenderersMatrix[x, y].transform.DOScale(Vector3.zero, 0.3f)
-                .OnComplete(() => _spriteRenderersMatrix[x, y].enabled = false);
-
-            _spriteRenderersMatrix[x, y].transform.localScale = localScale;
-        }
-    }
-
-    private void SwapAnimation(RaycastHit2D hitDown, RaycastHit2D hitUp, int x, int y,
-        Vector2Int direction) // done?
-    {
-        if (hitDown.collider != null && hitUp.collider != null)
-        {
-            // Debug.Log("           _____________________ ");
-            // Debug.Log($"itemMatrix[x, y].sprite is {_itemsMatrix[x, y].ItemSettings.Icon.name}");
-            // Debug.Log($"itemMatrix[x + dir.x, y + dir.y].sprite is {_itemsMatrix[x + direction.x, y + direction.y].ItemSettings.Icon.name}");
-
-            RectTransform firstTile = (RectTransform)hitDown.transform; // maybe easy Transform?
-            RectTransform secondTile = (RectTransform)hitUp.transform; // maybe easy Transform?
-
-            firstTile.DOMove(secondTile.position, 0.3f).SetDelay(_delay);
-            secondTile.DOMove(firstTile.position, 0.3f).SetDelay(_delay);
-
-            var tempItem = _itemsMatrix[x, y];
-            _itemsMatrix[x, y] = _itemsMatrix[x + direction.x, y + direction.y]; // не надо нажимать
-            _itemsMatrix[x + direction.x, y + direction.y] = tempItem; // alt + enter
-
-            var tempSpriteRenderer = _spriteRenderersMatrix[x, y];
-            _spriteRenderersMatrix[x, y] = _spriteRenderersMatrix[x + direction.x, y + direction.y]; // не надо нажимать
-            _spriteRenderersMatrix[x + direction.x, y + direction.y] = tempSpriteRenderer; // alt + enter
-
-            // Debug.Log($"itemMatrix[x, y].sprite is {_itemsMatrix[x, y].ItemSettings.Icon.name}");
-            //Debug.Log($"itemMatrix[x + dir.x, y + dir.y].sprite is {_itemsMatrix[x + direction.x, y + direction.y].ItemSettings.Icon.name}");
-        }
-    }
-
-    /// <summary>
-    /// return choose player's set with 5 random element.
-    /// After fill the game field with this elements
-    /// </summary>
-    private List<ItemScriptableObject> GetActualItemsList() //done
-    {
-        _itemCollectionsNumber = PlayerPrefs.GetInt(PlayerSettingsConst.PLAYING_SET);
-        List<ItemScriptableObject> actualItemsListForReturn = new();
-        Random random = new Random();
-        var actualItemSettingsProvider = _allVariantsItemsCollections.ElementAt(_itemCollectionsNumber);
-        var actualItemsCollection = actualItemSettingsProvider.ItemsList;
-        int[] unicIndexes = Enumerable.Range(0, actualItemsCollection.Count)
-            .OrderBy(x => random.Next())
-            .Take(5)
-            .ToArray();
-        for (int i = 0; i < 5; i++)
-        {
-            int index = unicIndexes[i];
-            actualItemsListForReturn.Add(actualItemsCollection[index]);
-        }
-
-        return actualItemsListForReturn;
     }
 }
