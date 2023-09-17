@@ -314,9 +314,9 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 5f01fa8e97adb4047b57506dff6e83b1, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b95dd504eb4bb9b4daeed751f8e19b49, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 0.39215687}
-  m_FlipX: 0
+  m_FlipX: 1
   m_FlipY: 0
   m_DrawMode: 0
   m_Size: {x: 16, y: 20}
@@ -333,7 +333,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 247021327}
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: -0.29, z: 0}
   m_LocalScale: {x: 0.5, y: 0.7, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1216,7 +1216,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &654414773
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2122,7 +2122,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.9622642, g: 0.944109, b: 0.7298683, a: 0}
+  m_BackGroundColor: {r: 0.754717, g: 0.754717, b: 0.754717, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -3183,7 +3183,7 @@ GameObject:
   - component: {fileID: 1930906205}
   - component: {fileID: 1930906204}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: MainCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3322,6 +3322,10 @@ MonoBehaviour:
   _autoSet: {fileID: 1793543138}
   _westerosSet: {fileID: 1814679981}
   _forexSet: {fileID: 387440211}
+  _backgroundSprites:
+  - {fileID: 21300000, guid: 2e6bb9496c981a740881700ac989ea62, type: 3}
+  - {fileID: 21300000, guid: ae5e5ad287b53a742a2a33e5d99a9164, type: 3}
+  - {fileID: 21300000, guid: b95dd504eb4bb9b4daeed751f8e19b49, type: 3}
 --- !u!4 &1970425240
 Transform:
   m_ObjectHideFlags: 0
