@@ -8,4 +8,5 @@ public class PlayerSettingsConst
     public const float SCREEN_WIDTH = 6.7f;
     public static readonly Vector3 START_GRID_POSITION = new Vector3(-3.375f, -4.7f, 0);
     public static readonly string SCREEN_SIZE = "1080x1920";
+    public const float DELAY = 0.1f;
 }

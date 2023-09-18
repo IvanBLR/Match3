@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
     private Vector3Int _hitPointDown;
     private Vector3Int _hitPointUp;
     private Vector3 _delta;
-   // private Vector3Int _hitPointInGridsCoordinate;
+  
     private RaycastHit2D _raycastHitDown;
     private RaycastHit2D _raycastHitUp;
 
