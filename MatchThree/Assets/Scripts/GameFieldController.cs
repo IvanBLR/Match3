@@ -8,9 +8,13 @@ using Random = System.Random;
 
 public class GameFieldController : MonoBehaviour
 {
+   // [SerializeField] private SoundsManager _sm;
+
+
     public Action InitializationActualItemsCompleted;
     public Action FilledGameBoard;
-    
+    public Action GotMatchTree;
+
     public GameFieldController()
     {
         _someTechnicalCalculations = new SomeTechnicalCalculations(this);
@@ -56,7 +60,7 @@ public class GameFieldController : MonoBehaviour
         set { _itemCollectionsNumber = value; }
         get { return _itemCollectionsNumber; }
     }
-    
+
     [SerializeField] private Grid _grid;
     [SerializeField] private GameObject _itemPrefab;
 
@@ -71,15 +75,13 @@ public class GameFieldController : MonoBehaviour
     private int _itemCollectionsNumber;
     private readonly SomeTechnicalCalculations _someTechnicalCalculations;
 
-  
-
     private void Start()
     {
-        // _gameFieldSettings.GameSettingsAccepted += InitializeActualItemsListClassFields;      я их подписал ->
-        // _gameFieldSettings.GameSettingsAccepted += FillGameBoardWithTiles;                    в ГеймМенеджере
+        //  GotMatchTree += _sm.DropItems;
     }
 
-    public void InitializeActualItemsListClassFields() // done
+
+    public void InitializeActualItemsList() // done
     {
         _itemCollectionsNumber = PlayerPrefs.GetInt(PlayerSettingsConst.PLAYING_SET);
         _actualItemsList = SomeTechnicalCalculations.GetActualItemsList();
@@ -134,9 +136,11 @@ public class GameFieldController : MonoBehaviour
             match3 = SomeTechnicalCalculations.GetMatchThreeOrMore();
 
             if (match3.Count > 0)
+            {
+                GotMatchTree.Invoke();
                 StartCoroutine(RestoreGameField(match3));
-            else
-                StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
+            }
+            else StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
         }
 
         if (direction == new Vector2(-1, 0)) // to left
@@ -145,9 +149,11 @@ public class GameFieldController : MonoBehaviour
             match3 = SomeTechnicalCalculations.GetMatchThreeOrMore();
 
             if (match3.Count > 0)
+            {
+                GotMatchTree.Invoke();
                 StartCoroutine(RestoreGameField(match3));
-            else
-                StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
+            }
+            else StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
         }
 
         if (direction == new Vector2(0, 1)) // to up
@@ -156,9 +162,11 @@ public class GameFieldController : MonoBehaviour
             match3 = SomeTechnicalCalculations.GetMatchThreeOrMore();
 
             if (match3.Count > 0)
+            {
+                GotMatchTree.Invoke();
                 StartCoroutine(RestoreGameField(match3));
-            else
-                StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
+            }
+            else StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
         }
 
         if (direction == new Vector2(0, -1)) // to down
@@ -167,9 +175,11 @@ public class GameFieldController : MonoBehaviour
             match3 = SomeTechnicalCalculations.GetMatchThreeOrMore();
 
             if (match3.Count > 0)
+            {
+                GotMatchTree.Invoke();
                 StartCoroutine(RestoreGameField(match3));
-            else
-                StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
+            }
+            else StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
         }
     }
 
@@ -213,7 +223,7 @@ public class GameFieldController : MonoBehaviour
     private void FallDownItems() //   done
     {
         var emptyCoordinates = SomeTechnicalCalculations.GetAllEmptyCoordinates();
-        var itemCoordinatesForFalling = GetItemsCoordinatesForFalling(emptyCoordinates);
+        var itemCoordinatesForFalling = _someTechnicalCalculations.GetItemsCoordinatesForFalling(emptyCoordinates);
 
         for (int i = 0; i < emptyCoordinates.Count; i++)
         {
@@ -284,66 +294,6 @@ public class GameFieldController : MonoBehaviour
                 _spriteRenderersMatrix[x, y].transform.DOScale(finishScale, 0.3f);
             }
         }
-    }
-
-    private List<List<Vector3Int>> GetItemsCoordinatesForFalling(List<List<Vector3Int>> allEmptyCoordinates) // done
-    {
-        int column = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_COLUMN);
-        List<List<Vector3Int>> finalReturnList = new();
-        Queue<List<Vector3Int>> globalQueueWithListCoordinates = new();
-
-        for (int i = 0; i < allEmptyCoordinates.Count; i++)
-        {
-            globalQueueWithListCoordinates.Enqueue(allEmptyCoordinates[i]); // Count == _row
-        }
-
-        List<Vector3Int> currentListWithEmptyCoordinates = new();
-
-        while (globalQueueWithListCoordinates.Count > 0)
-        {
-            currentListWithEmptyCoordinates = globalQueueWithListCoordinates.Dequeue();
-            List<Vector3Int> listForReturnList = new();
-            Queue<Vector3Int> currentQueue = new();
-
-            for (int j = 0; j < currentListWithEmptyCoordinates.Count; j++)
-            {
-                currentQueue.Enqueue(currentListWithEmptyCoordinates[j]);
-            }
-
-            while (currentQueue.Count > 0)
-            {
-                Vector3Int currentPoint = currentQueue.Dequeue();
-                Vector3Int nextPoint;
-                while (currentQueue.Count > 0)
-                {
-                    nextPoint = currentQueue.Dequeue();
-                    if (nextPoint.y - currentPoint.y == 1)
-                    {
-                        currentPoint = nextPoint;
-                    }
-                    else
-                    {
-                        int start = currentPoint.y + 1;
-                        int end = nextPoint.y - 1;
-                        for (int index = start; index <= end; index++)
-                        {
-                            listForReturnList.Add(new Vector3Int(currentPoint.x, index));
-                        }
-
-                        currentPoint = nextPoint;
-                    }
-                }
-
-                for (int y = currentPoint.y + 1; y < column; y++)
-                {
-                    listForReturnList.Add(new Vector3Int(currentPoint.x, y));
-                }
-            }
-
-            finalReturnList.Add(listForReturnList);
-        }
-
-        return finalReturnList;
     }
 
     private IEnumerator RestoreGameField(HashSet<Vector3Int> match3)

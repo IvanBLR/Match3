@@ -19,7 +19,8 @@ public class SomeTechnicalCalculations
     {
         List<ItemScriptableObject> actualItemsListForReturn = new();
         Random random = new Random();
-        var actualItemSettingsProvider = _gameFieldController.AllVariantsItemsCollections.ElementAt(_gameFieldController.ItemCollectionsNumber);
+        var actualItemSettingsProvider =
+            _gameFieldController.AllVariantsItemsCollections.ElementAt(_gameFieldController.ItemCollectionsNumber);
         var actualItemsCollection = actualItemSettingsProvider.ItemsList;
         int[] unicIndexes = Enumerable.Range(0, actualItemsCollection.Count)
             .OrderBy(x => random.Next())
@@ -93,6 +94,60 @@ public class SomeTechnicalCalculations
         }
     }
 
+    public List<List<Vector3Int>> GetItemsCoordinatesForFalling(List<List<Vector3Int>> allEmptyCoordinates) // done
+    {
+        int column = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_COLUMN);
+        List<List<Vector3Int>> finalReturnList = new();
+        Queue<List<Vector3Int>> globalQueueWithListCoordinates = new();
+
+        for (int i = 0; i < allEmptyCoordinates.Count; i++)
+        {
+            globalQueueWithListCoordinates.Enqueue(allEmptyCoordinates[i]); // Count == _row
+        }
+        List<Vector3Int> currentListWithEmptyCoordinates = new();
+
+        while (globalQueueWithListCoordinates.Count > 0)
+        {
+            currentListWithEmptyCoordinates = globalQueueWithListCoordinates.Dequeue();
+            List<Vector3Int> listForReturnList = new();
+            Queue<Vector3Int> currentQueue = new();
+
+            for (int j = 0; j < currentListWithEmptyCoordinates.Count; j++)
+            {
+                currentQueue.Enqueue(currentListWithEmptyCoordinates[j]);
+            }
+            while (currentQueue.Count > 0)
+            {
+                Vector3Int currentPoint = currentQueue.Dequeue();
+                Vector3Int nextPoint;
+                while (currentQueue.Count > 0)
+                {
+                    nextPoint = currentQueue.Dequeue();
+                    if (nextPoint.y - currentPoint.y == 1)
+                    {
+                        currentPoint = nextPoint;
+                    }
+                    else
+                    {
+                        int start = currentPoint.y + 1;
+                        int end = nextPoint.y - 1;
+                        for (int index = start; index <= end; index++)
+                        {
+                            listForReturnList.Add(new Vector3Int(currentPoint.x, index));
+                        }
+                        currentPoint = nextPoint;
+                    }
+                }
+                for (int y = currentPoint.y + 1; y < column; y++)
+                {
+                    listForReturnList.Add(new Vector3Int(currentPoint.x, y));
+                }
+            }
+            finalReturnList.Add(listForReturnList);
+        }
+        return finalReturnList;
+    }
+
     public List<List<Vector3Int>> GetAllEmptyCoordinates() // done
     {
         int row = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_ROW);
@@ -127,6 +182,7 @@ public class SomeTechnicalCalculations
         return arrayForReturn;
     }
 
+
     public HashSet<Vector3Int> GetMatchThreeOrMore() // done
     {
         int row = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_ROW);
@@ -152,7 +208,7 @@ public class SomeTechnicalCalculations
 
         return returnHashSet;
     }
-    
+
     private void CheckVertical(int x, int y, int ID, HashSet<Vector3Int> pointsForDestroy) // done
     {
         int column = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_COLUMN);
@@ -228,5 +284,4 @@ public class SomeTechnicalCalculations
 
         currentPointsForDestroy.Clear();
     }
-
 }
