@@ -11,11 +11,14 @@ public class GameFieldController : MonoBehaviour
     public Action FilledGameBoard;
     public Action GotMatchTree;
     public Action WrongMatch3;
+    public Action BombUsed;
+    public Action<int> ScoreChanged;
     public GameFieldController()
     {
         _someTechnicalCalculations = new SomeTechnicalCalculations(this);
     }
 
+    public int TotalScore => _totalScore;
     public SomeTechnicalCalculations SomeTechnicalCalculations
     {
         get { return _someTechnicalCalculations; }
@@ -59,7 +62,6 @@ public class GameFieldController : MonoBehaviour
 
     [SerializeField] private Grid _grid;
     [SerializeField] private GameObject _itemPrefab;
-
     [SerializeField] private List<ItemSettingsProvider> _allVariantsItemsCollections;
     [SerializeField] private Transform _parent;
 
@@ -69,8 +71,10 @@ public class GameFieldController : MonoBehaviour
     private Item[,] _itemsMatrix;
 
     private int _itemCollectionsNumber;
-    private readonly SomeTechnicalCalculations _someTechnicalCalculations;
+    private int _totalScore;
     
+    private readonly SomeTechnicalCalculations _someTechnicalCalculations;
+
     public void InitializeActualItemsList() // done
     {
         _itemCollectionsNumber = PlayerPrefs.GetInt(PlayerSettingsConst.PLAYING_SET);
@@ -80,6 +84,12 @@ public class GameFieldController : MonoBehaviour
         int row = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_ROW);
         int column = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_COLUMN);
         _parent.position = _grid.transform.position;
+        if (PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_COLUMN) == 5)
+        {
+            _grid.transform.position += new Vector3(0, 1.5f, 0);
+            _parent.position += new Vector3(0, 1.5f, 0);
+        }
+
         _spriteRenderersMatrix = new SpriteRenderer[row, column];
         _itemsMatrix = new Item[row, column];
 
@@ -126,15 +136,9 @@ public class GameFieldController : MonoBehaviour
             match3 = SomeTechnicalCalculations.GetMatchThreeOrMore();
 
             if (match3.Count > 0)
-            {
-                GotMatchTree.Invoke();
                 StartCoroutine(RestoreGameField(match3));
-            }
             else
-            {
-                WrongMatch3?.Invoke();
                 StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
-            }
         }
 
         if (direction == new Vector2(-1, 0)) // to left
@@ -143,15 +147,9 @@ public class GameFieldController : MonoBehaviour
             match3 = SomeTechnicalCalculations.GetMatchThreeOrMore();
 
             if (match3.Count > 0)
-            {
-                GotMatchTree.Invoke();
                 StartCoroutine(RestoreGameField(match3));
-            }
             else
-            {
-                WrongMatch3?.Invoke();
                 StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
-            }
         }
 
         if (direction == new Vector2(0, 1)) // to up
@@ -160,15 +158,9 @@ public class GameFieldController : MonoBehaviour
             match3 = SomeTechnicalCalculations.GetMatchThreeOrMore();
 
             if (match3.Count > 0)
-            {
-                GotMatchTree.Invoke();
                 StartCoroutine(RestoreGameField(match3));
-            }
             else
-            {
-                WrongMatch3?.Invoke();
                 StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
-            }
         }
 
         if (direction == new Vector2(0, -1)) // to down
@@ -177,15 +169,9 @@ public class GameFieldController : MonoBehaviour
             match3 = SomeTechnicalCalculations.GetMatchThreeOrMore();
 
             if (match3.Count > 0)
-            {
-                GotMatchTree.Invoke();
                 StartCoroutine(RestoreGameField(match3));
-            }
             else
-            {
-                WrongMatch3?.Invoke();
                 StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
-            }
         }
     }
 
@@ -211,6 +197,7 @@ public class GameFieldController : MonoBehaviour
 
     private void DeleteMatchThree(HashSet<Vector3Int> setForDelete) // done
     {
+        GotMatchTree.Invoke();
         foreach (var point in setForDelete)
         {
             int x = point.x;
@@ -276,7 +263,6 @@ public class GameFieldController : MonoBehaviour
         _itemsMatrix[secondPoint.x, secondPoint.y] = tempItem;
     }
 
-
     private void FillEmptyCellsAfterMatch3() // done
     {
         var emptyCells = SomeTechnicalCalculations.GetAllEmptyCoordinates();
@@ -302,6 +288,22 @@ public class GameFieldController : MonoBehaviour
         }
     }
 
+    public void UseBomb(int x, int y)
+    {
+        List<Vector3Int> bomb = _someTechnicalCalculations.GetBombsCoordinates(x, y);
+        HashSet<Vector3Int> bombCoordinates = new();
+        
+        _totalScore -= 3 * bomb.Count;
+        _totalScore = _totalScore < 0 ? 0 : _totalScore;
+        
+        for (int i = 0; i < bomb.Count; i++)
+        {
+            bombCoordinates.Add(bomb[i]);
+        }
+        BombUsed?.Invoke();
+        StartCoroutine(RestoreGameField(bombCoordinates));
+    }
+
     private IEnumerator RestoreGameField(HashSet<Vector3Int> match3)
     {
         yield return new WaitForSeconds(0.3f + PlayerSettingsConst.DELAY);
@@ -310,6 +312,9 @@ public class GameFieldController : MonoBehaviour
         FallDownItems();
         yield return new WaitForSeconds(0.5f + PlayerSettingsConst.DELAY);
 
+        _totalScore += match3.Count;
+        ScoreChanged?.Invoke(_totalScore);
+        
         var newMatch3 = SomeTechnicalCalculations.GetMatchThreeOrMore();
         if (newMatch3.Count > 2)
         {
@@ -321,6 +326,7 @@ public class GameFieldController : MonoBehaviour
 
     private IEnumerator SwapBackAnimation(RaycastHit2D hitDown, RaycastHit2D hitUp, int x, int y, Vector2Int direction)
     {
+        WrongMatch3?.Invoke();
         yield return null; // is it right?
         yield return new WaitForSeconds(PlayerSettingsConst.DELAY + 0.3f); // is it right?
         SwapAnimation(hitDown, hitUp, x, y, direction);

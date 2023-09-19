@@ -12,6 +12,27 @@ public class SomeTechnicalCalculations
         _gameFieldController = gameFieldController;
     }
 
+    public List<Vector3Int> GetBombsCoordinates(int x, int y)
+    {
+        List<Vector3Int> bombList = new List<Vector3Int>
+        {
+            new Vector3Int(0, 0, 0), new Vector3Int(0, 1, 0), new Vector3Int(1, 0, 0), new Vector3Int(1, 1, 0)
+        };
+        int row = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_ROW);
+        int column = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_COLUMN);
+
+        int startX = row - 1 > x ? x : row - 2;
+        int startY = column - 1 > y ? y : column - 2;
+
+        Vector3Int currentPoint = new Vector3Int(startX, startY, 0);
+        for (int i = 0; i < bombList.Count; i++)
+        {
+            bombList[i] += currentPoint;
+        }
+
+        return bombList;
+    }
+
     /// <summary>
     /// return choose player's set with 5 random element.
     /// </summary>
@@ -104,6 +125,7 @@ public class SomeTechnicalCalculations
         {
             globalQueueWithListCoordinates.Enqueue(allEmptyCoordinates[i]); // Count == _row
         }
+
         List<Vector3Int> currentListWithEmptyCoordinates = new();
 
         while (globalQueueWithListCoordinates.Count > 0)
@@ -116,6 +138,7 @@ public class SomeTechnicalCalculations
             {
                 currentQueue.Enqueue(currentListWithEmptyCoordinates[j]);
             }
+
             while (currentQueue.Count > 0)
             {
                 Vector3Int currentPoint = currentQueue.Dequeue();
@@ -135,16 +158,20 @@ public class SomeTechnicalCalculations
                         {
                             listForReturnList.Add(new Vector3Int(currentPoint.x, index));
                         }
+
                         currentPoint = nextPoint;
                     }
                 }
+
                 for (int y = currentPoint.y + 1; y < column; y++)
                 {
                     listForReturnList.Add(new Vector3Int(currentPoint.x, y));
                 }
             }
+
             finalReturnList.Add(listForReturnList);
         }
+
         return finalReturnList;
     }
 
@@ -181,8 +208,6 @@ public class SomeTechnicalCalculations
 
         return arrayForReturn;
     }
-
-
     public HashSet<Vector3Int> GetMatchThreeOrMore() // done
     {
         int row = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_ROW);

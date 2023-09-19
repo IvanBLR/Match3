@@ -1,5 +1,8 @@
 using System;
+using JetBrains.Annotations;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -8,20 +11,32 @@ public class GameManager : MonoBehaviour
     [SerializeField] private EmptyGameField _emptyGameField;
     [SerializeField] private SoundsManager _soundsManager;
     [SerializeField] private Grid _grid;
-
-    private const float _minClickInterval = 0.4f;
-
+    [SerializeField] private Button _bomb;
+    [SerializeField] private TextMeshProUGUI _score;
+    
     private float _click;
     private Vector2 _offset;
     private Vector3Int _hitPointDown;
     private Vector3Int _hitPointUp;
     private Vector3 _delta;
-
+    private bool _isBombActive;
     private RaycastHit2D _raycastHitDown;
     private RaycastHit2D _raycastHitUp;
 
+    [UsedImplicitly]
+    public void BombActivation() => _isBombActive = true;
+
+    [UsedImplicitly]
+    public void ActivateAdditionalOptions()
+    {
+        _bomb.gameObject.SetActive(true);
+        _score.gameObject.SetActive(true);
+    }
+
     private void Awake() //                                                  done
     {
+        _score.gameObject.SetActive(false);
+        _bomb.gameObject.SetActive(false);
         _gameFieldSettings.GameSettingsAccepted += _gameFieldController.InitializeActualItemsList;
         _gameFieldSettings.GameSettingsAccepted += _gameFieldController.FillGameBoardWithTilesFirstTimeOnly;
         _gameFieldSettings.GameFieldRawSizeChanged += _emptyGameField.GenerateGameField;
@@ -29,10 +44,13 @@ public class GameManager : MonoBehaviour
 
         _gameFieldController.GotMatchTree += _soundsManager.DropItems;
         _gameFieldController.WrongMatch3 += _soundsManager.SwapBack;
+        _gameFieldController.BombUsed += _soundsManager.BombActivate;
+        _gameFieldController.ScoreChanged += UpdateScore;
 
         _gameFieldController.InitializationActualItemsCompleted += DestroyAction;
         _gameFieldController.FilledGameBoard += DestroyAction;
     }
+
 
 
     private void Start()
@@ -40,56 +58,51 @@ public class GameManager : MonoBehaviour
         _offset = new Vector2(_grid.cellSize.x / 2, _grid.cellSize.y / 2);
     }
 
-    void Update()
+    private void Update()
     {
         _click += Time.deltaTime;
-        if (Input.GetKeyDown(KeyCode.A))
+      
+        if (Input.GetMouseButtonDown(0) && _click >= PlayerSettingsConst.MIN_CLICK_INTERVAL)
         {
-            //_gameFieldController.FallDownItems();
-            // _gameFieldController.SSS();
-            //_gameFieldController.Check();
+            if (!_isBombActive)
+            {
+                var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                _raycastHitDown = Physics2D.Raycast(ray.origin, ray.direction);
+                _hitPointDown = GetHitPointCoordinateInGrid(_raycastHitDown);
+
+                _click = 0;
+            }
         }
 
+        if (Input.GetMouseButtonUp(0) && _click >= PlayerSettingsConst.MIN_CLICK_INTERVAL)
+        {
+            if (!_isBombActive)
+            {
+                var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                _raycastHitUp = Physics2D.Raycast(ray.origin, ray.direction);
+                _hitPointUp = GetHitPointCoordinateInGrid(_raycastHitUp);
 
-        if (Input.GetMouseButtonDown(0) && _click >= _minClickInterval)
+                int deltaX = _hitPointUp.x - _hitPointDown.x;
+                int deltaY = _hitPointUp.y - _hitPointDown.y;
+
+                CalculateInputDirectionAndStartSwap(deltaX, deltaY);
+            }
+        }
+
+        if (Input.GetMouseButtonDown(0) && _isBombActive)
         {
             var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            _raycastHitDown = Physics2D.Raycast(ray.origin, ray.direction);
-            _hitPointDown = GetHitPointCoordinateInGrid(_raycastHitDown);
-
-
-            _click = 0;
-        }
-
-        if (Input.GetMouseButtonUp(0) && _click >= _minClickInterval)
-        {
-            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            _raycastHitUp = Physics2D.Raycast(ray.origin, ray.direction);
-            _hitPointUp = GetHitPointCoordinateInGrid(_raycastHitUp);
-
-            int deltaX = _hitPointUp.x - _hitPointDown.x;
-            int deltaY = _hitPointUp.y - _hitPointDown.y;
-
-            CalculateInputDirectionForSwapping(deltaX, deltaY);
-        }
-
-        if (Input.GetMouseButtonDown(1))
-        {
-            //  var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            //  _raycastHit2D = Physics2D.Raycast(ray.origin, ray.direction);
-            //  var coordinate = _grid.WorldToCell(_raycastHit2D.point + _offset);
-            // 
-            //  Debug.Log(coordinate);
-            //  if (_raycastHit2D.collider != null)
-            //  {
-            //      Debug.Log(_raycastHit2D.transform.GetComponent<Item>().ItemSettings.Icon.name);
-            //  }
-            //  Debug.Log($"tile LOCAL coordinate is {_gameFieldController.IIII[coordinate.x, coordinate.y].transform.localPosition}");
-            //  Debug.Log($"tile world coordinate is {_gameFieldController.IIII[coordinate.x, coordinate.y].transform.position}");
+            var hit = Physics2D.Raycast(ray.origin, ray.direction);
+            if (hit.collider != null)
+            {
+                var point = GetHitPointCoordinateInGrid(hit);
+                _gameFieldController.UseBomb(point.x, point.y);
+                _isBombActive = false;
+            }
         }
     }
 
-    private void CalculateInputDirectionForSwapping(int deltaX, int deltaY)
+    private void CalculateInputDirectionAndStartSwap(int deltaX, int deltaY)
     {
         if (Math.Abs(deltaX) > Math.Abs(deltaY)) // horisontal swap
         {
@@ -137,7 +150,11 @@ public class GameManager : MonoBehaviour
         else return new Vector3Int(100, 100, 100);
     }
 
-    private void DestroyAction() //                                          done
+    private void UpdateScore(int score)
+    {
+        _score.text = score.ToString();
+    }
+    private void DestroyAction() //          done
     {
         _gameFieldController.InitializationActualItemsCompleted -= DestroyAction;
         _gameFieldController.FilledGameBoard -= DestroyAction;
@@ -152,5 +169,8 @@ public class GameManager : MonoBehaviour
     {
         _gameFieldController.GotMatchTree -= _soundsManager.DropItems;
         _gameFieldController.WrongMatch3 -= _soundsManager.SwapBack;
+        _gameFieldController.BombUsed -= _soundsManager.BombActivate;
+        _gameFieldController.ScoreChanged -= UpdateScore;
     }
+
 }
