@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -18,7 +16,7 @@ public class GameManager : MonoBehaviour
     private Vector3Int _hitPointDown;
     private Vector3Int _hitPointUp;
     private Vector3 _delta;
-  
+
     private RaycastHit2D _raycastHitDown;
     private RaycastHit2D _raycastHitUp;
 
@@ -28,8 +26,9 @@ public class GameManager : MonoBehaviour
         _gameFieldSettings.GameSettingsAccepted += _gameFieldController.FillGameBoardWithTilesFirstTimeOnly;
         _gameFieldSettings.GameFieldRawSizeChanged += _emptyGameField.GenerateGameField;
         _gameFieldSettings.GameFieldColumnSizeChanged += _emptyGameField.GenerateGameField;
-        
+
         _gameFieldController.GotMatchTree += _soundsManager.DropItems;
+        _gameFieldController.WrongMatch3 += _soundsManager.SwapBack;
 
         _gameFieldController.InitializationActualItemsCompleted += DestroyAction;
         _gameFieldController.FilledGameBoard += DestroyAction;
@@ -47,7 +46,7 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.A))
         {
             //_gameFieldController.FallDownItems();
-           // _gameFieldController.SSS();
+            // _gameFieldController.SSS();
             //_gameFieldController.Check();
         }
 
@@ -70,7 +69,7 @@ public class GameManager : MonoBehaviour
 
             int deltaX = _hitPointUp.x - _hitPointDown.x;
             int deltaY = _hitPointUp.y - _hitPointDown.y;
-           
+
             CalculateInputDirectionForSwapping(deltaX, deltaY);
         }
 
@@ -147,6 +146,11 @@ public class GameManager : MonoBehaviour
         _gameFieldSettings.GameSettingsAccepted -= _gameFieldController.FillGameBoardWithTilesFirstTimeOnly;
         _gameFieldSettings.GameFieldRawSizeChanged -= _emptyGameField.GenerateGameField;
         _gameFieldSettings.GameFieldColumnSizeChanged -= _emptyGameField.GenerateGameField;
+    }
+
+    private void OnDestroy()
+    {
         _gameFieldController.GotMatchTree -= _soundsManager.DropItems;
+        _gameFieldController.WrongMatch3 -= _soundsManager.SwapBack;
     }
 }

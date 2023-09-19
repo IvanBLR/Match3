@@ -4,17 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
 using UnityEngine;
-using Random = System.Random;
 
 public class GameFieldController : MonoBehaviour
 {
-   // [SerializeField] private SoundsManager _sm;
-
-
     public Action InitializationActualItemsCompleted;
     public Action FilledGameBoard;
     public Action GotMatchTree;
-
+    public Action WrongMatch3;
     public GameFieldController()
     {
         _someTechnicalCalculations = new SomeTechnicalCalculations(this);
@@ -74,13 +70,7 @@ public class GameFieldController : MonoBehaviour
 
     private int _itemCollectionsNumber;
     private readonly SomeTechnicalCalculations _someTechnicalCalculations;
-
-    private void Start()
-    {
-        //  GotMatchTree += _sm.DropItems;
-    }
-
-
+    
     public void InitializeActualItemsList() // done
     {
         _itemCollectionsNumber = PlayerPrefs.GetInt(PlayerSettingsConst.PLAYING_SET);
@@ -140,7 +130,11 @@ public class GameFieldController : MonoBehaviour
                 GotMatchTree.Invoke();
                 StartCoroutine(RestoreGameField(match3));
             }
-            else StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
+            else
+            {
+                WrongMatch3?.Invoke();
+                StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
+            }
         }
 
         if (direction == new Vector2(-1, 0)) // to left
@@ -153,7 +147,11 @@ public class GameFieldController : MonoBehaviour
                 GotMatchTree.Invoke();
                 StartCoroutine(RestoreGameField(match3));
             }
-            else StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
+            else
+            {
+                WrongMatch3?.Invoke();
+                StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
+            }
         }
 
         if (direction == new Vector2(0, 1)) // to up
@@ -166,7 +164,11 @@ public class GameFieldController : MonoBehaviour
                 GotMatchTree.Invoke();
                 StartCoroutine(RestoreGameField(match3));
             }
-            else StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
+            else
+            {
+                WrongMatch3?.Invoke();
+                StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
+            }
         }
 
         if (direction == new Vector2(0, -1)) // to down
@@ -179,7 +181,11 @@ public class GameFieldController : MonoBehaviour
                 GotMatchTree.Invoke();
                 StartCoroutine(RestoreGameField(match3));
             }
-            else StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
+            else
+            {
+                WrongMatch3?.Invoke();
+                StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
+            }
         }
     }
 

@@ -1,13 +1,9 @@
 using JetBrains.Annotations;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class GameFieldSettings : MonoBehaviour
@@ -58,7 +54,6 @@ public class GameFieldSettings : MonoBehaviour
             _invalidCanvas.enabled = true;
         }
 
-
         yield return new WaitUntil(() => PlayerSettingsConst.SCREEN_SIZE == currentScreenSize);
     }
 
@@ -67,7 +62,6 @@ public class GameFieldSettings : MonoBehaviour
     {
         SceneManager.LoadScene(0);
     }
-
 
     #region public methods, use in ScreenSettings Menu, setup in Unity Editor. Responsibility: change gameField sizes
 
@@ -85,7 +79,6 @@ public class GameFieldSettings : MonoBehaviour
                 StopCoroutine(_currentSetActiveAttention);
                 _attentionText.enabled = false;
             }
-
             _currentSetActiveAttention = StartCoroutine(ActivateAttentionText());
         }
 
