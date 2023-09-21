@@ -77,14 +77,14 @@ public class GameFieldController : MonoBehaviour
 
     public void InitializeActualItemsList() // done
     {
-        _itemCollectionsNumber = PlayerPrefs.GetInt(PlayerSettingsConst.PLAYING_SET);
+        _itemCollectionsNumber = PlayerPrefs.GetInt(SettingsConstant.PLAYING_SET);
         _actualItemsList = SomeTechnicalCalculations.GetActualItemsList();
         _actualNameID = SomeTechnicalCalculations.GetActualNameID();
 
-        int row = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_ROW);
-        int column = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_COLUMN);
+        int row = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_ROW);
+        int column = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_COLUMN);
         _parent.position = _grid.transform.position;
-        if (PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_COLUMN) == 5)
+        if (PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_COLUMN) == 5)
         {
             _grid.transform.position += new Vector3(0, 1.5f, 0);
             _parent.position += new Vector3(0, 1.5f, 0);
@@ -98,8 +98,8 @@ public class GameFieldController : MonoBehaviour
 
     public void FillGameBoardWithTilesFirstTimeOnly() // done 
     {
-        int row = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_ROW);
-        int column = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_COLUMN);
+        int row = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_ROW);
+        int column = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_COLUMN);
         for (int i = 0; i < row; i++)
         {
             for (int j = 0; j < column; j++)
@@ -119,7 +119,7 @@ public class GameFieldController : MonoBehaviour
 
                 var targetScale = tile.transform.localScale;
                 tile.transform.localScale = Vector3.zero;
-                tile.transform.DOScale(targetScale, 0.3f).SetDelay(PlayerSettingsConst.DELAY);
+                tile.transform.DOScale(targetScale, 0.3f).SetDelay(SettingsConstant.DELAY);
             }
         }
 
@@ -182,8 +182,8 @@ public class GameFieldController : MonoBehaviour
             RectTransform firstTile = (RectTransform)hitDown.transform; // maybe easy Transform?
             RectTransform secondTile = (RectTransform)hitUp.transform; // maybe easy Transform?
 
-            firstTile.DOMove(secondTile.position, 0.3f).SetDelay(PlayerSettingsConst.DELAY);
-            secondTile.DOMove(firstTile.position, 0.3f).SetDelay(PlayerSettingsConst.DELAY);
+            firstTile.DOMove(secondTile.position, 0.3f).SetDelay(SettingsConstant.DELAY);
+            secondTile.DOMove(firstTile.position, 0.3f).SetDelay(SettingsConstant.DELAY);
 
             var tempItem = _itemsMatrix[x, y];
             _itemsMatrix[x, y] = _itemsMatrix[x + direction.x, y + direction.y]; // не надо нажимать
@@ -307,11 +307,11 @@ public class GameFieldController : MonoBehaviour
 
     private IEnumerator RestoreGameField(HashSet<Vector3Int> match3)
     {
-        yield return new WaitForSeconds(0.3f + PlayerSettingsConst.DELAY);
+        yield return new WaitForSeconds(0.3f + SettingsConstant.DELAY);
         DeleteMatchThree(match3);
-        yield return new WaitForSeconds(0.3f + PlayerSettingsConst.DELAY);
+        yield return new WaitForSeconds(0.3f + SettingsConstant.DELAY);
         FallDownItems();
-        yield return new WaitForSeconds(0.5f + PlayerSettingsConst.DELAY);
+        yield return new WaitForSeconds(0.5f + SettingsConstant.DELAY);
 
         _totalScore += match3.Count;
         ScoreChanged?.Invoke(_totalScore);
@@ -329,7 +329,7 @@ public class GameFieldController : MonoBehaviour
     {
         WrongMatch3?.Invoke();
         yield return null; // is it right?
-        yield return new WaitForSeconds(PlayerSettingsConst.DELAY + 0.3f); // is it right?
+        yield return new WaitForSeconds(SettingsConstant.DELAY + 0.3f); // is it right?
         SwapAnimation(hitDown, hitUp, x, y, direction);
     }
 }

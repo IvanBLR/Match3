@@ -27,4 +27,9 @@ public class SoundsManager : MonoBehaviour
     {
         _audioSource.PlayOneShot(_swapBack, 0.2f);
     }
+
+    private void Awake()
+    {
+        gameObject.SetActive(PlayerPrefs.GetInt(SettingsConstant.SOUND_ON_OFF) == 1);
+    }
 }

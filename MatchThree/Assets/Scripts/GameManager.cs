@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private UI_controller _UI;
     [SerializeField] private Grid _grid;
     [SerializeField] private Button _bomb;
+    [SerializeField] private Button _restart;
     [SerializeField] private TextMeshProUGUI _score;
 
     private float _click;
@@ -26,6 +27,10 @@ public class GameManager : MonoBehaviour
 
     [UsedImplicitly]
     public void BombActivation() => _isBombActive = true;
+
+    [UsedImplicitly]
+    public void ActivateRestartButton() => _restart.gameObject.SetActive(true);
+    
 
     [UsedImplicitly]
     public void ActivateAdditionalOptions()
@@ -65,7 +70,7 @@ public class GameManager : MonoBehaviour
     {
         _click += Time.deltaTime;
 
-        if (Input.GetMouseButtonDown(0) && _click >= PlayerSettingsConst.MIN_CLICK_INTERVAL)
+        if (Input.GetMouseButtonDown(0) && _click >= SettingsConstant.MIN_CLICK_INTERVAL)
         {
             if (!_isBombActive)
             {
@@ -77,7 +82,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        if (Input.GetMouseButtonUp(0) && _click >= PlayerSettingsConst.MIN_CLICK_INTERVAL)
+        if (Input.GetMouseButtonUp(0) && _click >= SettingsConstant.MIN_CLICK_INTERVAL)
         {
             if (!_isBombActive)
             {

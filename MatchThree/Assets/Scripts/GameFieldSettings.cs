@@ -38,8 +38,8 @@ public class GameFieldSettings : MonoBehaviour
     private void Awake()
     {
         _attentionText.enabled = false;
-        PlayerPrefs.SetInt(PlayerSettingsConst.GAME_FIELD_ROW, _rowSize);
-        PlayerPrefs.SetInt(PlayerSettingsConst.GAME_FIELD_COLUMN, _columnSize);
+        PlayerPrefs.SetInt(SettingsConstant.GAME_FIELD_ROW, _rowSize);
+        PlayerPrefs.SetInt(SettingsConstant.GAME_FIELD_COLUMN, _columnSize);
         PlayerPrefs.Save();
         _invalidCanvas.enabled = false;
         StartCoroutine(CheckValidateWindowAspect());
@@ -47,7 +47,7 @@ public class GameFieldSettings : MonoBehaviour
 
     private void Start()
     {
-        int index = PlayerPrefs.GetInt(PlayerSettingsConst.PLAYING_SET, 0);
+        int index = PlayerPrefs.GetInt(SettingsConstant.PLAYING_SET, 0);
         _background.sprite = _backgroundSprites[index];
     }
 
@@ -56,13 +56,13 @@ public class GameFieldSettings : MonoBehaviour
         var width = Screen.width;
         var height = Screen.height;
         var currentScreenSize = width.ToString() + "x" + height.ToString();
-        if (!currentScreenSize.Equals(PlayerSettingsConst.SCREEN_SIZE))
+        if (!currentScreenSize.Equals(SettingsConstant.SCREEN_SIZE))
         {
             _settingsCanvas.enabled = false;
             _invalidCanvas.enabled = true;
         }
 
-        yield return new WaitUntil(() => PlayerSettingsConst.SCREEN_SIZE == currentScreenSize);
+        yield return new WaitUntil(() => SettingsConstant.SCREEN_SIZE == currentScreenSize);
     }
 
     [UsedImplicitly]
@@ -92,7 +92,7 @@ public class GameFieldSettings : MonoBehaviour
         }
 
         _rowSizeText.text = _rowSize.ToString();
-        PlayerPrefs.SetInt(PlayerSettingsConst.GAME_FIELD_ROW, _rowSize);
+        PlayerPrefs.SetInt(SettingsConstant.GAME_FIELD_ROW, _rowSize);
         PlayerPrefs.Save();
 
         GameFieldRawSizeChanged?.Invoke(_rowSize, _columnSize);
@@ -117,7 +117,7 @@ public class GameFieldSettings : MonoBehaviour
         }
 
         _rowSizeText.text = _rowSize.ToString();
-        PlayerPrefs.SetInt(PlayerSettingsConst.GAME_FIELD_ROW, _rowSize);
+        PlayerPrefs.SetInt(SettingsConstant.GAME_FIELD_ROW, _rowSize);
         PlayerPrefs.Save();
 
         GameFieldRawSizeChanged?.Invoke(_rowSize, _columnSize);
@@ -142,7 +142,7 @@ public class GameFieldSettings : MonoBehaviour
         }
 
         _columnSizeText.text = _columnSize.ToString();
-        PlayerPrefs.SetInt(PlayerSettingsConst.GAME_FIELD_COLUMN, _columnSize);
+        PlayerPrefs.SetInt(SettingsConstant.GAME_FIELD_COLUMN, _columnSize);
         PlayerPrefs.Save();
 
         GameFieldColumnSizeChanged?.Invoke(_rowSize, _columnSize);
@@ -167,7 +167,7 @@ public class GameFieldSettings : MonoBehaviour
         }
 
         _columnSizeText.text = _columnSize.ToString();
-        PlayerPrefs.SetInt(PlayerSettingsConst.GAME_FIELD_COLUMN, _columnSize);
+        PlayerPrefs.SetInt(SettingsConstant.GAME_FIELD_COLUMN, _columnSize);
         PlayerPrefs.Save();
 
         GameFieldColumnSizeChanged?.Invoke(_rowSize, _columnSize);
@@ -193,7 +193,7 @@ public class GameFieldSettings : MonoBehaviour
     [UsedImplicitly]
     public void SaveAutoSet()
     {
-        PlayerPrefs.SetInt(PlayerSettingsConst.PLAYING_SET, 0);
+        PlayerPrefs.SetInt(SettingsConstant.PLAYING_SET, 0);
         PlayerPrefs.Save();
         _background.sprite = _backgroundSprites[0];
         ActivatedEasyLevel?.Invoke(0);
@@ -202,7 +202,7 @@ public class GameFieldSettings : MonoBehaviour
     [UsedImplicitly]
     public void SaveWesterosSet()
     {
-        PlayerPrefs.SetInt(PlayerSettingsConst.PLAYING_SET, 1);
+        PlayerPrefs.SetInt(SettingsConstant.PLAYING_SET, 1);
         PlayerPrefs.Save();
         _background.sprite = _backgroundSprites[1];
         ActivetedMiddleLevel?.Invoke(1);
@@ -211,7 +211,7 @@ public class GameFieldSettings : MonoBehaviour
     [UsedImplicitly]
     public void SaveForexSet()
     {
-        PlayerPrefs.SetInt(PlayerSettingsConst.PLAYING_SET, 2);
+        PlayerPrefs.SetInt(SettingsConstant.PLAYING_SET, 2);
         PlayerPrefs.Save();
         _background.sprite = _backgroundSprites[2];
         ActivatedHardLevel?.Invoke(2);

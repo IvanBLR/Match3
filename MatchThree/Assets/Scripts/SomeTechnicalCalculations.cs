@@ -18,8 +18,8 @@ public class SomeTechnicalCalculations
         {
             new Vector3Int(0, 0, 0), new Vector3Int(0, 1, 0), new Vector3Int(1, 0, 0), new Vector3Int(1, 1, 0)
         };
-        int row = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_ROW);
-        int column = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_COLUMN);
+        int row = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_ROW);
+        int column = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_COLUMN);
 
         int startX = row - 1 > x ? x : row - 2;
         int startY = column - 1 > y ? y : column - 2;
@@ -75,8 +75,8 @@ public class SomeTechnicalCalculations
     {
         Random random = new Random();
         HashSet<int> checkList = new();
-        int row = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_ROW);
-        int column = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_COLUMN);
+        int row = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_ROW);
+        int column = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_COLUMN);
         int currentID = 0;
         int upID = 0;
         int downID = 0;
@@ -117,7 +117,7 @@ public class SomeTechnicalCalculations
 
     public List<List<Vector3Int>> GetItemsCoordinatesForFalling(List<List<Vector3Int>> allEmptyCoordinates) // done
     {
-        int column = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_COLUMN);
+        int column = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_COLUMN);
         List<List<Vector3Int>> finalReturnList = new();
         Queue<List<Vector3Int>> globalQueueWithListCoordinates = new();
 
@@ -177,7 +177,7 @@ public class SomeTechnicalCalculations
 
     public List<List<Vector3Int>> GetAllEmptyCoordinates() // done
     {
-        int row = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_ROW);
+        int row = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_ROW);
         List<List<Vector3Int>> returnList = new();
 
         for (int i = 0; i < row; i++)
@@ -194,7 +194,7 @@ public class SomeTechnicalCalculations
     /// </summary>
     private List<Vector3Int> GetEmptyCoordinatesInCurrentColumnInGridNotation(int rowIndex) // done 
     {
-        int column = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_COLUMN);
+        int column = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_COLUMN);
         List<Vector3Int> arrayForReturn = new();
         for (int j = 0; j < column; j++)
         {
@@ -210,8 +210,8 @@ public class SomeTechnicalCalculations
     }
     public HashSet<Vector3Int> GetMatchThreeOrMore() // done
     {
-        int row = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_ROW);
-        int column = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_COLUMN);
+        int row = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_ROW);
+        int column = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_COLUMN);
         HashSet<Vector3Int> returnHashSet = new();
         HashSet<Vector3Int> currentPointsForDestroy = new();
 
@@ -236,7 +236,7 @@ public class SomeTechnicalCalculations
 
     private void CheckVertical(int x, int y, int ID, HashSet<Vector3Int> pointsForDestroy) // done
     {
-        int column = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_COLUMN);
+        int column = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_COLUMN);
         pointsForDestroy.Add(new Vector3Int(x, y));
         for (int j = y + 1; j < column; j++)
         {
@@ -266,7 +266,7 @@ public class SomeTechnicalCalculations
 
     private void CheckHorizontal(int x, int y, int ID, HashSet<Vector3Int> pointsForDestroy) //done
     {
-        int row = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_ROW);
+        int row = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_ROW);
         pointsForDestroy.Add(new Vector3Int(x, y));
         for (int i = x + 1; i < row; i++)
         {

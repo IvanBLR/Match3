@@ -7,8 +7,8 @@ public class EmptyGameField : MonoBehaviour
 
     private void Start()
     {
-        int x = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_ROW);
-        int y = PlayerPrefs.GetInt(PlayerSettingsConst.GAME_FIELD_COLUMN);
+        int x = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_ROW);
+        int y = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_COLUMN);
 
         GenerateGameField(x, y);
     }
@@ -21,13 +21,13 @@ public class EmptyGameField : MonoBehaviour
         var tilesAmount = sizeGameFieldX;
         var tilesSize = _grid.cellSize.x;
 
-        var screenWidth = PlayerSettingsConst.SCREEN_WIDTH;
+        var screenWidth = SettingsConstant.SCREEN_WIDTH;
 
         var offset = GetOffset(screenWidth, tilesSize, tilesAmount, cellGap);
 
-        _grid.transform.position = new Vector3(PlayerSettingsConst.START_GRID_POSITION.X,
-                                       PlayerSettingsConst.START_GRID_POSITION.Y,
-                                       PlayerSettingsConst.START_GRID_POSITION.Z)
+        _grid.transform.position = new Vector3(SettingsConstant.START_GRID_POSITION.X,
+                                       SettingsConstant.START_GRID_POSITION.Y,
+                                       SettingsConstant.START_GRID_POSITION.Z)
                                    + new Vector3(offset, 0, 0);
        
         for (int i = 0; i < sizeGameFieldX; i++)
