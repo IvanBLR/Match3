@@ -9,6 +9,9 @@ using UnityEngine.UI;
 public class GameFieldSettings : MonoBehaviour
 {
     public Action GameSettingsAccepted;
+    public Action<int> ActivatedEasyLevel;
+    public Action<int> ActivetedMiddleLevel;
+    public Action<int> ActivatedHardLevel;
 
     public Action<int, int> GameFieldRawSizeChanged;
     public Action<int, int> GameFieldColumnSizeChanged;
@@ -42,6 +45,11 @@ public class GameFieldSettings : MonoBehaviour
         StartCoroutine(CheckValidateWindowAspect());
     }
 
+    private void Start()
+    {
+        int index = PlayerPrefs.GetInt(PlayerSettingsConst.PLAYING_SET, 0);
+        _background.sprite = _backgroundSprites[index];
+    }
 
     private IEnumerator CheckValidateWindowAspect()
     {
@@ -79,6 +87,7 @@ public class GameFieldSettings : MonoBehaviour
                 StopCoroutine(_currentSetActiveAttention);
                 _attentionText.enabled = false;
             }
+
             _currentSetActiveAttention = StartCoroutine(ActivateAttentionText());
         }
 
@@ -187,22 +196,25 @@ public class GameFieldSettings : MonoBehaviour
         PlayerPrefs.SetInt(PlayerSettingsConst.PLAYING_SET, 0);
         PlayerPrefs.Save();
         _background.sprite = _backgroundSprites[0];
+        ActivatedEasyLevel?.Invoke(0);
     }
 
     [UsedImplicitly]
     public void SaveWesterosSet()
     {
-        PlayerPrefs.SetInt(PlayerSettingsConst.PLAYING_SET, 2);
+        PlayerPrefs.SetInt(PlayerSettingsConst.PLAYING_SET, 1);
         PlayerPrefs.Save();
         _background.sprite = _backgroundSprites[1];
+        ActivetedMiddleLevel?.Invoke(1);
     }
 
     [UsedImplicitly]
     public void SaveForexSet()
     {
-        PlayerPrefs.SetInt(PlayerSettingsConst.PLAYING_SET, 1);
+        PlayerPrefs.SetInt(PlayerSettingsConst.PLAYING_SET, 2);
         PlayerPrefs.Save();
         _background.sprite = _backgroundSprites[2];
+        ActivatedHardLevel?.Invoke(2);
     }
 
     #endregion

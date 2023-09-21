@@ -294,7 +294,8 @@ public class GameFieldController : MonoBehaviour
         HashSet<Vector3Int> bombCoordinates = new();
         
         _totalScore -= 3 * bomb.Count;
-        _totalScore = _totalScore < 0 ? 0 : _totalScore;
+        if (_totalScore < 0)
+            _totalScore = 0;
         
         for (int i = 0; i < bomb.Count; i++)
         {

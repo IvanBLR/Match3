@@ -10,10 +10,11 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameFieldSettings _gameFieldSettings;
     [SerializeField] private EmptyGameField _emptyGameField;
     [SerializeField] private SoundsManager _soundsManager;
+    [SerializeField] private UI_controller _UI;
     [SerializeField] private Grid _grid;
     [SerializeField] private Button _bomb;
     [SerializeField] private TextMeshProUGUI _score;
-    
+
     private float _click;
     private Vector2 _offset;
     private Vector3Int _hitPointDown;
@@ -41,6 +42,10 @@ public class GameManager : MonoBehaviour
         _gameFieldSettings.GameSettingsAccepted += _gameFieldController.FillGameBoardWithTilesFirstTimeOnly;
         _gameFieldSettings.GameFieldRawSizeChanged += _emptyGameField.GenerateGameField;
         _gameFieldSettings.GameFieldColumnSizeChanged += _emptyGameField.GenerateGameField;
+        _gameFieldSettings.ActivatedEasyLevel += _UI.ActivateChoosenLevel;
+        _gameFieldSettings.ActivetedMiddleLevel += _UI.ActivateChoosenLevel;
+        _gameFieldSettings.ActivatedHardLevel += _UI.ActivateChoosenLevel;
+        _gameFieldSettings.GameSettingsAccepted += _UI.DeactivateChoosenViewUILevels;
 
         _gameFieldController.GotMatchTree += _soundsManager.DropItems;
         _gameFieldController.WrongMatch3 += _soundsManager.SwapBack;
@@ -51,8 +56,6 @@ public class GameManager : MonoBehaviour
         _gameFieldController.FilledGameBoard += DestroyAction;
     }
 
-
-
     private void Start()
     {
         _offset = new Vector2(_grid.cellSize.x / 2, _grid.cellSize.y / 2);
@@ -61,7 +64,7 @@ public class GameManager : MonoBehaviour
     private void Update()
     {
         _click += Time.deltaTime;
-      
+
         if (Input.GetMouseButtonDown(0) && _click >= PlayerSettingsConst.MIN_CLICK_INTERVAL)
         {
             if (!_isBombActive)
@@ -149,7 +152,6 @@ public class GameManager : MonoBehaviour
         }
         else return new Vector3Int(100, 100, 100);
     }
-
     private void UpdateScore(int score)
     {
         _score.text = score.ToString();
@@ -171,6 +173,9 @@ public class GameManager : MonoBehaviour
         _gameFieldController.WrongMatch3 -= _soundsManager.SwapBack;
         _gameFieldController.BombUsed -= _soundsManager.BombActivate;
         _gameFieldController.ScoreChanged -= UpdateScore;
+        _gameFieldSettings.ActivatedEasyLevel -= _UI.ActivateChoosenLevel;
+        _gameFieldSettings.ActivetedMiddleLevel -= _UI.ActivateChoosenLevel;
+        _gameFieldSettings.ActivatedHardLevel -= _UI.ActivateChoosenLevel;
+        _gameFieldSettings.GameSettingsAccepted += _UI.DeactivateChoosenViewUILevels;
     }
-
 }

@@ -61,7 +61,7 @@ public class SomeTechnicalCalculations
         int[] actualNameID = new int[5];
         for (int i = 0; i < 5; i++)
         {
-            actualNameID[i] = _gameFieldController.ActualItemsList[i].NameID;
+            actualNameID[i] = _gameFieldController.ActualItemsList[i].ID;
         }
 
         return actualNameID;
@@ -84,22 +84,22 @@ public class SomeTechnicalCalculations
         int rightID = 0;
         if (y + 1 < column && _gameFieldController.ItemsMatrix[x, y + 1] is not null)
         {
-            upID = _gameFieldController.ItemsMatrix[x, y + 1].ItemSettings.NameID;
+            upID = _gameFieldController.ItemsMatrix[x, y + 1].ItemSettings.ID;
         }
 
         if (y - 1 >= 0) // можно не вводить доп.проверок на null
         {
-            downID = _gameFieldController.ItemsMatrix[x, y - 1].ItemSettings.NameID;
+            downID = _gameFieldController.ItemsMatrix[x, y - 1].ItemSettings.ID;
         }
 
         if (x + 1 < row && _gameFieldController.ItemsMatrix[x + 1, y] != null)
         {
-            rightID = _gameFieldController.ItemsMatrix[x + 1, y].ItemSettings.NameID;
+            rightID = _gameFieldController.ItemsMatrix[x + 1, y].ItemSettings.ID;
         }
 
         if (x - 1 >= 0) // можно не вводить доп.проверок на null
         {
-            leftID = _gameFieldController.ItemsMatrix[x - 1, y].ItemSettings.NameID;
+            leftID = _gameFieldController.ItemsMatrix[x - 1, y].ItemSettings.ID;
         }
 
         checkList.Add(upID);
@@ -221,7 +221,7 @@ public class SomeTechnicalCalculations
             {
                 if (_gameFieldController.SpriteRenderersMatrix[i, j].gameObject.activeSelf)
                 {
-                    int currentSpriteId = _gameFieldController.ItemsMatrix[i, j].ItemSettings.NameID;
+                    int currentSpriteId = _gameFieldController.ItemsMatrix[i, j].ItemSettings.ID;
                     CheckVertical(i, j, currentSpriteId, currentPointsForDestroy);
                     CheckValidate(currentPointsForDestroy, returnHashSet);
 
@@ -240,7 +240,7 @@ public class SomeTechnicalCalculations
         pointsForDestroy.Add(new Vector3Int(x, y));
         for (int j = y + 1; j < column; j++)
         {
-            int currentID = _gameFieldController.ItemsMatrix[x, j].ItemSettings.NameID;
+            int currentID = _gameFieldController.ItemsMatrix[x, j].ItemSettings.ID;
             if (currentID == ID && _gameFieldController.SpriteRenderersMatrix[x, j].gameObject.activeSelf)
             {
                 pointsForDestroy.Add(new Vector3Int(x, j));
@@ -250,7 +250,7 @@ public class SomeTechnicalCalculations
 
         for (int j = y - 1; j >= 0; j--)
         {
-            int currentID = _gameFieldController.ItemsMatrix[x, j].ItemSettings.NameID;
+            int currentID = _gameFieldController.ItemsMatrix[x, j].ItemSettings.ID;
             if (currentID == ID && _gameFieldController.SpriteRenderersMatrix[x, j].gameObject.activeSelf)
             {
                 pointsForDestroy.Add(new Vector3Int(x, j));
@@ -270,7 +270,7 @@ public class SomeTechnicalCalculations
         pointsForDestroy.Add(new Vector3Int(x, y));
         for (int i = x + 1; i < row; i++)
         {
-            int currentID = _gameFieldController.ItemsMatrix[i, y].ItemSettings.NameID;
+            int currentID = _gameFieldController.ItemsMatrix[i, y].ItemSettings.ID;
             if (currentID == ID && _gameFieldController.SpriteRenderersMatrix[i, y].gameObject.activeSelf)
             {
                 pointsForDestroy.Add(new Vector3Int(i, y));
@@ -280,7 +280,7 @@ public class SomeTechnicalCalculations
 
         for (int i = x - 1; i >= 0; i--)
         {
-            int currentID = _gameFieldController.ItemsMatrix[i, y].ItemSettings.NameID;
+            int currentID = _gameFieldController.ItemsMatrix[i, y].ItemSettings.ID;
             if (currentID == ID && _gameFieldController.SpriteRenderersMatrix[i, y].gameObject.activeSelf)
             {
                 pointsForDestroy.Add(new Vector3Int(i, y));
