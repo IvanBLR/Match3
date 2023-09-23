@@ -13,6 +13,7 @@ public class GameFieldController : MonoBehaviour
     public Action WrongMatch3;
     public Action BombUsed;
     public Action<int> ScoreChanged;
+
     public GameFieldController()
     {
         _someTechnicalCalculations = new SomeTechnicalCalculations(this);
@@ -20,60 +21,31 @@ public class GameFieldController : MonoBehaviour
 
     public List<ItemSettingsProvider> AllVariantsItemsCollections
     {
-        set { _allVariantsItemsCollections = value; }
-        get { return _allVariantsItemsCollections; }
+        get => _allVariantsItemsCollections;
     }
 
-    public List<ItemScriptableObject> ActualItemsList
-    {
-        set { _actualItemsList = value; }
-        get { return _actualItemsList; }
-    }
-
-    public int[] ActualNameID
-    {
-        set { _actualNameID = value; }
-        get { return _actualNameID; }
-    }
-
-    public SpriteRenderer[,] SpriteRenderersMatrix
-    {
-        set { _spriteRenderersMatrix = value; }
-        get { return _spriteRenderersMatrix; }
-    }
-
-    public ItemSettings[,] ItemsMatrix
-    {
-        set { _itemsMatrix = value; }
-        get { return _itemsMatrix; }
-    }
-
-    public int ItemCollectionsNumber
-    {
-        set { _itemCollectionsNumber = value; }
-        get { return _itemCollectionsNumber; }
-    }
+    public List<ItemScriptableObject> ActualItemsList { get; private set; }
+    public int[] ActualNameID { get; private set; } = new int[5];
+    public SpriteRenderer[,] SpriteRenderersMatrix { get; private set; }
+    public ItemSettings[,] ItemsMatrix { get; private set; }
+    public int ItemCollectionsNumber { get; private set; }
 
     [SerializeField] private Grid _grid;
     [SerializeField] private GameObject _itemPrefab;
     [SerializeField] private List<ItemSettingsProvider> _allVariantsItemsCollections;
     [SerializeField] private Transform _parent;
 
-    private List<ItemScriptableObject> _actualItemsList;
-    private int[] _actualNameID = new int[5];
-    private SpriteRenderer[,] _spriteRenderersMatrix;
-    private ItemSettings[,] _itemsMatrix;
-
-    private int _itemCollectionsNumber;
     private int _totalScore;
-    
+
     private readonly SomeTechnicalCalculations _someTechnicalCalculations;
 
-    public void InitializeActualItemsList() // done
+    public void InitializeActualItemsList()
     {
-        _itemCollectionsNumber = PlayerPrefs.GetInt(PlayingSettingsConstant.PLAYING_SET);
-        _actualItemsList = _someTechnicalCalculations.GetActualItemsList();
-        _actualNameID = _someTechnicalCalculations.GetActualNameID();
+        _someTechnicalCalculations.InitializeRowAndColumn();
+        
+        ItemCollectionsNumber = PlayerPrefs.GetInt(PlayingSettingsConstant.PLAYING_SET);
+        ActualItemsList = _someTechnicalCalculations.GetActualItemsList();
+        ActualNameID = _someTechnicalCalculations.GetActualNameID();
 
         int row = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_ROW);
         int column = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_COLUMN);
@@ -84,16 +56,16 @@ public class GameFieldController : MonoBehaviour
             _parent.position += new Vector3(0, 1.5f, 0);
         }
 
-        _spriteRenderersMatrix = new SpriteRenderer[row, column];
-        _itemsMatrix = new ItemSettings[row, column];
+        SpriteRenderersMatrix = new SpriteRenderer[row, column];
+        ItemsMatrix = new ItemSettings[row, column];
 
         InitializationActualItemsCompleted?.Invoke();
     }
 
-    public void FillGameBoardWithTilesFirstTimeOnly() // done 
+    public void FillGameBoardWithTilesFirstTimeOnly()
     {
-        int row = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_ROW);
-        int column = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_COLUMN);
+        int row = PrefsManager.GetDataInt(PlayingSettingsConstant.GAME_FIELD_ROW);
+        int column = PrefsManager.GetDataInt(PlayingSettingsConstant.GAME_FIELD_COLUMN);
         for (int i = 0; i < row; i++)
         {
             for (int j = 0; j < column; j++)
@@ -102,14 +74,14 @@ public class GameFieldController : MonoBehaviour
                 var tile = Instantiate(_itemPrefab, _parent);
                 tile.transform.localPosition = position + _grid.cellGap;
 
-                _spriteRenderersMatrix[i, j] = tile.GetComponent<SpriteRenderer>();
-                _itemsMatrix[i, j] = tile.GetComponent<ItemSettings>();
+                SpriteRenderersMatrix[i, j] = tile.GetComponent<SpriteRenderer>();
+                ItemsMatrix[i, j] = tile.GetComponent<ItemSettings>();
 
                 int indexCurrentSettings = _someTechnicalCalculations.GetCurrentSettingsIndex(i, j);
-                var currentSettings = _actualItemsList[indexCurrentSettings];
+                var currentSettings = ActualItemsList[indexCurrentSettings];
 
-                _itemsMatrix[i, j].ItemsSettings = currentSettings;
-                _spriteRenderersMatrix[i, j].sprite = currentSettings.Icon;
+                ItemsMatrix[i, j].ItemsSettings = currentSettings;
+                SpriteRenderersMatrix[i, j].sprite = currentSettings.Icon;
 
                 var targetScale = tile.transform.localScale;
                 tile.transform.localScale = Vector3.zero;
@@ -122,74 +94,52 @@ public class GameFieldController : MonoBehaviour
 
     public void Swap(RaycastHit2D hitDown, RaycastHit2D hitUp, int x, int y, Vector2Int direction) // done
     {
-        HashSet<Vector3Int> match3 = new();
-
         if (direction == new Vector2(1, 0)) // to right
-        {
-            SwapAnimation(hitDown, hitUp, x, y, direction);
-            match3 = _someTechnicalCalculations.GetMatchThreeOrMore();
-
-            if (match3.Count > 0)
-                StartCoroutine(RestoreGameField(match3));
-            else
-                StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
-        }
+            StartSwapAnimation(hitDown, hitUp, x, y, direction);
 
         if (direction == new Vector2(-1, 0)) // to left
-        {
-            SwapAnimation(hitDown, hitUp, x, y, direction);
-            match3 = _someTechnicalCalculations.GetMatchThreeOrMore();
-
-            if (match3.Count > 0)
-                StartCoroutine(RestoreGameField(match3));
-            else
-                StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
-        }
+            StartSwapAnimation(hitDown, hitUp, x, y, direction);
 
         if (direction == new Vector2(0, 1)) // to up
-        {
-            SwapAnimation(hitDown, hitUp, x, y, direction);
-            match3 = _someTechnicalCalculations.GetMatchThreeOrMore();
-
-            if (match3.Count > 0)
-                StartCoroutine(RestoreGameField(match3));
-            else
-                StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
-        }
+            StartSwapAnimation(hitDown, hitUp, x, y, direction);
 
         if (direction == new Vector2(0, -1)) // to down
-        {
-            SwapAnimation(hitDown, hitUp, x, y, direction);
-            match3 = _someTechnicalCalculations.GetMatchThreeOrMore();
+            StartSwapAnimation(hitDown, hitUp, x, y, direction);
+    }
 
-            if (match3.Count > 0)
-                StartCoroutine(RestoreGameField(match3));
-            else
-                StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
-        }
+    private void StartSwapAnimation(RaycastHit2D hitDown, RaycastHit2D hitUp, int x, int y, Vector2Int direction)
+    {
+        SwapAnimation(hitDown, hitUp, x, y, direction);
+
+        HashSet<Vector3Int> match3 = _someTechnicalCalculations.GetMatchThreeOrMore();
+
+        if (match3.Count > 0)
+            StartCoroutine(RestoreGameField(match3));
+        else
+            StartCoroutine(SwapBackAnimation(hitDown, hitUp, x, y, direction));
     }
 
     private void SwapAnimation(RaycastHit2D hitDown, RaycastHit2D hitUp, int x, int y, Vector2Int direction)
     {
         if (hitDown.collider != null && hitUp.collider != null)
         {
-            RectTransform firstTile = (RectTransform)hitDown.transform; // maybe easy Transform?
-            RectTransform secondTile = (RectTransform)hitUp.transform; // maybe easy Transform?
+            RectTransform firstTile = (RectTransform)hitDown.transform;
+            RectTransform secondTile = (RectTransform)hitUp.transform;
 
             firstTile.DOMove(secondTile.position, 0.3f).SetDelay(PlayingSettingsConstant.DELAY);
             secondTile.DOMove(firstTile.position, 0.3f).SetDelay(PlayingSettingsConstant.DELAY);
 
-            var tempItem = _itemsMatrix[x, y];
-            _itemsMatrix[x, y] = _itemsMatrix[x + direction.x, y + direction.y]; // íå íàäî íàæèìàòü
-            _itemsMatrix[x + direction.x, y + direction.y] = tempItem; // alt + enter
+            var tempItem = ItemsMatrix[x, y];
+            ItemsMatrix[x, y] = ItemsMatrix[x + direction.x, y + direction.y]; // íå íàäî íàæèìàòü
+            ItemsMatrix[x + direction.x, y + direction.y] = tempItem; // alt + enter
 
-            var tempSpriteRenderer = _spriteRenderersMatrix[x, y];
-            _spriteRenderersMatrix[x, y] = _spriteRenderersMatrix[x + direction.x, y + direction.y]; // íå íàäî íàæèìàòü
-            _spriteRenderersMatrix[x + direction.x, y + direction.y] = tempSpriteRenderer; // alt + enter
+            var tempSpriteRenderer = SpriteRenderersMatrix[x, y];
+            SpriteRenderersMatrix[x, y] = SpriteRenderersMatrix[x + direction.x, y + direction.y]; // íå íàäî íàæèìàòü
+            SpriteRenderersMatrix[x + direction.x, y + direction.y] = tempSpriteRenderer; // alt + enter
         }
     }
 
-    private void DeleteMatchThree(HashSet<Vector3Int> setForDelete) // done
+    private void DeleteMatchThree(HashSet<Vector3Int> setForDelete)
     {
         GotMatchTree.Invoke();
         foreach (var point in setForDelete)
@@ -197,17 +147,17 @@ public class GameFieldController : MonoBehaviour
             int x = point.x;
             int y = point.y;
 
-            var localScale = _spriteRenderersMatrix[x, y].transform.localScale;
-            _spriteRenderersMatrix[x, y].transform.DOScale(Vector3.zero, 0.3f)
+            var localScale = SpriteRenderersMatrix[x, y].transform.localScale;
+            SpriteRenderersMatrix[x, y].transform.DOScale(Vector3.zero, 0.3f)
                 .OnComplete(() =>
                 {
-                    _spriteRenderersMatrix[x, y].gameObject.SetActive(false);
-                    _spriteRenderersMatrix[x, y].transform.localScale = localScale;
+                    SpriteRenderersMatrix[x, y].gameObject.SetActive(false);
+                    SpriteRenderersMatrix[x, y].transform.localScale = localScale;
                 });
         }
     }
 
-    private void FallDownItems() //   done
+    private void FallDownItems()
     {
         var emptyCoordinates = _someTechnicalCalculations.GetAllEmptyCoordinates();
         var itemCoordinatesForFalling = _someTechnicalCalculations.GetItemsCoordinatesForFalling(emptyCoordinates);
@@ -225,39 +175,37 @@ public class GameFieldController : MonoBehaviour
 
                 var sortedCoordinates = newEmptyCoordinates.OrderBy(point => point.y).ToList();
 
-                if (itemCoordinatesForFalling[i].Count > 0)
+                if (itemCoordinatesForFalling[i].Count <= 0) continue;
+                for (int n = 0; n < itemCoordinatesForFalling[i].Count; n++)
                 {
-                    for (int n = 0; n < itemCoordinatesForFalling[i].Count; n++)
-                    {
-                        FallingAnimation(itemCoordinatesForFalling, i, n, sortedCoordinates);
-                    }
+                    FallingAnimation(itemCoordinatesForFalling, i, n, sortedCoordinates);
                 }
             }
         }
     }
 
     private void FallingAnimation(List<List<Vector3Int>> coordinatesForFalling, int i, int j,
-        List<Vector3Int> sortedCoordinates) // done
+        List<Vector3Int> sortedCoordinates)
     {
         var firstPoint = coordinatesForFalling[i][j];
         var secondPoint = sortedCoordinates[j];
 
-        RectTransform tileForFalling = (RectTransform)_spriteRenderersMatrix[firstPoint.x, firstPoint.y].transform;
-        RectTransform emptyTile = (RectTransform)_spriteRenderersMatrix[secondPoint.x, secondPoint.y].transform;
+        RectTransform tileForFalling = (RectTransform)SpriteRenderersMatrix[firstPoint.x, firstPoint.y].transform;
+        RectTransform emptyTile = (RectTransform)SpriteRenderersMatrix[secondPoint.x, secondPoint.y].transform;
 
         tileForFalling.DOMove(_grid.CellToWorld(secondPoint), 0.5f);
         emptyTile.DOMove(_grid.CellToWorld(firstPoint), 0.5f);
 
-        var tempSpriteRenderer = _spriteRenderersMatrix[firstPoint.x, firstPoint.y];
-        _spriteRenderersMatrix[firstPoint.x, firstPoint.y] = _spriteRenderersMatrix[secondPoint.x, secondPoint.y];
-        _spriteRenderersMatrix[secondPoint.x, secondPoint.y] = tempSpriteRenderer;
+        var tempSpriteRenderer = SpriteRenderersMatrix[firstPoint.x, firstPoint.y]; // íå íàäî íàæèìàòü alt+enter
+        SpriteRenderersMatrix[firstPoint.x, firstPoint.y] = SpriteRenderersMatrix[secondPoint.x, secondPoint.y];
+        SpriteRenderersMatrix[secondPoint.x, secondPoint.y] = tempSpriteRenderer;
 
-        var tempItem = _itemsMatrix[firstPoint.x, firstPoint.y];
-        _itemsMatrix[firstPoint.x, firstPoint.y] = _itemsMatrix[secondPoint.x, secondPoint.y];
-        _itemsMatrix[secondPoint.x, secondPoint.y] = tempItem;
+        var tempItem = ItemsMatrix[firstPoint.x, firstPoint.y]; // íå íàäî íàæèìàòü alt+enter
+        ItemsMatrix[firstPoint.x, firstPoint.y] = ItemsMatrix[secondPoint.x, secondPoint.y];
+        ItemsMatrix[secondPoint.x, secondPoint.y] = tempItem;
     }
 
-    private void FillEmptyCellsAfterMatch3() // done
+    private void FillEmptyCellsAfterMatch3()
     {
         var emptyCells = _someTechnicalCalculations.GetAllEmptyCoordinates();
         HashSet<int> ID = new();
@@ -270,14 +218,14 @@ public class GameFieldController : MonoBehaviour
                 int y = emptyCells[i][j].y;
 
                 int currentSettingsIndex = _someTechnicalCalculations.GetCurrentSettingsIndex(x, y);
-                _spriteRenderersMatrix[x, y].gameObject.SetActive(true);
+                SpriteRenderersMatrix[x, y].gameObject.SetActive(true);
 
-                _itemsMatrix[x, y].ItemsSettings = _actualItemsList[currentSettingsIndex];
-                _spriteRenderersMatrix[x, y].sprite = _itemsMatrix[x, y].ItemsSettings.Icon;
+                ItemsMatrix[x, y].ItemsSettings = ActualItemsList[currentSettingsIndex];
+                SpriteRenderersMatrix[x, y].sprite = ItemsMatrix[x, y].ItemsSettings.Icon;
 
-                var finishScale = _spriteRenderersMatrix[x, y].transform.localScale;
-                _spriteRenderersMatrix[x, y].transform.localScale = Vector3.zero;
-                _spriteRenderersMatrix[x, y].transform.DOScale(finishScale, 0.3f);
+                var finishScale = SpriteRenderersMatrix[x, y].transform.localScale;
+                SpriteRenderersMatrix[x, y].transform.localScale = Vector3.zero;
+                SpriteRenderersMatrix[x, y].transform.DOScale(finishScale, 0.3f);
             }
         }
     }
@@ -286,15 +234,16 @@ public class GameFieldController : MonoBehaviour
     {
         List<Vector3Int> bomb = _someTechnicalCalculations.GetBombsCoordinates(x, y);
         HashSet<Vector3Int> bombCoordinates = new();
-        
+
         _totalScore -= 3 * bomb.Count;
         if (_totalScore < 0)
             _totalScore = 0;
-        
+
         for (int i = 0; i < bomb.Count; i++)
         {
             bombCoordinates.Add(bomb[i]);
         }
+
         BombUsed?.Invoke();
         StartCoroutine(RestoreGameField(bombCoordinates));
     }
@@ -309,7 +258,7 @@ public class GameFieldController : MonoBehaviour
 
         _totalScore += match3.Count;
         ScoreChanged?.Invoke(_totalScore);
-        
+
         var newMatch3 = _someTechnicalCalculations.GetMatchThreeOrMore();
         if (newMatch3.Count > 2)
         {

@@ -1,28 +1,34 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Random = System.Random;
 
 public class SomeTechnicalCalculations
 {
-    private GameFieldController _gameFieldController;
-
     public SomeTechnicalCalculations(GameFieldController gameFieldController)
     {
         _gameFieldController = gameFieldController;
+    }
+
+    private readonly GameFieldController _gameFieldController;
+
+    private int _row = 0;
+    private int _column;
+
+    public void InitializeRowAndColumn()
+    {
+        _row = PrefsManager.GetDataInt(PlayingSettingsConstant.GAME_FIELD_ROW);
+        _column = PrefsManager.GetDataInt(PlayingSettingsConstant.GAME_FIELD_COLUMN);
     }
 
     public List<Vector3Int> GetBombsCoordinates(int x, int y)
     {
         List<Vector3Int> bombList = new List<Vector3Int>
         {
-            new Vector3Int(0, 0, 0), new Vector3Int(0, 1, 0), new Vector3Int(1, 0, 0), new Vector3Int(1, 1, 0)
+            new(0, 0, 0), new(0, 1, 0), new(1, 0, 0), new(1, 1, 0)
         };
-        int row = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_ROW);
-        int column = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_COLUMN);
 
-        int startX = row - 1 > x ? x : row - 2;
-        int startY = column - 1 > y ? y : column - 2;
+        int startX = _row - 1 > x ? x : _row - 2;
+        int startY = _column - 1 > y ? y : _column - 2;
 
         Vector3Int currentPoint = new Vector3Int(startX, startY, 0);
         for (int i = 0; i < bombList.Count; i++)
@@ -36,15 +42,14 @@ public class SomeTechnicalCalculations
     /// <summary>
     /// return choose player's set with 5 random element.
     /// </summary>
-    public List<ItemScriptableObject> GetActualItemsList() //done
+    public List<ItemScriptableObject> GetActualItemsList()
     {
         List<ItemScriptableObject> actualItemsListForReturn = new();
-        Random random = new Random();
         var actualItemSettingsProvider =
             _gameFieldController.AllVariantsItemsCollections.ElementAt(_gameFieldController.ItemCollectionsNumber);
         var actualItemsCollection = actualItemSettingsProvider.ItemsList;
         int[] uniqueIndexes = Enumerable.Range(0, actualItemsCollection.Count)
-            .OrderBy(x => UnityEngine.Random.Range(0, actualItemsCollection.Count))
+            .OrderBy(x => Random.Range(0, actualItemsCollection.Count))
             .Take(5)
             .ToArray();
         for (int i = 0; i < 5; i++)
@@ -56,7 +61,7 @@ public class SomeTechnicalCalculations
         return actualItemsListForReturn;
     }
 
-    public int[] GetActualNameID() // done
+    public int[] GetActualNameID()
     {
         int[] actualNameID = new int[5];
         for (int i = 0; i < 5; i++)
@@ -71,18 +76,15 @@ public class SomeTechnicalCalculations
     ///  Метод помогает заполнить пустые ячейки, вернув нужный IndexSettings,
     /// kоторый гарантирует, что нигде не будет match-3
     /// /// </summary>
-    public int GetCurrentSettingsIndex(int x, int y) // done.
+    public int GetCurrentSettingsIndex(int x, int y)
     {
-        Random random = new Random();
         HashSet<int> checkList = new();
-        int row = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_ROW);
-        int column = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_COLUMN);
         int currentID = 0;
         int upID = 0;
         int downID = 0;
         int leftID = 0;
         int rightID = 0;
-        if (y + 1 < column && _gameFieldController.ItemsMatrix[x, y + 1] is not null)
+        if (y + 1 < _column && _gameFieldController.ItemsMatrix[x, y + 1] is not null)
         {
             upID = _gameFieldController.ItemsMatrix[x, y + 1].ItemsSettings.ID;
         }
@@ -92,7 +94,7 @@ public class SomeTechnicalCalculations
             downID = _gameFieldController.ItemsMatrix[x, y - 1].ItemsSettings.ID;
         }
 
-        if (x + 1 < row && _gameFieldController.ItemsMatrix[x + 1, y] != null)
+        if (x + 1 < _row && _gameFieldController.ItemsMatrix[x + 1, y] != null)
         {
             rightID = _gameFieldController.ItemsMatrix[x + 1, y].ItemsSettings.ID;
         }
@@ -109,15 +111,14 @@ public class SomeTechnicalCalculations
 
         while (true)
         {
-            int index = random.Next(0, 5);
+            int index = Random.Range(0, 5);
             currentID = _gameFieldController.ActualNameID[index];
             if (!checkList.Contains(currentID)) return index;
         }
     }
 
-    public List<List<Vector3Int>> GetItemsCoordinatesForFalling(List<List<Vector3Int>> allEmptyCoordinates) // done
+    public List<List<Vector3Int>> GetItemsCoordinatesForFalling(List<List<Vector3Int>> allEmptyCoordinates)
     {
-        int column = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_COLUMN);
         List<List<Vector3Int>> finalReturnList = new();
         Queue<List<Vector3Int>> globalQueueWithListCoordinates = new();
 
@@ -163,7 +164,7 @@ public class SomeTechnicalCalculations
                     }
                 }
 
-                for (int y = currentPoint.y + 1; y < column; y++)
+                for (int y = currentPoint.y + 1; y < _column; y++)
                 {
                     listForReturnList.Add(new Vector3Int(currentPoint.x, y));
                 }
@@ -175,12 +176,11 @@ public class SomeTechnicalCalculations
         return finalReturnList;
     }
 
-    public List<List<Vector3Int>> GetAllEmptyCoordinates() // done
+    public List<List<Vector3Int>> GetAllEmptyCoordinates()
     {
-        int row = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_ROW);
         List<List<Vector3Int>> returnList = new();
 
-        for (int i = 0; i < row; i++)
+        for (int i = 0; i < _row; i++)
         {
             var currentList = GetEmptyCoordinatesInCurrentColumnInGridNotation(i);
             returnList.Add(currentList);
@@ -192,33 +192,28 @@ public class SomeTechnicalCalculations
     /// <summary>
     /// вспомогательный метод
     /// </summary>
-    private List<Vector3Int> GetEmptyCoordinatesInCurrentColumnInGridNotation(int rowIndex) // done 
+    private List<Vector3Int> GetEmptyCoordinatesInCurrentColumnInGridNotation(int rowIndex)
     {
-        int column = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_COLUMN);
         List<Vector3Int> arrayForReturn = new();
-        for (int j = 0; j < column; j++)
+        for (int j = 0; j < _column; j++)
         {
             var currentSpriteRenderer = _gameFieldController.SpriteRenderersMatrix[rowIndex, j];
-            if (!currentSpriteRenderer.gameObject.activeSelf) //currentSpriteRenderer.enabled == false)
-            {
-                var emptyPosition = new Vector3Int(rowIndex, j);
-                arrayForReturn.Add(emptyPosition);
-            }
+            if (currentSpriteRenderer.gameObject.activeSelf) continue;
+            var emptyPosition = new Vector3Int(rowIndex, j);
+            arrayForReturn.Add(emptyPosition);
         }
 
         return arrayForReturn;
     }
 
-    public HashSet<Vector3Int> GetMatchThreeOrMore() // done
+    public HashSet<Vector3Int> GetMatchThreeOrMore()
     {
-        int row = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_ROW);
-        int column = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_COLUMN);
         HashSet<Vector3Int> returnHashSet = new();
         HashSet<Vector3Int> currentPointsForDestroy = new();
 
-        for (int i = 0; i < row; i++)
+        for (int i = 0; i < _row; i++)
         {
-            for (int j = 0; j < column; j++)
+            for (int j = 0; j < _column; j++)
             {
                 if (_gameFieldController.SpriteRenderersMatrix[i, j].gameObject.activeSelf)
                 {
@@ -235,11 +230,10 @@ public class SomeTechnicalCalculations
         return returnHashSet;
     }
 
-    private void CheckVertical(int x, int y, int ID, HashSet<Vector3Int> pointsForDestroy) // done
+    private void CheckVertical(int x, int y, int ID, HashSet<Vector3Int> pointsForDestroy)
     {
-        int column = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_COLUMN);
         pointsForDestroy.Add(new Vector3Int(x, y));
-        for (int j = y + 1; j < column; j++)
+        for (int j = y + 1; j < _column; j++)
         {
             int currentID = _gameFieldController.ItemsMatrix[x, j].ItemsSettings.ID;
             if (currentID == ID && _gameFieldController.SpriteRenderersMatrix[x, j].gameObject.activeSelf)
@@ -265,11 +259,10 @@ public class SomeTechnicalCalculations
         }
     }
 
-    private void CheckHorizontal(int x, int y, int ID, HashSet<Vector3Int> pointsForDestroy) //done
+    private void CheckHorizontal(int x, int y, int ID, HashSet<Vector3Int> pointsForDestroy)
     {
-        int row = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_ROW);
         pointsForDestroy.Add(new Vector3Int(x, y));
-        for (int i = x + 1; i < row; i++)
+        for (int i = x + 1; i < _row; i++)
         {
             int currentID = _gameFieldController.ItemsMatrix[i, y].ItemsSettings.ID;
             if (currentID == ID && _gameFieldController.SpriteRenderersMatrix[i, y].gameObject.activeSelf)
@@ -298,7 +291,7 @@ public class SomeTechnicalCalculations
     /// <summary>
     /// метод дополнительной проверки корректности полученных координат Match-3
     /// </summary>
-    private void CheckValidate(HashSet<Vector3Int> currentPointsForDestroy, HashSet<Vector3Int> returnHashSet) //done 
+    private void CheckValidate(HashSet<Vector3Int> currentPointsForDestroy, HashSet<Vector3Int> returnHashSet)
     {
         if (currentPointsForDestroy.Count > 2)
         {

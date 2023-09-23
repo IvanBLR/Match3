@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour
     private Vector2 _offset;
     private Vector3Int _hitPointDown;
     private Vector3Int _hitPointUp;
-    private Vector3Int _invalidValue = new Vector3Int(999, 999, 999);
+    private readonly Vector3Int _invalidValue = new(999, 999, 999);
     private Vector3 _delta;
     private bool _isBombActive;
     private RaycastHit2D _raycastHitDown;
@@ -97,7 +97,7 @@ public class GameManager : MonoBehaviour
                 _isBombActive = false;
             }
         }
-        
+
         if (Input.GetMouseButtonUp(0) && _click >= PlayingSettingsConstant.MIN_CLICK_INTERVAL && !_isBombActive)
         {
             var ray = _camera.ScreenPointToRay(Input.mousePosition);
@@ -117,24 +117,28 @@ public class GameManager : MonoBehaviour
         {
             if (deltaX == 1 && deltaY == 0) // to right
             {
-                _gameFieldController.Swap(_raycastHitDown, _raycastHitUp, _hitPointDown.x, _hitPointDown.y, new Vector2Int(1, 0));
+                _gameFieldController.Swap(_raycastHitDown, _raycastHitUp, _hitPointDown.x, _hitPointDown.y,
+                    new Vector2Int(1, 0));
             }
 
             if (deltaX == -1 && deltaY == 0) // to left
             {
-                _gameFieldController.Swap(_raycastHitDown, _raycastHitUp, _hitPointDown.x, _hitPointDown.y, new Vector2Int(-1, 0));
+                _gameFieldController.Swap(_raycastHitDown, _raycastHitUp, _hitPointDown.x, _hitPointDown.y,
+                    new Vector2Int(-1, 0));
             }
         }
         else // vertical swap
         {
             if (deltaX == 0 && deltaY == 1) // to up
             {
-                _gameFieldController.Swap(_raycastHitDown, _raycastHitUp, _hitPointDown.x, _hitPointDown.y, new Vector2Int(0, 1));
+                _gameFieldController.Swap(_raycastHitDown, _raycastHitUp, _hitPointDown.x, _hitPointDown.y,
+                    new Vector2Int(0, 1));
             }
 
             if (deltaX == 0 && deltaY == -1) // to down
             {
-                _gameFieldController.Swap(_raycastHitDown, _raycastHitUp, _hitPointDown.x, _hitPointDown.y, new Vector2Int(0, -1));
+                _gameFieldController.Swap(_raycastHitDown, _raycastHitUp, _hitPointDown.x, _hitPointDown.y,
+                    new Vector2Int(0, -1));
             }
         }
     }
@@ -160,7 +164,7 @@ public class GameManager : MonoBehaviour
         _gameFieldController.InitializationActualItemsCompleted -= DestroyAction;
         _gameFieldController.FilledGameBoard -= DestroyAction;
         _gameFieldController.FilledGameBoard -= _gameFieldController.FillGameBoardWithTilesFirstTimeOnly;
-        
+
         _gameFieldSettings.GameSettingsAccepted -= _gameFieldController.InitializeActualItemsList;
         _gameFieldSettings.GameSettingsAccepted -= _gameFieldController.FillGameBoardWithTilesFirstTimeOnly;
         _gameFieldSettings.GameSettingsAccepted -= _UI.StartedGame;
@@ -175,7 +179,7 @@ public class GameManager : MonoBehaviour
         _gameFieldController.WrongMatch3 -= _soundsManager.OnSwapBack;
         _gameFieldController.BombUsed -= _soundsManager.OnBombActivate;
         _gameFieldController.ScoreChanged -= UpdateScore;
-        
+
         _gameFieldSettings.ActivatedEasyLevel -= _UI.ActivateAcceptLevelView;
         _gameFieldSettings.ActivatedMiddleLevel -= _UI.ActivateAcceptLevelView;
         _gameFieldSettings.ActivatedHardLevel -= _UI.ActivateAcceptLevelView;
