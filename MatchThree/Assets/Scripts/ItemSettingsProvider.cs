@@ -6,7 +6,7 @@ using UnityEngine;
                  order = 52)]
 public class ItemSettingsProvider : ScriptableObject
 {
-    public List<ItemScriptableObject> ItemsList => _itemsList;
+    public IReadOnlyList<ItemScriptableObject> ItemsList => _itemsList;
 
     [SerializeField] 
     private List<ItemScriptableObject> _itemsList;

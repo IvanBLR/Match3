@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -7,17 +6,21 @@ using UnityEngine.UI;
 
 public class LoadGame : MonoBehaviour
 {
-    [SerializeField] private Toggle _toggle;
+    [SerializeField] private Canvas _invalidCanvas;
+    [SerializeField] private Canvas _canvas;
     [SerializeField] private Image _soundOn;
     [SerializeField] private Image _soundOff;
     [SerializeField] private AudioSource _audioSource;
+    [SerializeField] private AudioClip _bottonClick;
+
     private bool _isSoundOn = true;
 
     [UsedImplicitly]
     public void StartGame()
     {
+        _audioSource.PlayOneShot(_bottonClick);
         int sound = _isSoundOn ? 1 : 0;
-        PlayerPrefs.SetInt(SettingsConstant.SOUND_ON_OFF, sound);
+        PlayerPrefs.SetInt(PlayingSettingsConstant.SOUND_ON_OFF, sound);
         PlayerPrefs.Save();
         SceneManager.LoadScene(1);
     }
@@ -25,9 +28,47 @@ public class LoadGame : MonoBehaviour
     [UsedImplicitly]
     public void SoundTumbler()
     {
+        _audioSource.mute = _isSoundOn;
         _soundOff.gameObject.SetActive(_isSoundOn);
         _soundOn.gameObject.SetActive(!_isSoundOn);
         _isSoundOn = !_isSoundOn;
-        _audioSource.gameObject.SetActive(_isSoundOn);
+    }
+
+    [UsedImplicitly]
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(0);
+    }
+
+    private void Awake()
+    {
+        StartCoroutine(CheckValidateWindowAspect());
+    }
+
+    private IEnumerator CheckValidateWindowAspect()
+    {
+        float width = Screen.width;
+        float height = Screen.height;
+        float currentSize = width / height;
+
+        float expectedWidth = PlayingSettingsConstant.SCREEN_ROW;
+        float expectedHeight = PlayingSettingsConstant.SCREEN_COLUMN;
+        float expectedSize = expectedWidth / expectedHeight;
+
+        if (!(currentSize == expectedSize))
+        {
+            _invalidCanvas.gameObject.SetActive(true);
+            _canvas.gameObject.SetActive(false);
+            _audioSource.gameObject.SetActive(false);
+            transform.GetComponent<SpriteRenderer>().enabled = false;
+        }
+        else
+        {
+            _invalidCanvas.gameObject.SetActive(false);
+            _canvas.gameObject.SetActive(true);
+            _audioSource.gameObject.SetActive(true);
+        }
+
+        yield return new WaitUntil(() => currentSize == expectedSize);
     }
 }

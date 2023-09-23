@@ -18,12 +18,6 @@ public class GameFieldController : MonoBehaviour
         _someTechnicalCalculations = new SomeTechnicalCalculations(this);
     }
 
-    public int TotalScore => _totalScore;
-    public SomeTechnicalCalculations SomeTechnicalCalculations
-    {
-        get { return _someTechnicalCalculations; }
-    }
-
     public List<ItemSettingsProvider> AllVariantsItemsCollections
     {
         set { _allVariantsItemsCollections = value; }
@@ -48,7 +42,7 @@ public class GameFieldController : MonoBehaviour
         get { return _spriteRenderersMatrix; }
     }
 
-    public Item[,] ItemsMatrix
+    public ItemSettings[,] ItemsMatrix
     {
         set { _itemsMatrix = value; }
         get { return _itemsMatrix; }
@@ -68,7 +62,7 @@ public class GameFieldController : MonoBehaviour
     private List<ItemScriptableObject> _actualItemsList;
     private int[] _actualNameID = new int[5];
     private SpriteRenderer[,] _spriteRenderersMatrix;
-    private Item[,] _itemsMatrix;
+    private ItemSettings[,] _itemsMatrix;
 
     private int _itemCollectionsNumber;
     private int _totalScore;
@@ -77,29 +71,29 @@ public class GameFieldController : MonoBehaviour
 
     public void InitializeActualItemsList() // done
     {
-        _itemCollectionsNumber = PlayerPrefs.GetInt(SettingsConstant.PLAYING_SET);
-        _actualItemsList = SomeTechnicalCalculations.GetActualItemsList();
-        _actualNameID = SomeTechnicalCalculations.GetActualNameID();
+        _itemCollectionsNumber = PlayerPrefs.GetInt(PlayingSettingsConstant.PLAYING_SET);
+        _actualItemsList = _someTechnicalCalculations.GetActualItemsList();
+        _actualNameID = _someTechnicalCalculations.GetActualNameID();
 
-        int row = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_ROW);
-        int column = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_COLUMN);
+        int row = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_ROW);
+        int column = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_COLUMN);
         _parent.position = _grid.transform.position;
-        if (PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_COLUMN) == 5)
+        if (PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_COLUMN) == 5)
         {
             _grid.transform.position += new Vector3(0, 1.5f, 0);
             _parent.position += new Vector3(0, 1.5f, 0);
         }
 
         _spriteRenderersMatrix = new SpriteRenderer[row, column];
-        _itemsMatrix = new Item[row, column];
+        _itemsMatrix = new ItemSettings[row, column];
 
         InitializationActualItemsCompleted?.Invoke();
     }
 
     public void FillGameBoardWithTilesFirstTimeOnly() // done 
     {
-        int row = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_ROW);
-        int column = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_COLUMN);
+        int row = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_ROW);
+        int column = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_COLUMN);
         for (int i = 0; i < row; i++)
         {
             for (int j = 0; j < column; j++)
@@ -109,17 +103,17 @@ public class GameFieldController : MonoBehaviour
                 tile.transform.localPosition = position + _grid.cellGap;
 
                 _spriteRenderersMatrix[i, j] = tile.GetComponent<SpriteRenderer>();
-                _itemsMatrix[i, j] = tile.GetComponent<Item>();
+                _itemsMatrix[i, j] = tile.GetComponent<ItemSettings>();
 
-                int indexCurrentSettings = SomeTechnicalCalculations.GetCurrentSettingsIndex(i, j);
+                int indexCurrentSettings = _someTechnicalCalculations.GetCurrentSettingsIndex(i, j);
                 var currentSettings = _actualItemsList[indexCurrentSettings];
 
-                _itemsMatrix[i, j].ItemSettings = currentSettings;
+                _itemsMatrix[i, j].ItemsSettings = currentSettings;
                 _spriteRenderersMatrix[i, j].sprite = currentSettings.Icon;
 
                 var targetScale = tile.transform.localScale;
                 tile.transform.localScale = Vector3.zero;
-                tile.transform.DOScale(targetScale, 0.3f).SetDelay(SettingsConstant.DELAY);
+                tile.transform.DOScale(targetScale, 0.3f).SetDelay(PlayingSettingsConstant.DELAY);
             }
         }
 
@@ -133,7 +127,7 @@ public class GameFieldController : MonoBehaviour
         if (direction == new Vector2(1, 0)) // to right
         {
             SwapAnimation(hitDown, hitUp, x, y, direction);
-            match3 = SomeTechnicalCalculations.GetMatchThreeOrMore();
+            match3 = _someTechnicalCalculations.GetMatchThreeOrMore();
 
             if (match3.Count > 0)
                 StartCoroutine(RestoreGameField(match3));
@@ -144,7 +138,7 @@ public class GameFieldController : MonoBehaviour
         if (direction == new Vector2(-1, 0)) // to left
         {
             SwapAnimation(hitDown, hitUp, x, y, direction);
-            match3 = SomeTechnicalCalculations.GetMatchThreeOrMore();
+            match3 = _someTechnicalCalculations.GetMatchThreeOrMore();
 
             if (match3.Count > 0)
                 StartCoroutine(RestoreGameField(match3));
@@ -155,7 +149,7 @@ public class GameFieldController : MonoBehaviour
         if (direction == new Vector2(0, 1)) // to up
         {
             SwapAnimation(hitDown, hitUp, x, y, direction);
-            match3 = SomeTechnicalCalculations.GetMatchThreeOrMore();
+            match3 = _someTechnicalCalculations.GetMatchThreeOrMore();
 
             if (match3.Count > 0)
                 StartCoroutine(RestoreGameField(match3));
@@ -166,7 +160,7 @@ public class GameFieldController : MonoBehaviour
         if (direction == new Vector2(0, -1)) // to down
         {
             SwapAnimation(hitDown, hitUp, x, y, direction);
-            match3 = SomeTechnicalCalculations.GetMatchThreeOrMore();
+            match3 = _someTechnicalCalculations.GetMatchThreeOrMore();
 
             if (match3.Count > 0)
                 StartCoroutine(RestoreGameField(match3));
@@ -182,8 +176,8 @@ public class GameFieldController : MonoBehaviour
             RectTransform firstTile = (RectTransform)hitDown.transform; // maybe easy Transform?
             RectTransform secondTile = (RectTransform)hitUp.transform; // maybe easy Transform?
 
-            firstTile.DOMove(secondTile.position, 0.3f).SetDelay(SettingsConstant.DELAY);
-            secondTile.DOMove(firstTile.position, 0.3f).SetDelay(SettingsConstant.DELAY);
+            firstTile.DOMove(secondTile.position, 0.3f).SetDelay(PlayingSettingsConstant.DELAY);
+            secondTile.DOMove(firstTile.position, 0.3f).SetDelay(PlayingSettingsConstant.DELAY);
 
             var tempItem = _itemsMatrix[x, y];
             _itemsMatrix[x, y] = _itemsMatrix[x + direction.x, y + direction.y]; // не надо нажимать
@@ -215,7 +209,7 @@ public class GameFieldController : MonoBehaviour
 
     private void FallDownItems() //   done
     {
-        var emptyCoordinates = SomeTechnicalCalculations.GetAllEmptyCoordinates();
+        var emptyCoordinates = _someTechnicalCalculations.GetAllEmptyCoordinates();
         var itemCoordinatesForFalling = _someTechnicalCalculations.GetItemsCoordinatesForFalling(emptyCoordinates);
 
         for (int i = 0; i < emptyCoordinates.Count; i++)
@@ -265,7 +259,7 @@ public class GameFieldController : MonoBehaviour
 
     private void FillEmptyCellsAfterMatch3() // done
     {
-        var emptyCells = SomeTechnicalCalculations.GetAllEmptyCoordinates();
+        var emptyCells = _someTechnicalCalculations.GetAllEmptyCoordinates();
         HashSet<int> ID = new();
 
         for (int i = 0; i < emptyCells.Count; i++)
@@ -275,11 +269,11 @@ public class GameFieldController : MonoBehaviour
                 int x = emptyCells[i][j].x;
                 int y = emptyCells[i][j].y;
 
-                int currentSettingsIndex = SomeTechnicalCalculations.GetCurrentSettingsIndex(x, y);
+                int currentSettingsIndex = _someTechnicalCalculations.GetCurrentSettingsIndex(x, y);
                 _spriteRenderersMatrix[x, y].gameObject.SetActive(true);
 
-                _itemsMatrix[x, y].ItemSettings = _actualItemsList[currentSettingsIndex];
-                _spriteRenderersMatrix[x, y].sprite = _itemsMatrix[x, y].ItemSettings.Icon;
+                _itemsMatrix[x, y].ItemsSettings = _actualItemsList[currentSettingsIndex];
+                _spriteRenderersMatrix[x, y].sprite = _itemsMatrix[x, y].ItemsSettings.Icon;
 
                 var finishScale = _spriteRenderersMatrix[x, y].transform.localScale;
                 _spriteRenderersMatrix[x, y].transform.localScale = Vector3.zero;
@@ -307,16 +301,16 @@ public class GameFieldController : MonoBehaviour
 
     private IEnumerator RestoreGameField(HashSet<Vector3Int> match3)
     {
-        yield return new WaitForSeconds(0.3f + SettingsConstant.DELAY);
+        yield return new WaitForSeconds(0.3f + PlayingSettingsConstant.DELAY);
         DeleteMatchThree(match3);
-        yield return new WaitForSeconds(0.3f + SettingsConstant.DELAY);
+        yield return new WaitForSeconds(0.3f + PlayingSettingsConstant.DELAY);
         FallDownItems();
-        yield return new WaitForSeconds(0.5f + SettingsConstant.DELAY);
+        yield return new WaitForSeconds(0.5f + PlayingSettingsConstant.DELAY);
 
         _totalScore += match3.Count;
         ScoreChanged?.Invoke(_totalScore);
         
-        var newMatch3 = SomeTechnicalCalculations.GetMatchThreeOrMore();
+        var newMatch3 = _someTechnicalCalculations.GetMatchThreeOrMore();
         if (newMatch3.Count > 2)
         {
             StartCoroutine(RestoreGameField(match3));
@@ -329,7 +323,7 @@ public class GameFieldController : MonoBehaviour
     {
         WrongMatch3?.Invoke();
         yield return null; // is it right?
-        yield return new WaitForSeconds(SettingsConstant.DELAY + 0.3f); // is it right?
+        yield return new WaitForSeconds(PlayingSettingsConstant.DELAY + 0.3f); // is it right?
         SwapAnimation(hitDown, hitUp, x, y, direction);
     }
 }

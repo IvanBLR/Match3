@@ -18,8 +18,8 @@ public class SomeTechnicalCalculations
         {
             new Vector3Int(0, 0, 0), new Vector3Int(0, 1, 0), new Vector3Int(1, 0, 0), new Vector3Int(1, 1, 0)
         };
-        int row = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_ROW);
-        int column = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_COLUMN);
+        int row = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_ROW);
+        int column = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_COLUMN);
 
         int startX = row - 1 > x ? x : row - 2;
         int startY = column - 1 > y ? y : column - 2;
@@ -43,13 +43,13 @@ public class SomeTechnicalCalculations
         var actualItemSettingsProvider =
             _gameFieldController.AllVariantsItemsCollections.ElementAt(_gameFieldController.ItemCollectionsNumber);
         var actualItemsCollection = actualItemSettingsProvider.ItemsList;
-        int[] unicIndexes = Enumerable.Range(0, actualItemsCollection.Count)
-            .OrderBy(x => random.Next())
+        int[] uniqueIndexes = Enumerable.Range(0, actualItemsCollection.Count)
+            .OrderBy(x => UnityEngine.Random.Range(0, actualItemsCollection.Count))
             .Take(5)
             .ToArray();
         for (int i = 0; i < 5; i++)
         {
-            int index = unicIndexes[i];
+            int index = uniqueIndexes[i];
             actualItemsListForReturn.Add(actualItemsCollection[index]);
         }
 
@@ -75,8 +75,8 @@ public class SomeTechnicalCalculations
     {
         Random random = new Random();
         HashSet<int> checkList = new();
-        int row = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_ROW);
-        int column = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_COLUMN);
+        int row = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_ROW);
+        int column = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_COLUMN);
         int currentID = 0;
         int upID = 0;
         int downID = 0;
@@ -84,22 +84,22 @@ public class SomeTechnicalCalculations
         int rightID = 0;
         if (y + 1 < column && _gameFieldController.ItemsMatrix[x, y + 1] is not null)
         {
-            upID = _gameFieldController.ItemsMatrix[x, y + 1].ItemSettings.ID;
+            upID = _gameFieldController.ItemsMatrix[x, y + 1].ItemsSettings.ID;
         }
 
         if (y - 1 >= 0) // можно не вводить доп.проверок на null
         {
-            downID = _gameFieldController.ItemsMatrix[x, y - 1].ItemSettings.ID;
+            downID = _gameFieldController.ItemsMatrix[x, y - 1].ItemsSettings.ID;
         }
 
         if (x + 1 < row && _gameFieldController.ItemsMatrix[x + 1, y] != null)
         {
-            rightID = _gameFieldController.ItemsMatrix[x + 1, y].ItemSettings.ID;
+            rightID = _gameFieldController.ItemsMatrix[x + 1, y].ItemsSettings.ID;
         }
 
         if (x - 1 >= 0) // можно не вводить доп.проверок на null
         {
-            leftID = _gameFieldController.ItemsMatrix[x - 1, y].ItemSettings.ID;
+            leftID = _gameFieldController.ItemsMatrix[x - 1, y].ItemsSettings.ID;
         }
 
         checkList.Add(upID);
@@ -117,7 +117,7 @@ public class SomeTechnicalCalculations
 
     public List<List<Vector3Int>> GetItemsCoordinatesForFalling(List<List<Vector3Int>> allEmptyCoordinates) // done
     {
-        int column = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_COLUMN);
+        int column = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_COLUMN);
         List<List<Vector3Int>> finalReturnList = new();
         Queue<List<Vector3Int>> globalQueueWithListCoordinates = new();
 
@@ -177,7 +177,7 @@ public class SomeTechnicalCalculations
 
     public List<List<Vector3Int>> GetAllEmptyCoordinates() // done
     {
-        int row = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_ROW);
+        int row = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_ROW);
         List<List<Vector3Int>> returnList = new();
 
         for (int i = 0; i < row; i++)
@@ -194,7 +194,7 @@ public class SomeTechnicalCalculations
     /// </summary>
     private List<Vector3Int> GetEmptyCoordinatesInCurrentColumnInGridNotation(int rowIndex) // done 
     {
-        int column = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_COLUMN);
+        int column = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_COLUMN);
         List<Vector3Int> arrayForReturn = new();
         for (int j = 0; j < column; j++)
         {
@@ -208,10 +208,11 @@ public class SomeTechnicalCalculations
 
         return arrayForReturn;
     }
+
     public HashSet<Vector3Int> GetMatchThreeOrMore() // done
     {
-        int row = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_ROW);
-        int column = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_COLUMN);
+        int row = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_ROW);
+        int column = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_COLUMN);
         HashSet<Vector3Int> returnHashSet = new();
         HashSet<Vector3Int> currentPointsForDestroy = new();
 
@@ -221,7 +222,7 @@ public class SomeTechnicalCalculations
             {
                 if (_gameFieldController.SpriteRenderersMatrix[i, j].gameObject.activeSelf)
                 {
-                    int currentSpriteId = _gameFieldController.ItemsMatrix[i, j].ItemSettings.ID;
+                    int currentSpriteId = _gameFieldController.ItemsMatrix[i, j].ItemsSettings.ID;
                     CheckVertical(i, j, currentSpriteId, currentPointsForDestroy);
                     CheckValidate(currentPointsForDestroy, returnHashSet);
 
@@ -236,11 +237,11 @@ public class SomeTechnicalCalculations
 
     private void CheckVertical(int x, int y, int ID, HashSet<Vector3Int> pointsForDestroy) // done
     {
-        int column = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_COLUMN);
+        int column = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_COLUMN);
         pointsForDestroy.Add(new Vector3Int(x, y));
         for (int j = y + 1; j < column; j++)
         {
-            int currentID = _gameFieldController.ItemsMatrix[x, j].ItemSettings.ID;
+            int currentID = _gameFieldController.ItemsMatrix[x, j].ItemsSettings.ID;
             if (currentID == ID && _gameFieldController.SpriteRenderersMatrix[x, j].gameObject.activeSelf)
             {
                 pointsForDestroy.Add(new Vector3Int(x, j));
@@ -250,7 +251,7 @@ public class SomeTechnicalCalculations
 
         for (int j = y - 1; j >= 0; j--)
         {
-            int currentID = _gameFieldController.ItemsMatrix[x, j].ItemSettings.ID;
+            int currentID = _gameFieldController.ItemsMatrix[x, j].ItemsSettings.ID;
             if (currentID == ID && _gameFieldController.SpriteRenderersMatrix[x, j].gameObject.activeSelf)
             {
                 pointsForDestroy.Add(new Vector3Int(x, j));
@@ -266,11 +267,11 @@ public class SomeTechnicalCalculations
 
     private void CheckHorizontal(int x, int y, int ID, HashSet<Vector3Int> pointsForDestroy) //done
     {
-        int row = PlayerPrefs.GetInt(SettingsConstant.GAME_FIELD_ROW);
+        int row = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_ROW);
         pointsForDestroy.Add(new Vector3Int(x, y));
         for (int i = x + 1; i < row; i++)
         {
-            int currentID = _gameFieldController.ItemsMatrix[i, y].ItemSettings.ID;
+            int currentID = _gameFieldController.ItemsMatrix[i, y].ItemsSettings.ID;
             if (currentID == ID && _gameFieldController.SpriteRenderersMatrix[i, y].gameObject.activeSelf)
             {
                 pointsForDestroy.Add(new Vector3Int(i, y));
@@ -280,7 +281,7 @@ public class SomeTechnicalCalculations
 
         for (int i = x - 1; i >= 0; i--)
         {
-            int currentID = _gameFieldController.ItemsMatrix[i, y].ItemSettings.ID;
+            int currentID = _gameFieldController.ItemsMatrix[i, y].ItemsSettings.ID;
             if (currentID == ID && _gameFieldController.SpriteRenderersMatrix[i, y].gameObject.activeSelf)
             {
                 pointsForDestroy.Add(new Vector3Int(i, y));

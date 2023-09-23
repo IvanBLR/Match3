@@ -9,27 +9,29 @@ public class SoundsManager : MonoBehaviour
     [SerializeField] private AudioClip _swapBack;
     [SerializeField] private AudioClip _bomb;
 
+    private float _soundScale = 0.2f;
+    
     [UsedImplicitly]
-    public void ButtonClick()
+    public void OnButtonClick()
     {
         _audioSource.PlayOneShot(_buttonClick);
     }
-    public void DropItems()
+    public void OnDropItems()
     {
-        _audioSource.PlayOneShot(_drop, 0.2f);
+        _audioSource.PlayOneShot(_drop, _soundScale);
     }
 
-    public void BombActivate()
+    public void OnBombActivate()
     {
-        _audioSource.PlayOneShot(_bomb, 0.2f);
+        _audioSource.PlayOneShot(_bomb, _soundScale);
     }
-    public void SwapBack()
+    public void OnSwapBack()
     {
-        _audioSource.PlayOneShot(_swapBack, 0.2f);
+        _audioSource.PlayOneShot(_swapBack, _soundScale);
     }
 
     private void Awake()
     {
-        gameObject.SetActive(PlayerPrefs.GetInt(SettingsConstant.SOUND_ON_OFF) == 1);
+        gameObject.SetActive(PrefsManager.GetDataInt(PlayingSettingsConstant.SOUND_ON_OFF) == 1); 
     }
 }

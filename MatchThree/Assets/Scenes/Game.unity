@@ -206,8 +206,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1970425239}
-        m_TargetAssemblyTypeName: GameFieldSettings, Assembly-CSharp
+      - m_Target: {fileID: 590128952}
+        m_TargetAssemblyTypeName: UI_controller, Assembly-CSharp
         m_MethodName: IncreaseRowSize
         m_Mode: 1
         m_Arguments:
@@ -220,7 +220,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 1627721923}
         m_TargetAssemblyTypeName: SoundsManager, Assembly-CSharp
-        m_MethodName: ButtonClick
+        m_MethodName: OnButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1038,7 +1038,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: c18709820d4dc694e8de64cfdb1cc55a, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.5882353}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.49019608}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1180,7 +1180,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 230.82971}
+  m_AnchoredPosition: {x: 0, y: 365}
   m_SizeDelta: {x: 800, y: 138.3406}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &384519713
@@ -1214,7 +1214,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _gameFieldController: {fileID: 1874218686}
   _gameFieldSettings: {fileID: 1970425239}
-  _emptyGameField: {fileID: 730447288}
+  _gameFieldSample: {fileID: 730447288}
   _soundsManager: {fileID: 1627721923}
   _UI: {fileID: 590128952}
   _grid: {fileID: 1777019442}
@@ -1333,7 +1333,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 1627721923}
         m_TargetAssemblyTypeName: SoundsManager, Assembly-CSharp
-        m_MethodName: ButtonClick
+        m_MethodName: OnButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1456,7 +1456,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 8812aa2a1ed289e43bd8b3cf1f36fd9f, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.5882353}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.49019608}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1657,6 +1657,15 @@ MonoBehaviour:
   - {fileID: 1748825701}
   - {fileID: 428302381}
   - {fileID: 340992969}
+  _backgroundSprites:
+  - {fileID: 21300000, guid: 2e6bb9496c981a740881700ac989ea62, type: 3}
+  - {fileID: 21300000, guid: ae5e5ad287b53a742a2a33e5d99a9164, type: 3}
+  - {fileID: 21300000, guid: b95dd504eb4bb9b4daeed751f8e19b49, type: 3}
+  _background: {fileID: 247021328}
+  _rowSizeText: {fileID: 750396767}
+  _columnSizeText: {fileID: 1502341667}
+  _attentionText: {fileID: 358720459}
+  _settingsCanvas: {fileID: 1930906206}
 --- !u!1 &592122871
 GameObject:
   m_ObjectHideFlags: 0
@@ -1842,8 +1851,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1970425239}
-        m_TargetAssemblyTypeName: GameFieldSettings, Assembly-CSharp
+      - m_Target: {fileID: 590128952}
+        m_TargetAssemblyTypeName: UI_controller, Assembly-CSharp
         m_MethodName: IncreaseColumnSize
         m_Mode: 1
         m_Arguments:
@@ -1856,7 +1865,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 1627721923}
         m_TargetAssemblyTypeName: SoundsManager, Assembly-CSharp
-        m_MethodName: ButtonClick
+        m_MethodName: OnButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1922,7 +1931,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &654414773
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2322,8 +2331,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1970425239}
-        m_TargetAssemblyTypeName: GameFieldSettings, Assembly-CSharp
+      - m_Target: {fileID: 590128952}
+        m_TargetAssemblyTypeName: UI_controller, Assembly-CSharp
         m_MethodName: DecreaseRowSize
         m_Mode: 1
         m_Arguments:
@@ -2336,7 +2345,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 1627721923}
         m_TargetAssemblyTypeName: SoundsManager, Assembly-CSharp
-        m_MethodName: ButtonClick
+        m_MethodName: OnButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2395,7 +2404,7 @@ GameObject:
   - component: {fileID: 730447287}
   - component: {fileID: 730447288}
   m_Layer: 0
-  m_Name: EmptyGameField
+  m_Name: GameFieldSample
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3133,8 +3142,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1970425239}
-        m_TargetAssemblyTypeName: GameFieldSettings, Assembly-CSharp
+      - m_Target: {fileID: 590128952}
+        m_TargetAssemblyTypeName: UI_controller, Assembly-CSharp
         m_MethodName: DecreaseColumnSize
         m_Mode: 1
         m_Arguments:
@@ -3147,7 +3156,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 1627721923}
         m_TargetAssemblyTypeName: SoundsManager, Assembly-CSharp
-        m_MethodName: ButtonClick
+        m_MethodName: OnButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4320,7 +4329,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 1627721923}
         m_TargetAssemblyTypeName: SoundsManager, Assembly-CSharp
-        m_MethodName: ButtonClick
+        m_MethodName: OnButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4569,7 +4578,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -1
   m_Sprite: {fileID: 21300000, guid: da726246f8af67d40851424c19662b85, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.5882353}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.49019608}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -4720,7 +4729,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 1627721923}
         m_TargetAssemblyTypeName: SoundsManager, Assembly-CSharp
-        m_MethodName: ButtonClick
+        m_MethodName: OnButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4865,7 +4874,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 1627721923}
         m_TargetAssemblyTypeName: SoundsManager, Assembly-CSharp
-        m_MethodName: ButtonClick
+        m_MethodName: OnButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5243,19 +5252,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 974faf4d26b322a46985bda5ab0e3046, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rowSizeText: {fileID: 750396767}
-  _columnSizeText: {fileID: 1502341667}
-  _attentionText: {fileID: 358720459}
-  _background: {fileID: 247021328}
-  _settingsCanvas: {fileID: 1930906206}
-  _invalidCanvas: {fileID: 654414776}
   _autoSet: {fileID: 1793543138}
   _westerosSet: {fileID: 1814679981}
   _forexSet: {fileID: 387440211}
-  _backgroundSprites:
-  - {fileID: 21300000, guid: 2e6bb9496c981a740881700ac989ea62, type: 3}
-  - {fileID: 21300000, guid: ae5e5ad287b53a742a2a33e5d99a9164, type: 3}
-  - {fileID: 21300000, guid: b95dd504eb4bb9b4daeed751f8e19b49, type: 3}
 --- !u!4 &1970425240
 Transform:
   m_ObjectHideFlags: 0
