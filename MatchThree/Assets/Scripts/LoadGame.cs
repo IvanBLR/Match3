@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -47,14 +48,14 @@ public class LoadGame : MonoBehaviour
 
     private IEnumerator CheckValidateWindowAspect()
     {
-        float width = Screen.width;
-        float height = Screen.height;
-        float currentSize = width / height;
-
-        float expectedWidth = PlayingSettingsConstant.SCREEN_ROW;
-        float expectedHeight = PlayingSettingsConstant.SCREEN_COLUMN;
-        float expectedSize = expectedWidth / expectedHeight;
-
+        double width = Screen.width;
+        double height = Screen.height;
+        double currentSize = Math.Round((width / height), 2);
+        
+        double expectedWidth = PlayingSettingsConstant.SCREEN_ROW;
+        double expectedHeight = PlayingSettingsConstant.SCREEN_COLUMN;
+        double expectedSize = Math.Round((expectedWidth / expectedHeight), 2);
+;
         if (!(currentSize == expectedSize))
         {
             _invalidCanvas.gameObject.SetActive(true);
