@@ -23,15 +23,15 @@ public class UI_controller : MonoBehaviour
     private Coroutine _currentSetActiveAttention;
     private int _previousIndex;
 
-    private int _rowSize = 4;
-    private int _columnSize = 6;
+    private int _rowSize = 8;
+    private int _columnSize = 7;
 
     #region public methods setup in Unity Editor. Responsibility: change gameField sizes
 
     [UsedImplicitly]
     public void IncreaseRowSize()
     {
-        if (_rowSize < 5)
+        if (_rowSize < 14)// it was 5
             _rowSize++;
         else
         {
@@ -52,7 +52,7 @@ public class UI_controller : MonoBehaviour
     [UsedImplicitly]
     public void DecreaseRowSize()
     {
-        if (_rowSize > 3)
+        if (_rowSize > 6)
             _rowSize--;
         else
         {
@@ -73,7 +73,7 @@ public class UI_controller : MonoBehaviour
     [UsedImplicitly]
     public void IncreaseColumnSize()
     {
-        if (_columnSize < 8)
+        if (_columnSize < 9)// it was 8
             _columnSize++;
         else
         {
@@ -94,7 +94,7 @@ public class UI_controller : MonoBehaviour
     [UsedImplicitly]
     public void DecreaseColumnSize()
     {
-        if (_columnSize > 5)
+        if (_columnSize > 6)
             _columnSize--;
         else
         {

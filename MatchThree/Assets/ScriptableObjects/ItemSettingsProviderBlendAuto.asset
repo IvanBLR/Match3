@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8dbde6e19deebe1429922977374b1eb4, type: 3}
+  m_Name: ItemSettingsProviderBlendAuto
+  m_EditorClassIdentifier: 
+  _itemsList:
+  - {fileID: 11400000, guid: 8b9f0a851bc011f4c9ae5d396dd9251d, type: 2}
+  - {fileID: 11400000, guid: 2e1836cb1d38f434b8f930749c600243, type: 2}
+  - {fileID: 11400000, guid: 116887dc70e08c94489b1ad27b390351, type: 2}
+  - {fileID: 11400000, guid: c77f67b6055ddff4da4f9e52ef260cf2, type: 2}
+  - {fileID: 11400000, guid: 1154e798195e79f4aa022316ade7e727, type: 2}

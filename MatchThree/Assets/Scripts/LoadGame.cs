@@ -43,7 +43,7 @@ public class LoadGame : MonoBehaviour
 
     private void Awake()
     {
-        StartCoroutine(CheckValidateWindowAspect());
+        //StartCoroutine(CheckValidateWindowAspect());
     }
 
     private IEnumerator CheckValidateWindowAspect()

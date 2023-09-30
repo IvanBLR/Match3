@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8dbde6e19deebe1429922977374b1eb4, type: 3}
+  m_Name: ItemSettingsProviderChinaAuto
+  m_EditorClassIdentifier: 
+  _itemsList:
+  - {fileID: 11400000, guid: f7243881c4d44e244bfa647bfa31742f, type: 2}
+  - {fileID: 11400000, guid: c03654008e3c99c439f5f03518c05bb7, type: 2}
+  - {fileID: 11400000, guid: b597b0a608a0fbd4caa282e31e4366b7, type: 2}
+  - {fileID: 11400000, guid: deab88e0a963e21478f03f1c1e3007a8, type: 2}
+  - {fileID: 11400000, guid: af38ca3f34c8a6e44903e0f958ce3a2b, type: 2}
+  - {fileID: 11400000, guid: 962dc34b3435ab045a5d902497267d65, type: 2}
+  - {fileID: 11400000, guid: 63e6311d0bfb53248a35453d2a644052, type: 2}
+  - {fileID: 11400000, guid: b43e580cd6a2fcb4b882448758fd5f95, type: 2}
