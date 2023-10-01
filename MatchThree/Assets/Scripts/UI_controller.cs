@@ -13,7 +13,9 @@ public class UI_controller : MonoBehaviour
   //  [SerializeField] private SpriteRenderer[] _levels;
   //  [SerializeField] private Sprite[] _backgroundSprites;
     [SerializeField] private SpriteRenderer _background;
-
+    [SerializeField] private SpriteRenderer _soundOn;
+    [SerializeField] private SpriteRenderer _soundOff;
+    [SerializeField] private AudioSource _audioSource;
     [SerializeField] private TextMeshProUGUI _rowSizeText;
     [SerializeField] private TextMeshProUGUI _columnSizeText;
     [SerializeField] private TextMeshProUGUI _attentionText;
@@ -22,10 +24,10 @@ public class UI_controller : MonoBehaviour
 
     private Coroutine _currentSetActiveAttention;
     private int _previousIndex;
-
     private int _rowSize = 8;
     private int _columnSize = 7;
-
+    private bool _isSoundOn = true;
+    
     #region public methods setup in Unity Editor. Responsibility: change gameField sizes
 
     [UsedImplicitly]
@@ -121,6 +123,15 @@ public class UI_controller : MonoBehaviour
         SceneManager.LoadScene(0);
     }
 
+    
+    [UsedImplicitly]
+    public void SoundTumbler()
+    {
+        _audioSource.mute = _isSoundOn;
+        _soundOff.gameObject.SetActive(_isSoundOn);
+        _soundOn.gameObject.SetActive(!_isSoundOn);
+        _isSoundOn = !_isSoundOn;
+    }
   //  public void ActivateAcceptLevelView(int index)
   //  {
   //      _levels[_previousIndex].gameObject.SetActive(false);

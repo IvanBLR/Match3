@@ -125,6 +125,11 @@ public class GameManager : MonoBehaviour
                     _isBombActive = false;
                 }
             }
+            else
+            {
+                _isSimpleBombActive = false;
+                _isBombActive = false;
+            }
         }
 
         if (Input.GetMouseButtonUp(0) && _click >= PlayingSettingsConstant.MIN_CLICK_INTERVAL && (!_isSimpleBombActive && !_isBombActive))
