@@ -46,7 +46,7 @@ public class SomeTechnicalCalculations
     {
         List<ItemScriptableObject> actualItemsListForReturn = new();
         var actualItemSettingsProvider =
-            _gameFieldController.AllVariantsItemsCollections.ElementAt(_gameFieldController.ItemCollectionsNumber);
+            _gameFieldController.AllVariantsItemsCollections[_gameFieldController.ItemCollectionsNumber];
         var actualItemsCollection = actualItemSettingsProvider.ItemsList;
         int[] uniqueIndexes = Enumerable.Range(0, actualItemsCollection.Count)
             .OrderBy(x => Random.Range(0, actualItemsCollection.Count))

@@ -10,8 +10,8 @@ public class UI_controller : MonoBehaviour
     public Action<int, int> GameFieldRawSizeChanged;
     public Action<int, int> GameFieldColumnSizeChanged;
 
-    [SerializeField] private SpriteRenderer[] _levels;
-    [SerializeField] private Sprite[] _backgroundSprites;
+  //  [SerializeField] private SpriteRenderer[] _levels;
+  //  [SerializeField] private Sprite[] _backgroundSprites;
     [SerializeField] private SpriteRenderer _background;
 
     [SerializeField] private TextMeshProUGUI _rowSizeText;
@@ -31,7 +31,7 @@ public class UI_controller : MonoBehaviour
     [UsedImplicitly]
     public void IncreaseRowSize()
     {
-        if (_rowSize < 14)// it was 5
+        if (_rowSize < 12)// it was 5
             _rowSize++;
         else
         {
@@ -73,7 +73,7 @@ public class UI_controller : MonoBehaviour
     [UsedImplicitly]
     public void IncreaseColumnSize()
     {
-        if (_columnSize < 9)// it was 8
+        if (_columnSize < 8)// it was 8
             _columnSize++;
         else
         {
@@ -121,23 +121,23 @@ public class UI_controller : MonoBehaviour
         SceneManager.LoadScene(0);
     }
 
-    public void ActivateAcceptLevelView(int index)
-    {
-        _levels[_previousIndex].gameObject.SetActive(false);
-        _levels[index].gameObject.SetActive(true);
+  //  public void ActivateAcceptLevelView(int index)
+  //  {
+  //      _levels[_previousIndex].gameObject.SetActive(false);
+  //      _levels[index].gameObject.SetActive(true);
+//
+  //      _background.sprite = _backgroundSprites[index];
+//
+  //      _previousIndex = index;
+  //  }
 
-        _background.sprite = _backgroundSprites[index];
-
-        _previousIndex = index;
-    }
-
-    public void DeactivateAcceptLevelView()
-    {
-        for (int i = 0; i < _levels.Length; i++)
-        {
-            _levels[i].gameObject.SetActive(false);
-        }
-    }
+  //  public void DeactivateAcceptLevelView()
+  //  {
+  //      for (int i = 0; i < _levels.Length; i++)
+  //      {
+  //          _levels[i].gameObject.SetActive(false);
+  //      }
+  //  }
 
     public void LowDownBackgroundAlpha()
     {
@@ -150,14 +150,14 @@ public class UI_controller : MonoBehaviour
 
     private void Awake()
     {
-        for (int i = 0; i < _levels.Length; i++)
-        {
-            _levels[i].gameObject.SetActive(false);
-        }
-
-        _previousIndex = PlayerPrefs.GetInt(PlayingSettingsConstant.PLAYING_SET, 0);
-        _levels[_previousIndex].gameObject.SetActive(true);
-        _background.sprite = _backgroundSprites[_previousIndex];
+      //  for (int i = 0; i < _levels.Length; i++)
+      //  {
+      //      _levels[i].gameObject.SetActive(false);
+      //  }
+//
+      //  _previousIndex = PlayerPrefs.GetInt(PlayingSettingsConstant.PLAYING_SET, 0);
+      //  _levels[_previousIndex].gameObject.SetActive(true);
+      //  _background.sprite = _backgroundSprites[_previousIndex];
 
         _attentionText.enabled = false;
         PrefsManager.SaveDataInt(PlayingSettingsConstant.GAME_FIELD_ROW, _rowSize);

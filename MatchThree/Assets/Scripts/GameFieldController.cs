@@ -12,6 +12,7 @@ public class GameFieldController : MonoBehaviour
     public Action GotMatchTree;
     public Action WrongMatch3;
     public Action BombUsed;
+    public Action SimpleBombUsed;
     public Action<int> ScoreChanged;
 
     public GameFieldController()
@@ -39,10 +40,36 @@ public class GameFieldController : MonoBehaviour
 
     private readonly SomeTechnicalCalculations _someTechnicalCalculations;
 
+    
+    public void UseSimpleBomb(int x, int y)
+    {
+        HashSet<Vector3Int> bombCoordinates = new();
+        bombCoordinates.Add(new Vector3Int(x, y, 0));
+        SimpleBombUsed?.Invoke();
+        StartCoroutine(RestoreGameField(bombCoordinates));
+    }
+
+    public void UseBomb(int x, int y)
+    {
+        List<Vector3Int> bomb = _someTechnicalCalculations.GetBombsCoordinates(x, y);
+        HashSet<Vector3Int> bombCoordinates = new();
+
+        _totalScore -= 3 * bomb.Count;
+        if (_totalScore < 0)
+            _totalScore = 0;
+
+        for (int i = 0; i < bomb.Count; i++)
+        {
+            bombCoordinates.Add(bomb[i]);
+        }
+
+        BombUsed?.Invoke();
+        StartCoroutine(RestoreGameField(bombCoordinates)); 
+    }
     public void InitializeActualItemsList()
     {
         _someTechnicalCalculations.InitializeRowAndColumn();
-        
+
         ItemCollectionsNumber = PlayerPrefs.GetInt(PlayingSettingsConstant.PLAYING_SET);
         ActualItemsList = _someTechnicalCalculations.GetActualItemsList();
         ActualNameID = _someTechnicalCalculations.GetActualNameID();
@@ -228,24 +255,6 @@ public class GameFieldController : MonoBehaviour
                 SpriteRenderersMatrix[x, y].transform.DOScale(finishScale, 0.3f);
             }
         }
-    }
-
-    public void UseBomb(int x, int y)
-    {
-        List<Vector3Int> bomb = _someTechnicalCalculations.GetBombsCoordinates(x, y);
-        HashSet<Vector3Int> bombCoordinates = new();
-
-        _totalScore -= 3 * bomb.Count;
-        if (_totalScore < 0)
-            _totalScore = 0;
-
-        for (int i = 0; i < bomb.Count; i++)
-        {
-            bombCoordinates.Add(bomb[i]);
-        }
-
-        BombUsed?.Invoke();
-        StartCoroutine(RestoreGameField(bombCoordinates));
     }
 
     private IEnumerator RestoreGameField(HashSet<Vector3Int> match3)
