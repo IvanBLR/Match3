@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Button _bomb;
     [SerializeField] private Button _restart;
     [SerializeField] private TextMeshProUGUI _score;
+    [SerializeField] private TextMeshProUGUI _bestScore;
 
     private float _click;
     private Vector2 _offset;
@@ -31,6 +32,9 @@ public class GameManager : MonoBehaviour
     private RaycastHit2D _raycastHitUp;
     private Camera _camera;
 
+    
+    
+    
     [UsedImplicitly]
     public void SimpleBombActivation()
     {
@@ -54,14 +58,15 @@ public class GameManager : MonoBehaviour
     {
         _simpleBomb.gameObject.SetActive(true);
         _bomb.gameObject.SetActive(true);
-        _score.gameObject.SetActive(true);
+        _score.gameObject.SetActive(true); 
+        //_bestScore.gameObject.SetActive(true);
     }
 
     private void Awake()
     {
-        _score.gameObject.SetActive(false);
-        _simpleBomb.gameObject.SetActive(false);
-        _bomb.gameObject.SetActive(false);
+       // _score.gameObject.SetActive(false);
+       // _simpleBomb.gameObject.SetActive(false);
+       // _bomb.gameObject.SetActive(false);
 
         _gameFieldSettings.GameSettingsAccepted += _gameFieldController.InitializeActualItemsList;
         _gameFieldSettings.GameSettingsAccepted += _gameFieldController.FillGameBoardWithTilesFirstTimeOnly;
@@ -88,6 +93,8 @@ public class GameManager : MonoBehaviour
     {
         _offset = new Vector2(_grid.cellSize.x / 2, _grid.cellSize.y / 2);
         _camera = Camera.main;
+        int bestScore = PrefsManager.GetDataInt(PlayingSettingsConstant.BEST_SCORE);
+        _bestScore.text = bestScore.ToString();
     }
 
     private void Update()
@@ -185,12 +192,18 @@ public class GameManager : MonoBehaviour
             var hitPointInGridsCoordinate = _grid.WorldToCell(hitWorldCoordinates + _offset);
             return hitPointInGridsCoordinate;
         }
-        else return _invalidValue;
+        return _invalidValue;
     }
 
     private void UpdateScore(int score)
     {
         _score.text = score.ToString();
+        int currentBestScore = PrefsManager.GetDataInt(PlayingSettingsConstant.BEST_SCORE);
+        if (score > currentBestScore)
+        {
+            PrefsManager.SaveDataInt(PlayingSettingsConstant.BEST_SCORE, score);
+            _bestScore.text = score.ToString();
+        }
     }
 
     private void DestroyAction()

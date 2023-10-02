@@ -12,4 +12,5 @@ public class PlayingSettingsConstant
     public const int SCREEN_COLUMN = 1920;
     public const float DELAY = 0.1f;
     public const float MIN_CLICK_INTERVAL = 0.33f;
+    public static readonly string BEST_SCORE = "BEST_SCORE";
 }

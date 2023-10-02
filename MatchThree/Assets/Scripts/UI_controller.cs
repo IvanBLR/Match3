@@ -75,7 +75,7 @@ public class UI_controller : MonoBehaviour
     [UsedImplicitly]
     public void IncreaseColumnSize()
     {
-        if (_columnSize < 8)// it was 8
+        if (_columnSize < 7)// it was 8
             _columnSize++;
         else
         {
@@ -122,7 +122,6 @@ public class UI_controller : MonoBehaviour
         gameObject.SetActive(false);
         SceneManager.LoadScene(0);
     }
-
     
     [UsedImplicitly]
     public void SoundTumbler()
@@ -177,8 +176,10 @@ public class UI_controller : MonoBehaviour
 
     private IEnumerator ActivateAttentionText()
     {
+        //_attentionText.gameObject.SetActive(true);
         _attentionText.enabled = true;
         yield return new WaitForSeconds(0.5f);
         _attentionText.enabled = false;
+       // _attentionText.gameObject.SetActive(false);
     }
 }

@@ -8,9 +8,9 @@ using UnityEngine.UI;
 public class GameFieldSettings : MonoBehaviour
 {
     public Action GameSettingsAccepted;
-    public Action<int> ActivatedEasyLevel;
-    public Action<int> ActivatedMiddleLevel;
-    public Action<int> ActivatedHardLevel;
+   // public Action<int> ActivatedEasyLevel;
+   // public Action<int> ActivatedMiddleLevel;
+   // public Action<int> ActivatedHardLevel;
 
     [SerializeField] private Button _blend;
     [SerializeField] private Button _China;
@@ -22,11 +22,11 @@ public class GameFieldSettings : MonoBehaviour
 
     private Coroutine _currentSetActiveAttention;
 
-    [UsedImplicitly]
-    public void RestartGame()
-    {
-        SceneManager.LoadScene(0);
-    }
+   // [UsedImplicitly]
+   // public void RestartGame()
+   // {
+   //     SceneManager.LoadScene(0);
+   // }
 
     [UsedImplicitly]
     public void AcceptSettings()

@@ -45,6 +45,11 @@ public class GameFieldController : MonoBehaviour
     {
         HashSet<Vector3Int> bombCoordinates = new();
         bombCoordinates.Add(new Vector3Int(x, y, 0));
+
+        _totalScore -= 2;
+        if (_totalScore < 0)
+            _totalScore = -1;
+        
         SimpleBombUsed?.Invoke();
         StartCoroutine(RestoreGameField(bombCoordinates));
     }
@@ -56,7 +61,7 @@ public class GameFieldController : MonoBehaviour
 
         _totalScore -= 3 * bomb.Count;
         if (_totalScore < 0)
-            _totalScore = 0;
+            _totalScore = -4;
 
         for (int i = 0; i < bomb.Count; i++)
         {
