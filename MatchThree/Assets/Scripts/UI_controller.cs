@@ -4,6 +4,7 @@ using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class UI_controller : MonoBehaviour
 {
@@ -19,7 +20,7 @@ public class UI_controller : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _rowSizeText;
     [SerializeField] private TextMeshProUGUI _columnSizeText;
     [SerializeField] private TextMeshProUGUI _attentionText;
-
+    [SerializeField] private Slider _soundSlider;
     [SerializeField] private Canvas _settingsCanvas;
 
     private Coroutine _currentSetActiveAttention;
@@ -122,6 +123,9 @@ public class UI_controller : MonoBehaviour
         gameObject.SetActive(false);
         SceneManager.LoadScene(0);
     }
+
+    [UsedImplicitly]
+    public void ChangeVolume(float volumeValue) => _audioSource.volume = volumeValue;
     
     [UsedImplicitly]
     public void SoundTumbler()

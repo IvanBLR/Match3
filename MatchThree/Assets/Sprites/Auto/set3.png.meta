@@ -129,7 +129,7 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: WebGL
-    maxTextureSize: 4096
+    maxTextureSize: 8192
     resizeAlgorithm: 0
     textureFormat: 12
     textureCompression: 1
@@ -1541,9 +1541,9 @@ TextureImporter:
     nameFileIdTable:
       set3_58: 147411562
       set3_16: -348414177
-      set3_50: 557621487
       set3_37: 1875073300
       set3_19: 592619330
+      set3_64: 570742964
       set3_63: 795516842
       set3_21: -884903228
       set3_56: -812106743
@@ -1596,15 +1596,15 @@ TextureImporter:
       set3_40: -715458674
       set3_52: -1689988250
       set3_10: -2082393217
-      set3_14: -389255921
+      set3_31: 1883207151
       set3_5: 623447585
+      set3_14: -389255921
       set3_65: -1757758966
       set3_45: -884858163
+      set3_50: 557621487
       set3_33: -2042139546
-      set3_62: 919301095
-      set3_31: 1883207151
       set3_26: 1742123838
-      set3_64: 570742964
+      set3_62: 919301095
   spritePackingTag: 
   pSDRemoveMatte: 0
   userData: 
