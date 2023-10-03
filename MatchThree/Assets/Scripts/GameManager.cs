@@ -2,7 +2,6 @@ using System;
 using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
@@ -18,6 +17,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Button _restart;
     [SerializeField] private TextMeshProUGUI _score;
     [SerializeField] private TextMeshProUGUI _bestScore;
+    [SerializeField] private AdvertisementManager _advertisementManager;
 
     private float _click;
     private Vector2 _offset;
@@ -32,9 +32,7 @@ public class GameManager : MonoBehaviour
     private RaycastHit2D _raycastHitUp;
     private Camera _camera;
 
-    
-    
-    
+
     [UsedImplicitly]
     public void SimpleBombActivation()
     {
@@ -52,33 +50,18 @@ public class GameManager : MonoBehaviour
     [UsedImplicitly]
     public void ActivateRestartButton() => _restart.gameObject.SetActive(true);
 
-
-    [UsedImplicitly]
-    public void ActivateAdditionalOptions()
-    {
-        _simpleBomb.gameObject.SetActive(true);
-        _bomb.gameObject.SetActive(true);
-        _score.gameObject.SetActive(true); 
-        //_bestScore.gameObject.SetActive(true);
-    }
-
     private void Awake()
     {
-       // _score.gameObject.SetActive(false);
-       // _simpleBomb.gameObject.SetActive(false);
-       // _bomb.gameObject.SetActive(false);
-
         _gameFieldSettings.GameSettingsAccepted += _gameFieldController.InitializeActualItemsList;
         _gameFieldSettings.GameSettingsAccepted += _gameFieldController.FillGameBoardWithTilesFirstTimeOnly;
         _gameFieldSettings.GameSettingsAccepted += _UI.StartedGame;
-        //  _gameFieldSettings.ActivatedEasyLevel += _UI.ActivateAcceptLevelView;
-        //  _gameFieldSettings.ActivatedMiddleLevel += _UI.ActivateAcceptLevelView;
-        //  _gameFieldSettings.ActivatedHardLevel += _UI.ActivateAcceptLevelView;
-        //  _gameFieldSettings.GameSettingsAccepted += _UI.DeactivateAcceptLevelView;
         _gameFieldSettings.GameSettingsAccepted += _UI.LowDownBackgroundAlpha;
+        _gameFieldSettings.UnblocedButtonSet += _advertisementManager.ActivateCurrentButton;
 
         _UI.GameFieldRawSizeChanged += _gameFieldSample.GenerateGameFieldSample;
         _UI.GameFieldColumnSizeChanged += _gameFieldSample.GenerateGameFieldSample;
+        _UI.RestartGame += _gameFieldSample.OnRestartInvoke;
+        _UI.RestartGame += _gameFieldController.ClearGameBoard;
 
         _gameFieldController.GotMatchTree += _soundsManager.OnDropItems;
         _gameFieldController.WrongMatch3 += _soundsManager.OnSwapBack;
@@ -119,7 +102,7 @@ public class GameManager : MonoBehaviour
             if (hit.collider != null)
             {
                 var point = GetHitPointCoordinateInGrid(hit);
-                
+
                 if (_isSimpleBombActive)
                 {
                     _gameFieldController.UseSimpleBomb(point.x, point.y);
@@ -139,7 +122,8 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        if (Input.GetMouseButtonUp(0) && _click >= PlayingSettingsConstant.MIN_CLICK_INTERVAL && (!_isSimpleBombActive && !_isBombActive))
+        if (Input.GetMouseButtonUp(0) && _click >= PlayingSettingsConstant.MIN_CLICK_INTERVAL &&
+            (!_isSimpleBombActive && !_isBombActive))
         {
             var ray = _camera.ScreenPointToRay(Input.mousePosition);
             _raycastHitUp = Physics2D.Raycast(ray.origin, ray.direction);
@@ -192,6 +176,7 @@ public class GameManager : MonoBehaviour
             var hitPointInGridsCoordinate = _grid.WorldToCell(hitWorldCoordinates + _offset);
             return hitPointInGridsCoordinate;
         }
+
         return _invalidValue;
     }
 
@@ -208,16 +193,15 @@ public class GameManager : MonoBehaviour
 
     private void DestroyAction()
     {
-        _gameFieldController.InitializationActualItemsCompleted -= DestroyAction;
-        _gameFieldController.FilledGameBoard -= DestroyAction;
-        _gameFieldController.FilledGameBoard -= _gameFieldController.FillGameBoardWithTilesFirstTimeOnly;
-
-        _gameFieldSettings.GameSettingsAccepted -= _gameFieldController.InitializeActualItemsList;
-        _gameFieldSettings.GameSettingsAccepted -= _gameFieldController.FillGameBoardWithTilesFirstTimeOnly;
-        _gameFieldSettings.GameSettingsAccepted -= _UI.StartedGame;
-
-        _UI.GameFieldRawSizeChanged -= _gameFieldSample.GenerateGameFieldSample;
-        _UI.GameFieldColumnSizeChanged -= _gameFieldSample.GenerateGameFieldSample;
+        //     _gameFieldController.InitializationActualItemsCompleted -= DestroyAction;
+        //     _gameFieldController.FilledGameBoard -= DestroyAction;
+        //
+        //     _gameFieldSettings.GameSettingsAccepted -= _gameFieldController.InitializeActualItemsList;
+        //     _gameFieldSettings.GameSettingsAccepted -= _gameFieldController.FillGameBoardWithTilesFirstTimeOnly;
+        //     _gameFieldSettings.GameSettingsAccepted -= _UI.StartedGame; 
+        //
+        //     _UI.GameFieldRawSizeChanged -= _gameFieldSample.GenerateGameFieldSample;
+        //     _UI.GameFieldColumnSizeChanged -= _gameFieldSample.GenerateGameFieldSample;
     }
 
     private void OnDestroy()
@@ -226,13 +210,19 @@ public class GameManager : MonoBehaviour
         _gameFieldController.WrongMatch3 -= _soundsManager.OnSwapBack;
         _gameFieldController.BombUsed -= _soundsManager.OnBombActivate;
         _gameFieldController.SimpleBombUsed -= _soundsManager.OnBombActivate;
-
         _gameFieldController.ScoreChanged -= UpdateScore;
+        _gameFieldController.InitializationActualItemsCompleted -= DestroyAction;
+        _gameFieldController.FilledGameBoard -= DestroyAction;
 
-        //  _gameFieldSettings.ActivatedEasyLevel -= _UI.ActivateAcceptLevelView;
-        //  _gameFieldSettings.ActivatedMiddleLevel -= _UI.ActivateAcceptLevelView;
-        //  _gameFieldSettings.ActivatedHardLevel -= _UI.ActivateAcceptLevelView;
-        //  _gameFieldSettings.GameSettingsAccepted -= _UI.DeactivateAcceptLevelView;
+        _gameFieldSettings.UnblocedButtonSet -= _advertisementManager.ActivateCurrentButton;
         _gameFieldSettings.GameSettingsAccepted -= _UI.LowDownBackgroundAlpha;
+        _gameFieldSettings.GameSettingsAccepted -= _gameFieldController.InitializeActualItemsList;
+        _gameFieldSettings.GameSettingsAccepted -= _gameFieldController.FillGameBoardWithTilesFirstTimeOnly;
+        _gameFieldSettings.GameSettingsAccepted -= _UI.StartedGame;
+
+        _UI.GameFieldRawSizeChanged -= _gameFieldSample.GenerateGameFieldSample;
+        _UI.GameFieldColumnSizeChanged -= _gameFieldSample.GenerateGameFieldSample;
+        _UI.RestartGame -= _gameFieldSample.OnRestartInvoke;
+        _UI.RestartGame -= _gameFieldController.ClearGameBoard;
     }
 }

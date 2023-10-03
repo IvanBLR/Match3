@@ -41,6 +41,7 @@ public class GameFieldController : MonoBehaviour
     private readonly SomeTechnicalCalculations _someTechnicalCalculations;
 
     
+    #region Bombs methods
     public void UseSimpleBomb(int x, int y)
     {
         HashSet<Vector3Int> bombCoordinates = new();
@@ -71,6 +72,7 @@ public class GameFieldController : MonoBehaviour
         BombUsed?.Invoke();
         StartCoroutine(RestoreGameField(bombCoordinates)); 
     }
+    #endregion
     public void InitializeActualItemsList()
     {
         _someTechnicalCalculations.InitializeRowAndColumn();
@@ -122,6 +124,15 @@ public class GameFieldController : MonoBehaviour
         }
 
         FilledGameBoard?.Invoke();
+    }
+
+    public void ClearGameBoard()
+    {
+        int amount = _parent.transform.childCount;
+        for (int i = 0; i < amount; i++)
+        {
+            Destroy(_parent.transform.GetChild(i).gameObject);
+        }
     }
 
     public void Swap(RaycastHit2D hitDown, RaycastHit2D hitUp, int x, int y, Vector2Int direction) // done

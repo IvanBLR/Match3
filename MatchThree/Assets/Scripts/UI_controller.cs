@@ -3,16 +3,13 @@ using System.Collections;
 using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class UI_controller : MonoBehaviour
 {
     public Action<int, int> GameFieldRawSizeChanged;
     public Action<int, int> GameFieldColumnSizeChanged;
+    public Action RestartGame;
 
-  //  [SerializeField] private SpriteRenderer[] _levels;
-  //  [SerializeField] private Sprite[] _backgroundSprites;
     [SerializeField] private SpriteRenderer _background;
     [SerializeField] private SpriteRenderer _soundOn;
     [SerializeField] private SpriteRenderer _soundOff;
@@ -20,28 +17,32 @@ public class UI_controller : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _rowSizeText;
     [SerializeField] private TextMeshProUGUI _columnSizeText;
     [SerializeField] private TextMeshProUGUI _attentionText;
-    [SerializeField] private Slider _soundSlider;
     [SerializeField] private Canvas _settingsCanvas;
+    [SerializeField] private Canvas _restartCanvas;
+    [SerializeField] private Canvas _blurayCanvas;
+    [SerializeField] private Canvas _additionalCanvas;
 
     private Coroutine _currentSetActiveAttention;
     private int _previousIndex;
     private int _rowSize = 8;
     private int _columnSize = 7;
     private bool _isSoundOn = true;
+
+    
     
     #region public methods setup in Unity Editor. Responsibility: change gameField sizes
 
     [UsedImplicitly]
-    public void IncreaseRowSize()
+    public void IncreaseRowSize() // назначен на кнопку + в SettingsCanvas
     {
-        if (_rowSize < 12)// it was 5
+        if (_rowSize < 12) // it was 5
             _rowSize++;
         else
         {
             if (_currentSetActiveAttention != null)
             {
                 StopCoroutine(_currentSetActiveAttention);
-                _attentionText.enabled = false;
+                _attentionText.gameObject.SetActive(false);
             }
 
             _currentSetActiveAttention = StartCoroutine(ActivateAttentionText());
@@ -53,7 +54,7 @@ public class UI_controller : MonoBehaviour
     }
 
     [UsedImplicitly]
-    public void DecreaseRowSize()
+    public void DecreaseRowSize() // назначен на кнопку - в SettingsCanvas
     {
         if (_rowSize > 6)
             _rowSize--;
@@ -62,7 +63,7 @@ public class UI_controller : MonoBehaviour
             if (_currentSetActiveAttention != null)
             {
                 StopCoroutine(_currentSetActiveAttention);
-                _attentionText.enabled = false;
+                _attentionText.gameObject.SetActive(false);
             }
 
             _currentSetActiveAttention = StartCoroutine(ActivateAttentionText());
@@ -74,16 +75,16 @@ public class UI_controller : MonoBehaviour
     }
 
     [UsedImplicitly]
-    public void IncreaseColumnSize()
+    public void IncreaseColumnSize() // назначен на кнопку "стрелка вверх" в SettingsCanvas
     {
-        if (_columnSize < 7)// it was 8
+        if (_columnSize < 7) // it was 8
             _columnSize++;
         else
         {
             if (_currentSetActiveAttention != null)
             {
                 StopCoroutine(_currentSetActiveAttention);
-                _attentionText.enabled = false;
+                _attentionText.gameObject.SetActive(false);
             }
 
             _currentSetActiveAttention = StartCoroutine(ActivateAttentionText());
@@ -95,16 +96,16 @@ public class UI_controller : MonoBehaviour
     }
 
     [UsedImplicitly]
-    public void DecreaseColumnSize()
+    public void DecreaseColumnSize() // назначен на кнопку "стрелка вниз" в SettingsCanvas
     {
-        if (_columnSize > 6)
+        if (_columnSize > 5)
             _columnSize--;
         else
         {
             if (_currentSetActiveAttention != null)
             {
                 StopCoroutine(_currentSetActiveAttention);
-                _attentionText.enabled = false;
+                _attentionText.gameObject.SetActive(false);
             }
 
             _currentSetActiveAttention = StartCoroutine(ActivateAttentionText());
@@ -118,40 +119,40 @@ public class UI_controller : MonoBehaviour
     #endregion
 
     [UsedImplicitly]
-    public void BackToMainMenu()
+    public void BackToMainMenu() // назначен на кнопку Рестарт в AdditionalCanvas
     {
-        gameObject.SetActive(false);
-        SceneManager.LoadScene(0);
+        _restartCanvas.gameObject.SetActive(true);
+        _blurayCanvas.gameObject.SetActive(true);
     }
 
     [UsedImplicitly]
-    public void ChangeVolume(float volumeValue) => _audioSource.volume = volumeValue;
-    
+    public void AcceptRestartProposition() // назначен на кнопку + , которая выскакивает после нажатия на Рестарт
+    {
+        RestartGame?.Invoke();
+        _restartCanvas.gameObject.SetActive(false);
+        _blurayCanvas.gameObject.SetActive(false);
+        _additionalCanvas.gameObject.SetActive(false);
+        _settingsCanvas.gameObject.SetActive(true);
+    }
+
     [UsedImplicitly]
-    public void SoundTumbler()
+    public void RefuseProposition() // назначен на кнопку - , которая выскакивает после нажатия на Рестарт
+    {
+        _restartCanvas.gameObject.SetActive(false);
+        _blurayCanvas.gameObject.SetActive(false);
+    }
+
+    [UsedImplicitly]
+    public void ChangeVolume(float volumeValue) => _audioSource.volume = volumeValue; // назначен на слайдер звука
+
+    [UsedImplicitly]
+    public void SoundTumbler() // назначен на тоггл со значком звука
     {
         _audioSource.mute = _isSoundOn;
         _soundOff.gameObject.SetActive(_isSoundOn);
         _soundOn.gameObject.SetActive(!_isSoundOn);
         _isSoundOn = !_isSoundOn;
     }
-  //  public void ActivateAcceptLevelView(int index)
-  //  {
-  //      _levels[_previousIndex].gameObject.SetActive(false);
-  //      _levels[index].gameObject.SetActive(true);
-//
-  //      _background.sprite = _backgroundSprites[index];
-//
-  //      _previousIndex = index;
-  //  }
-
-  //  public void DeactivateAcceptLevelView()
-  //  {
-  //      for (int i = 0; i < _levels.Length; i++)
-  //      {
-  //          _levels[i].gameObject.SetActive(false);
-  //      }
-  //  }
 
     public void LowDownBackgroundAlpha()
     {
@@ -160,30 +161,22 @@ public class UI_controller : MonoBehaviour
         _background.color = color;
     }
 
-    public void StartedGame() => _settingsCanvas.enabled = false;
+    public void StartedGame()
+    {
+        _settingsCanvas.gameObject.SetActive(false);
+        _additionalCanvas.gameObject.SetActive(true);
+    }
 
     private void Awake()
     {
-      //  for (int i = 0; i < _levels.Length; i++)
-      //  {
-      //      _levels[i].gameObject.SetActive(false);
-      //  }
-//
-      //  _previousIndex = PlayerPrefs.GetInt(PlayingSettingsConstant.PLAYING_SET, 0);
-      //  _levels[_previousIndex].gameObject.SetActive(true);
-      //  _background.sprite = _backgroundSprites[_previousIndex];
-
-        _attentionText.enabled = false;
         PrefsManager.SaveDataInt(PlayingSettingsConstant.GAME_FIELD_ROW, _rowSize);
         PrefsManager.SaveDataInt(PlayingSettingsConstant.GAME_FIELD_COLUMN, _columnSize);
     }
 
     private IEnumerator ActivateAttentionText()
     {
-        //_attentionText.gameObject.SetActive(true);
-        _attentionText.enabled = true;
-        yield return new WaitForSeconds(0.5f);
-        _attentionText.enabled = false;
-       // _attentionText.gameObject.SetActive(false);
+        _attentionText.gameObject.SetActive(true);
+        yield return new WaitForSeconds(0.9f);
+        _attentionText.gameObject.SetActive(false);
     }
 }

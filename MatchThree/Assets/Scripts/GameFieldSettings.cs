@@ -1,16 +1,12 @@
 using JetBrains.Annotations;
 using System;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class GameFieldSettings : MonoBehaviour
 {
     public Action GameSettingsAccepted;
-   // public Action<int> ActivatedEasyLevel;
-   // public Action<int> ActivatedMiddleLevel;
-   // public Action<int> ActivatedHardLevel;
+    public Action<Button> UnblocedButtonSet;// TODO: add method in AdvertisementManager, and += it in GameManager
 
     [SerializeField] private Button _blend;
     [SerializeField] private Button _China;
@@ -22,11 +18,6 @@ public class GameFieldSettings : MonoBehaviour
 
     private Coroutine _currentSetActiveAttention;
 
-   // [UsedImplicitly]
-   // public void RestartGame()
-   // {
-   //     SceneManager.LoadScene(0);
-   // }
 
     [UsedImplicitly]
     public void AcceptSettings()
@@ -41,28 +32,28 @@ public class GameFieldSettings : MonoBehaviour
     {
         PlayerPrefs.SetInt(PlayingSettingsConstant.PLAYING_SET, 0);
         PlayerPrefs.Save();
-        //ActivatedEasyLevel?.Invoke(0);
     }
 
     [UsedImplicitly]
     public void SaveJapan()
     {
+        UnblocedButtonSet?.Invoke(_Japan);
         PlayerPrefs.SetInt(PlayingSettingsConstant.PLAYING_SET, 1);
         PlayerPrefs.Save();
-        //ActivatedMiddleLevel?.Invoke(1);
     }
 
     [UsedImplicitly]
     public void SaveChina()
     {
+        UnblocedButtonSet?.Invoke(_China);
         PlayerPrefs.SetInt(PlayingSettingsConstant.PLAYING_SET, 2);
         PlayerPrefs.Save();
-       // ActivatedHardLevel?.Invoke(2);
     }
 
     [UsedImplicitly]
     public void SaveGB()
     {
+        UnblocedButtonSet?.Invoke(_GB);
         PlayerPrefs.SetInt(PlayingSettingsConstant.PLAYING_SET, 5);
         PlayerPrefs.Save();
     }
@@ -70,6 +61,7 @@ public class GameFieldSettings : MonoBehaviour
     [UsedImplicitly]
     public void SaveGermany()
     {
+        UnblocedButtonSet?.Invoke(_Germany);
         PlayerPrefs.SetInt(PlayingSettingsConstant.PLAYING_SET, 6);
         PlayerPrefs.Save();
     }
@@ -77,6 +69,7 @@ public class GameFieldSettings : MonoBehaviour
     [UsedImplicitly]
     public void SavePremium()
     {
+        UnblocedButtonSet?.Invoke(_premium);
         PlayerPrefs.SetInt(PlayingSettingsConstant.PLAYING_SET, 3);
         PlayerPrefs.Save();
     }
@@ -84,8 +77,10 @@ public class GameFieldSettings : MonoBehaviour
     [UsedImplicitly]
     public void SaveUSA()
     {
+        UnblocedButtonSet?.Invoke(_USA);
         PlayerPrefs.SetInt(PlayingSettingsConstant.PLAYING_SET, 4);
         PlayerPrefs.Save();
     }
+
     #endregion
 }

@@ -5,14 +5,12 @@ public class GameFieldSample : MonoBehaviour
     [SerializeField] private GameObject _emptyTilePrefab;
     [SerializeField] private Grid _grid;
 
-    private void Start()
+    public void OnRestartInvoke()
     {
-        int x = PrefsManager.GetDataInt(PlayingSettingsConstant.GAME_FIELD_ROW);
-        int y = PrefsManager.GetDataInt(PlayingSettingsConstant.GAME_FIELD_COLUMN);
-
-        GenerateGameFieldSample(x, y);
+        int row = PrefsManager.GetDataInt(PlayingSettingsConstant.GAME_FIELD_ROW);
+        int column = PrefsManager.GetDataInt(PlayingSettingsConstant.GAME_FIELD_COLUMN);
+        GenerateGameFieldSample(row, column);
     }
-
     public void GenerateGameFieldSample(int sizeGameFieldX, int sizeGameFieldY)
     {
         CleanGameFieldSample();
@@ -41,17 +39,25 @@ public class GameFieldSample : MonoBehaviour
         }
     }
 
-    private float GetOffset(float screenWidth, float tilesSize, int tilesAmount, float cellGap)
-    {
-        return ((screenWidth - ((tilesSize * tilesAmount) + (cellGap * (tilesAmount - 1)))) / 2) + tilesSize / 2;
-    }
-
-    private void CleanGameFieldSample()
+    public void CleanGameFieldSample()
     {
         int amount = _grid.transform.childCount;
         for (int i = 0; i < amount; i++)
         {
             Destroy(_grid.transform.GetChild(i).gameObject);
         }
+    }
+
+    private void Start()
+    {
+        int x = PrefsManager.GetDataInt(PlayingSettingsConstant.GAME_FIELD_ROW);
+        int y = PrefsManager.GetDataInt(PlayingSettingsConstant.GAME_FIELD_COLUMN);
+
+        GenerateGameFieldSample(x, y);
+    }
+
+    private float GetOffset(float screenWidth, float tilesSize, int tilesAmount, float cellGap)
+    {
+        return ((screenWidth - ((tilesSize * tilesAmount) + (cellGap * (tilesAmount - 1)))) / 2) + tilesSize / 2;
     }
 }
