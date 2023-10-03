@@ -56,7 +56,8 @@ public class GameManager : MonoBehaviour
         _gameFieldSettings.GameSettingsAccepted += _gameFieldController.FillGameBoardWithTilesFirstTimeOnly;
         _gameFieldSettings.GameSettingsAccepted += _UI.StartedGame;
         _gameFieldSettings.GameSettingsAccepted += _UI.LowDownBackgroundAlpha;
-        _gameFieldSettings.UnblocedButtonSet += _advertisementManager.ActivateCurrentButton;
+        //_gameFieldSettings.TryingActivateButton += _advertisementManager.ActivateCurrentButton;
+        _gameFieldSettings.TryingActivateButton += _UI.ActivateAdvCanvas;
 
         _UI.GameFieldRawSizeChanged += _gameFieldSample.GenerateGameFieldSample;
         _UI.GameFieldColumnSizeChanged += _gameFieldSample.GenerateGameFieldSample;
@@ -214,7 +215,8 @@ public class GameManager : MonoBehaviour
         _gameFieldController.InitializationActualItemsCompleted -= DestroyAction;
         _gameFieldController.FilledGameBoard -= DestroyAction;
 
-        _gameFieldSettings.UnblocedButtonSet -= _advertisementManager.ActivateCurrentButton;
+        //_gameFieldSettings.TryingActivateButton -= _advertisementManager.ActivateCurrentButton;
+        _gameFieldSettings.TryingActivateButton -= _UI.ActivateAdvCanvas;
         _gameFieldSettings.GameSettingsAccepted -= _UI.LowDownBackgroundAlpha;
         _gameFieldSettings.GameSettingsAccepted -= _gameFieldController.InitializeActualItemsList;
         _gameFieldSettings.GameSettingsAccepted -= _gameFieldController.FillGameBoardWithTilesFirstTimeOnly;

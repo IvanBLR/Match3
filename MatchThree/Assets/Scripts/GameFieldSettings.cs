@@ -6,9 +6,9 @@ using UnityEngine.UI;
 public class GameFieldSettings : MonoBehaviour
 {
     public Action GameSettingsAccepted;
-    public Action<Button> UnblocedButtonSet;// TODO: add method in AdvertisementManager, and += it in GameManager
+    public Action<Button> TryingActivateButton;// TODO: add method in AdvertisementManager, and += it in GameManager
 
-    [SerializeField] private Button _blend;
+   // [SerializeField] private Button _blend;
     [SerializeField] private Button _China;
     [SerializeField] private Button _Japan;
     [SerializeField] private Button _USA;
@@ -37,7 +37,7 @@ public class GameFieldSettings : MonoBehaviour
     [UsedImplicitly]
     public void SaveJapan()
     {
-        UnblocedButtonSet?.Invoke(_Japan);
+        TryingActivateButton?.Invoke(_Japan);
         PlayerPrefs.SetInt(PlayingSettingsConstant.PLAYING_SET, 1);
         PlayerPrefs.Save();
     }
@@ -45,7 +45,7 @@ public class GameFieldSettings : MonoBehaviour
     [UsedImplicitly]
     public void SaveChina()
     {
-        UnblocedButtonSet?.Invoke(_China);
+        TryingActivateButton?.Invoke(_China);
         PlayerPrefs.SetInt(PlayingSettingsConstant.PLAYING_SET, 2);
         PlayerPrefs.Save();
     }
@@ -53,7 +53,7 @@ public class GameFieldSettings : MonoBehaviour
     [UsedImplicitly]
     public void SaveGB()
     {
-        UnblocedButtonSet?.Invoke(_GB);
+        TryingActivateButton?.Invoke(_GB);
         PlayerPrefs.SetInt(PlayingSettingsConstant.PLAYING_SET, 5);
         PlayerPrefs.Save();
     }
@@ -61,7 +61,7 @@ public class GameFieldSettings : MonoBehaviour
     [UsedImplicitly]
     public void SaveGermany()
     {
-        UnblocedButtonSet?.Invoke(_Germany);
+        TryingActivateButton?.Invoke(_Germany);
         PlayerPrefs.SetInt(PlayingSettingsConstant.PLAYING_SET, 6);
         PlayerPrefs.Save();
     }
@@ -69,7 +69,7 @@ public class GameFieldSettings : MonoBehaviour
     [UsedImplicitly]
     public void SavePremium()
     {
-        UnblocedButtonSet?.Invoke(_premium);
+        TryingActivateButton?.Invoke(_premium);
         PlayerPrefs.SetInt(PlayingSettingsConstant.PLAYING_SET, 3);
         PlayerPrefs.Save();
     }
@@ -77,7 +77,7 @@ public class GameFieldSettings : MonoBehaviour
     [UsedImplicitly]
     public void SaveUSA()
     {
-        UnblocedButtonSet?.Invoke(_USA);
+        TryingActivateButton?.Invoke(_USA);
         PlayerPrefs.SetInt(PlayingSettingsConstant.PLAYING_SET, 4);
         PlayerPrefs.Save();
     }

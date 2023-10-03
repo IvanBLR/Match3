@@ -3,6 +3,7 @@ using System.Collections;
 using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UI_controller : MonoBehaviour
 {
@@ -21,6 +22,7 @@ public class UI_controller : MonoBehaviour
     [SerializeField] private Canvas _restartCanvas;
     [SerializeField] private Canvas _blurayCanvas;
     [SerializeField] private Canvas _additionalCanvas;
+    [SerializeField] private Canvas _advCanvas;
 
     private Coroutine _currentSetActiveAttention;
     private int _previousIndex;
@@ -126,7 +128,7 @@ public class UI_controller : MonoBehaviour
     }
 
     [UsedImplicitly]
-    public void AcceptRestartProposition() // назначен на кнопку + , которая выскакивает после нажатия на Рестарт
+    public void AcceptRestartProposition() // назначен на кнопку '+' , которая выскакивает после нажатия на Рестарт
     {
         RestartGame?.Invoke();
         _restartCanvas.gameObject.SetActive(false);
@@ -136,9 +138,10 @@ public class UI_controller : MonoBehaviour
     }
 
     [UsedImplicitly]
-    public void RefuseProposition() // назначен на кнопку - , которая выскакивает после нажатия на Рестарт
+    public void RefuseProposition() // назначен на кнопки '-' 
     {
         _restartCanvas.gameObject.SetActive(false);
+        _advCanvas.gameObject.SetActive(false);
         _blurayCanvas.gameObject.SetActive(false);
     }
 
@@ -165,6 +168,12 @@ public class UI_controller : MonoBehaviour
     {
         _settingsCanvas.gameObject.SetActive(false);
         _additionalCanvas.gameObject.SetActive(true);
+    }
+
+    public void ActivateAdvCanvas(Button button)
+    {
+        _blurayCanvas.gameObject.SetActive(true);
+        _advCanvas.gameObject.SetActive(true);
     }
 
     private void Awake()
