@@ -7,7 +7,6 @@ using UnityEngine;
 
 public class GameFieldController : MonoBehaviour
 {
-    public Action InitializationActualItemsCompleted;
     public Action GotMatchTree;
     public Action WrongMatch3;
     public Action BombUsed;
@@ -43,7 +42,7 @@ public class GameFieldController : MonoBehaviour
         HashSet<Vector3Int> bombCoordinates = new();
         bombCoordinates.Add(new Vector3Int(x, y, 0));
 
-        _score -= 2;
+        _score -= 4;
         if (_score < 0)
             _score = -1;
         
@@ -82,8 +81,6 @@ public class GameFieldController : MonoBehaviour
         _parent.position = _grid.transform.position;
         SpriteRenderersMatrix = new SpriteRenderer[row, column];
         ItemsMatrix = new ItemSettings[row, column];
-
-        InitializationActualItemsCompleted?.Invoke();
     }
 
     public void FillGameBoardWithTilesFirstTimeOnly()
@@ -268,7 +265,7 @@ public class GameFieldController : MonoBehaviour
         DeleteMatchThree(match3);
         yield return new WaitForSeconds(0.3f + PlayingSettingsConstant.DELAY);
         FallDownItems();
-        yield return new WaitForSeconds(0.5f + PlayingSettingsConstant.DELAY);
+        yield return new WaitForSeconds(0.6f + PlayingSettingsConstant.DELAY);
 
         _score += match3.Count;
         ScoreChanged?.Invoke(_score);

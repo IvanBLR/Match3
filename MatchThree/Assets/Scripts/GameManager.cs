@@ -11,9 +11,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameFieldSample _gameFieldSample;
     [SerializeField] private SoundsManager _soundsManager;
     [SerializeField] private UI_controller _UI;
-   // [SerializeField] private Grid _grid;
-   // [SerializeField] private Button _simpleBomb;
-   // [SerializeField] private Button _bomb;
     [SerializeField] private Button _restart;
     [SerializeField] private TextMeshProUGUI _score;
     [SerializeField] private TextMeshProUGUI _bestScore;
@@ -57,7 +54,6 @@ public class GameManager : MonoBehaviour
         _gameFieldSettings.GameSettingsAccepted += _gameFieldController.FillGameBoardWithTilesFirstTimeOnly;
         _gameFieldSettings.GameSettingsAccepted += _UI.StartedGame;
         _gameFieldSettings.GameSettingsAccepted += _UI.LowDownBackgroundAlpha;
-        //_gameFieldSettings.TryingActivateButton += _advertisementManager.ActivateCurrentButton;
         _gameFieldSettings.TryingActivateButton += _UI.ActivateAdvCanvas;
 
         _UI.GameFieldRawSizeChanged += _gameFieldSample.GenerateGameFieldSample;
@@ -71,8 +67,9 @@ public class GameManager : MonoBehaviour
         _gameFieldController.BombUsed += _soundsManager.OnBombActivate;
         _gameFieldController.SimpleBombUsed += _soundsManager.OnBombActivate;
         _gameFieldController.ScoreChanged += UpdateScore;
-        _gameFieldController.InitializationActualItemsCompleted += DestroyAction;
-       // _gameFieldController.FilledGameBoard += DestroyAction;
+
+        _advertisementManager.ActivateAutoButton += _gameFieldSettings.ActivateChoosenButton;
+        _advertisementManager.CloseAdvCanvas += _UI.RefuseProposition;
     }
 
     private void Start()
@@ -197,30 +194,8 @@ public class GameManager : MonoBehaviour
 
     private void RestartScore() => UpdateScore(0);
 
-    private void DestroyAction()
-    {
-        //     _gameFieldController.InitializationActualItemsCompleted -= DestroyAction;
-        //     _gameFieldController.FilledGameBoard -= DestroyAction;
-        //
-        //     _gameFieldSettings.GameSettingsAccepted -= _gameFieldController.InitializeActualItemsList;
-        //     _gameFieldSettings.GameSettingsAccepted -= _gameFieldController.FillGameBoardWithTilesFirstTimeOnly;
-        //     _gameFieldSettings.GameSettingsAccepted -= _UI.StartedGame; 
-        //
-        //     _UI.GameFieldRawSizeChanged -= _gameFieldSample.GenerateGameFieldSample;
-        //     _UI.GameFieldColumnSizeChanged -= _gameFieldSample.GenerateGameFieldSample;
-    }
-
     private void OnDestroy()
     {
-        _gameFieldController.GotMatchTree -= _soundsManager.OnDropItems;
-        _gameFieldController.WrongMatch3 -= _soundsManager.OnSwapBack;
-        _gameFieldController.BombUsed -= _soundsManager.OnBombActivate;
-        _gameFieldController.SimpleBombUsed -= _soundsManager.OnBombActivate;
-        _gameFieldController.ScoreChanged -= UpdateScore;
-        _gameFieldController.InitializationActualItemsCompleted -= DestroyAction;
-       // _gameFieldController.FilledGameBoard -= DestroyAction;
-
-        //_gameFieldSettings.TryingActivateButton -= _advertisementManager.ActivateCurrentButton;
         _gameFieldSettings.TryingActivateButton -= _UI.ActivateAdvCanvas;
         _gameFieldSettings.GameSettingsAccepted -= _UI.LowDownBackgroundAlpha;
         _gameFieldSettings.GameSettingsAccepted -= _gameFieldController.InitializeActualItemsList;
@@ -232,5 +207,14 @@ public class GameManager : MonoBehaviour
         _UI.RestartGame -= _gameFieldSample.OnRestartInvoke;
         _UI.RestartGame -= _gameFieldController.ClearGameBoard;
         _UI.RestartGame -= RestartScore;
+
+        _gameFieldController.GotMatchTree -= _soundsManager.OnDropItems;
+        _gameFieldController.WrongMatch3 -= _soundsManager.OnSwapBack;
+        _gameFieldController.BombUsed -= _soundsManager.OnBombActivate;
+        _gameFieldController.SimpleBombUsed -= _soundsManager.OnBombActivate;
+        _gameFieldController.ScoreChanged -= UpdateScore;
+
+        _advertisementManager.ActivateAutoButton -= _gameFieldSettings.ActivateChoosenButton;
+        _advertisementManager.CloseAdvCanvas -= _UI.RefuseProposition;
     }
 }

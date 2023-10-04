@@ -3,7 +3,6 @@ using System.Collections;
 using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class UI_controller : MonoBehaviour
 {
@@ -31,14 +30,13 @@ public class UI_controller : MonoBehaviour
     private int _columnSize = 6;
     private bool _isSoundOn = true;
 
-    
-    
+
     #region public methods setup in Unity Editor. Responsibility: change gameField sizes
 
     [UsedImplicitly]
     public void IncreaseRowSize() // назначен на кнопку '+' в SettingsCanvas
     {
-        if (_rowSize < 12) 
+        if (_rowSize < 12)
             _rowSize++;
         else
         {
@@ -151,7 +149,7 @@ public class UI_controller : MonoBehaviour
     public void ChangeVolume(float volumeValue) => _audioSource.volume = volumeValue; // назначен на слайдер звука
 
     [UsedImplicitly]
-    public void RequestAuthorization()// назначен на кнопку "Оценить игру" AdditionalCanvas
+    public void RequestAuthorization() // назначен на кнопку "Оценить игру" AdditionalCanvas
     {
         _authorizationCanvas.gameObject.SetActive(true);
         _blurayCanvas.gameObject.SetActive(true);
@@ -179,7 +177,7 @@ public class UI_controller : MonoBehaviour
         _additionalCanvas.gameObject.SetActive(true);
     }
 
-    public void ActivateAdvCanvas(Button button)
+    public void ActivateAdvCanvas()
     {
         _blurayCanvas.gameObject.SetActive(true);
         _advCanvas.gameObject.SetActive(true);

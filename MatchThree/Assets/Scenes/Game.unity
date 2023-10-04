@@ -3097,7 +3097,31 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 790171563}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1627721923}
+        m_TargetAssemblyTypeName: SoundsManager, Assembly-CSharp
+        m_MethodName: OnButtonClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 447501294}
+        m_TargetAssemblyTypeName: AdvertisementManager, Assembly-CSharp
+        m_MethodName: ActivateAdvertisement
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &790171563
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7404,12 +7428,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 974faf4d26b322a46985bda5ab0e3046, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _China: {fileID: 387440211}
-  _Japan: {fileID: 1814679981}
-  _USA: {fileID: 86710120}
-  _GB: {fileID: 733522228}
-  _Germany: {fileID: 1488040717}
-  _premium: {fileID: 635941804}
+  _China: {fileID: 387440212}
+  _Japan: {fileID: 1814679982}
+  _USA: {fileID: 86710121}
+  _GB: {fileID: 733522229}
+  _Germany: {fileID: 1488040718}
+  _premium: {fileID: 635941805}
 --- !u!4 &1970425240
 Transform:
   m_ObjectHideFlags: 0
