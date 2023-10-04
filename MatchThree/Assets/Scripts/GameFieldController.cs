@@ -8,7 +8,6 @@ using UnityEngine;
 public class GameFieldController : MonoBehaviour
 {
     public Action InitializationActualItemsCompleted;
-    public Action FilledGameBoard;
     public Action GotMatchTree;
     public Action WrongMatch3;
     public Action BombUsed;
@@ -20,10 +19,7 @@ public class GameFieldController : MonoBehaviour
         _someTechnicalCalculations = new SomeTechnicalCalculations(this);
     }
 
-    public List<ItemSettingsProvider> AllVariantsItemsCollections
-    {
-        get => _allVariantsItemsCollections;
-    }
+    public List<ItemSettingsProvider> AllVariantsItemsCollections => _allVariantsItemsCollections;
 
     public List<ItemScriptableObject> ActualItemsList { get; private set; }
     public int[] ActualNameID { get; private set; } = new int[5];
@@ -84,12 +80,6 @@ public class GameFieldController : MonoBehaviour
         int row = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_ROW);
         int column = PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_COLUMN);
         _parent.position = _grid.transform.position;
-        if (PlayerPrefs.GetInt(PlayingSettingsConstant.GAME_FIELD_COLUMN) == 5)
-        {
-            _grid.transform.position += new Vector3(0, 1.5f, 0);
-            _parent.position += new Vector3(0, 1.5f, 0);
-        }
-
         SpriteRenderersMatrix = new SpriteRenderer[row, column];
         ItemsMatrix = new ItemSettings[row, column];
 
@@ -122,8 +112,6 @@ public class GameFieldController : MonoBehaviour
                 tile.transform.DOScale(targetScale, 0.3f).SetDelay(PlayingSettingsConstant.DELAY);
             }
         }
-
-        FilledGameBoard?.Invoke();
     }
 
     public void ClearGameBoard()

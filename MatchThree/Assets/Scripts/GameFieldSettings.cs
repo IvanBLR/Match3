@@ -8,7 +8,6 @@ public class GameFieldSettings : MonoBehaviour
     public Action GameSettingsAccepted;
     public Action<Button> TryingActivateButton;// TODO: add method in AdvertisementManager, and += it in GameManager
 
-   // [SerializeField] private Button _blend;
     [SerializeField] private Button _China;
     [SerializeField] private Button _Japan;
     [SerializeField] private Button _USA;

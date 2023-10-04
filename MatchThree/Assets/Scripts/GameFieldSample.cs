@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class GameFieldSample : MonoBehaviour
 {
+    public Grid Grid => _grid;
+    
     [SerializeField] private GameObject _emptyTilePrefab;
     [SerializeField] private Grid _grid;
 
@@ -11,23 +13,25 @@ public class GameFieldSample : MonoBehaviour
         int column = PrefsManager.GetDataInt(PlayingSettingsConstant.GAME_FIELD_COLUMN);
         GenerateGameFieldSample(row, column);
     }
+
     public void GenerateGameFieldSample(int sizeGameFieldX, int sizeGameFieldY)
     {
         CleanGameFieldSample();
 
         var cellGap = _grid.cellGap.x;
-        var tilesAmount = sizeGameFieldX;
+        var tilesAmountX = sizeGameFieldX;
+        var tilesAmountY = sizeGameFieldY;
         var tilesSize = _grid.cellSize.x;
 
         var screenWidth = PlayingSettingsConstant.SCREEN_WIDTH;
 
-        var offset = GetOffset(screenWidth, tilesSize, tilesAmount, cellGap);
-        
+        var offsetX = GetOffset(screenWidth, tilesSize, tilesAmountX, cellGap);
+        var offsetY = GetOffset(screenWidth, tilesSize, tilesAmountY, cellGap);
         _grid.transform.position = new Vector3(PlayingSettingsConstant.START_GRID_POSITION.X,
                                        PlayingSettingsConstant.START_GRID_POSITION.Y,
                                        PlayingSettingsConstant.START_GRID_POSITION.Z)
-                                   + new Vector3(offset, 0.66f, 0);
-        
+                                   + new Vector3(offsetX, offsetY, 0);
+
         for (int i = 0; i < sizeGameFieldX; i++)
         {
             for (int j = 0; j < sizeGameFieldY; j++)
@@ -39,7 +43,7 @@ public class GameFieldSample : MonoBehaviour
         }
     }
 
-    public void CleanGameFieldSample()
+    private void CleanGameFieldSample()
     {
         int amount = _grid.transform.childCount;
         for (int i = 0; i < amount; i++)

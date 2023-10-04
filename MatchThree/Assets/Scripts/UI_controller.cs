@@ -28,7 +28,7 @@ public class UI_controller : MonoBehaviour
     private Coroutine _currentSetActiveAttention;
     private int _previousIndex;
     private int _rowSize = 8;
-    private int _columnSize = 7;
+    private int _columnSize = 6;
     private bool _isSoundOn = true;
 
     
@@ -36,9 +36,9 @@ public class UI_controller : MonoBehaviour
     #region public methods setup in Unity Editor. Responsibility: change gameField sizes
 
     [UsedImplicitly]
-    public void IncreaseRowSize() // назначен на кнопку + в SettingsCanvas
+    public void IncreaseRowSize() // назначен на кнопку '+' в SettingsCanvas
     {
-        if (_rowSize < 12) // it was 5
+        if (_rowSize < 12) 
             _rowSize++;
         else
         {
@@ -57,7 +57,7 @@ public class UI_controller : MonoBehaviour
     }
 
     [UsedImplicitly]
-    public void DecreaseRowSize() // назначен на кнопку - в SettingsCanvas
+    public void DecreaseRowSize() // назначен на кнопку '-' в SettingsCanvas
     {
         if (_rowSize > 6)
             _rowSize--;
@@ -80,7 +80,7 @@ public class UI_controller : MonoBehaviour
     [UsedImplicitly]
     public void IncreaseColumnSize() // назначен на кнопку "стрелка вверх" в SettingsCanvas
     {
-        if (_columnSize < 7) // it was 8
+        if (_columnSize < 7)
             _columnSize++;
         else
         {

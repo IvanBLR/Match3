@@ -1463,7 +1463,6 @@ MonoBehaviour:
   _gameFieldSample: {fileID: 730447288}
   _soundsManager: {fileID: 1627721923}
   _UI: {fileID: 590128952}
-  _grid: {fileID: 1777019442}
   _restart: {fileID: 1253690399}
   _score: {fileID: 1864697581}
   _bestScore: {fileID: 1739638945}
@@ -5344,7 +5343,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 7
+  m_text: 6
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 38be140ecf5dd814ea626e503a97200c, type: 2}
   m_sharedMaterial: {fileID: -3587434121410153611, guid: 38be140ecf5dd814ea626e503a97200c, type: 2}

@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameFieldSample _gameFieldSample;
     [SerializeField] private SoundsManager _soundsManager;
     [SerializeField] private UI_controller _UI;
-    [SerializeField] private Grid _grid;
+   // [SerializeField] private Grid _grid;
    // [SerializeField] private Button _simpleBomb;
    // [SerializeField] private Button _bomb;
     [SerializeField] private Button _restart;
@@ -31,6 +31,7 @@ public class GameManager : MonoBehaviour
     private RaycastHit2D _raycastHitDown;
     private RaycastHit2D _raycastHitUp;
     private Camera _camera;
+    private Grid _grid;
 
 
     [UsedImplicitly]
@@ -71,11 +72,12 @@ public class GameManager : MonoBehaviour
         _gameFieldController.SimpleBombUsed += _soundsManager.OnBombActivate;
         _gameFieldController.ScoreChanged += UpdateScore;
         _gameFieldController.InitializationActualItemsCompleted += DestroyAction;
-        _gameFieldController.FilledGameBoard += DestroyAction;
+       // _gameFieldController.FilledGameBoard += DestroyAction;
     }
 
     private void Start()
     {
+        _grid = _gameFieldSample.Grid;
         _offset = new Vector2(_grid.cellSize.x / 2, _grid.cellSize.y / 2);
         _camera = Camera.main;
         int bestScore = PrefsManager.GetDataInt(PlayingSettingsConstant.BEST_SCORE);
@@ -216,7 +218,7 @@ public class GameManager : MonoBehaviour
         _gameFieldController.SimpleBombUsed -= _soundsManager.OnBombActivate;
         _gameFieldController.ScoreChanged -= UpdateScore;
         _gameFieldController.InitializationActualItemsCompleted -= DestroyAction;
-        _gameFieldController.FilledGameBoard -= DestroyAction;
+       // _gameFieldController.FilledGameBoard -= DestroyAction;
 
         //_gameFieldSettings.TryingActivateButton -= _advertisementManager.ActivateCurrentButton;
         _gameFieldSettings.TryingActivateButton -= _UI.ActivateAdvCanvas;
