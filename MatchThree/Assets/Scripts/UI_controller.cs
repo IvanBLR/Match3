@@ -18,6 +18,7 @@ public class UI_controller : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _rowSizeText;
     [SerializeField] private TextMeshProUGUI _columnSizeText;
     [SerializeField] private TextMeshProUGUI _attentionText;
+    [SerializeField] private Canvas _authorizationCanvas;
     [SerializeField] private Canvas _settingsCanvas;
     [SerializeField] private Canvas _restartCanvas;
     [SerializeField] private Canvas _blurayCanvas;
@@ -143,10 +144,18 @@ public class UI_controller : MonoBehaviour
         _restartCanvas.gameObject.SetActive(false);
         _advCanvas.gameObject.SetActive(false);
         _blurayCanvas.gameObject.SetActive(false);
+        _authorizationCanvas.gameObject.SetActive(false);
     }
 
     [UsedImplicitly]
     public void ChangeVolume(float volumeValue) => _audioSource.volume = volumeValue; // назначен на слайдер звука
+
+    [UsedImplicitly]
+    public void RequestAuthorization()// назначен на кнопку "Оценить игру" AdditionalCanvas
+    {
+        _authorizationCanvas.gameObject.SetActive(true);
+        _blurayCanvas.gameObject.SetActive(true);
+    }
 
     [UsedImplicitly]
     public void SoundTumbler() // назначен на тоггл со значком звука

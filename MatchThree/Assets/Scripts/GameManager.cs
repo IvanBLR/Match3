@@ -12,8 +12,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private SoundsManager _soundsManager;
     [SerializeField] private UI_controller _UI;
     [SerializeField] private Grid _grid;
-    [SerializeField] private Button _simpleBomb;
-    [SerializeField] private Button _bomb;
+   // [SerializeField] private Button _simpleBomb;
+   // [SerializeField] private Button _bomb;
     [SerializeField] private Button _restart;
     [SerializeField] private TextMeshProUGUI _score;
     [SerializeField] private TextMeshProUGUI _bestScore;
@@ -63,6 +63,7 @@ public class GameManager : MonoBehaviour
         _UI.GameFieldColumnSizeChanged += _gameFieldSample.GenerateGameFieldSample;
         _UI.RestartGame += _gameFieldSample.OnRestartInvoke;
         _UI.RestartGame += _gameFieldController.ClearGameBoard;
+        _UI.RestartGame += RestartScore;
 
         _gameFieldController.GotMatchTree += _soundsManager.OnDropItems;
         _gameFieldController.WrongMatch3 += _soundsManager.OnSwapBack;
@@ -192,6 +193,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void RestartScore() => UpdateScore(0);
+
     private void DestroyAction()
     {
         //     _gameFieldController.InitializationActualItemsCompleted -= DestroyAction;
@@ -226,5 +229,6 @@ public class GameManager : MonoBehaviour
         _UI.GameFieldColumnSizeChanged -= _gameFieldSample.GenerateGameFieldSample;
         _UI.RestartGame -= _gameFieldSample.OnRestartInvoke;
         _UI.RestartGame -= _gameFieldController.ClearGameBoard;
+        _UI.RestartGame -= RestartScore;
     }
 }

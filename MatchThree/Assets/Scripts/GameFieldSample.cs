@@ -22,12 +22,12 @@ public class GameFieldSample : MonoBehaviour
         var screenWidth = PlayingSettingsConstant.SCREEN_WIDTH;
 
         var offset = GetOffset(screenWidth, tilesSize, tilesAmount, cellGap);
-
+        
         _grid.transform.position = new Vector3(PlayingSettingsConstant.START_GRID_POSITION.X,
                                        PlayingSettingsConstant.START_GRID_POSITION.Y,
                                        PlayingSettingsConstant.START_GRID_POSITION.Z)
-                                   + new Vector3(offset, 0, 0);
-
+                                   + new Vector3(offset, 0.66f, 0);
+        
         for (int i = 0; i < sizeGameFieldX; i++)
         {
             for (int j = 0; j < sizeGameFieldY; j++)

@@ -36,7 +36,7 @@ public class GameFieldController : MonoBehaviour
     [SerializeField] private List<ItemSettingsProvider> _allVariantsItemsCollections;
     [SerializeField] private Transform _parent;
 
-    private int _totalScore;
+    private int _score;
 
     private readonly SomeTechnicalCalculations _someTechnicalCalculations;
 
@@ -47,9 +47,9 @@ public class GameFieldController : MonoBehaviour
         HashSet<Vector3Int> bombCoordinates = new();
         bombCoordinates.Add(new Vector3Int(x, y, 0));
 
-        _totalScore -= 2;
-        if (_totalScore < 0)
-            _totalScore = -1;
+        _score -= 2;
+        if (_score < 0)
+            _score = -1;
         
         SimpleBombUsed?.Invoke();
         StartCoroutine(RestoreGameField(bombCoordinates));
@@ -60,9 +60,9 @@ public class GameFieldController : MonoBehaviour
         List<Vector3Int> bomb = _someTechnicalCalculations.GetBombsCoordinates(x, y);
         HashSet<Vector3Int> bombCoordinates = new();
 
-        _totalScore -= 3 * bomb.Count;
-        if (_totalScore < 0)
-            _totalScore = -4;
+        _score -= 3 * bomb.Count;
+        if (_score < 0)
+            _score = -4;
 
         for (int i = 0; i < bomb.Count; i++)
         {
@@ -128,6 +128,7 @@ public class GameFieldController : MonoBehaviour
 
     public void ClearGameBoard()
     {
+        _score = 0;
         int amount = _parent.transform.childCount;
         for (int i = 0; i < amount; i++)
         {
@@ -281,8 +282,8 @@ public class GameFieldController : MonoBehaviour
         FallDownItems();
         yield return new WaitForSeconds(0.5f + PlayingSettingsConstant.DELAY);
 
-        _totalScore += match3.Count;
-        ScoreChanged?.Invoke(_totalScore);
+        _score += match3.Count;
+        ScoreChanged?.Invoke(_score);
 
         var newMatch3 = _someTechnicalCalculations.GetMatchThreeOrMore();
         if (newMatch3.Count > 2)
