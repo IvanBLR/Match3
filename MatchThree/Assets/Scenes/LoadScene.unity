@@ -814,6 +814,7 @@ MonoBehaviour:
   _yandexSDK: {fileID: 1057123972}
   _slider: {fileID: 2096110574}
   _image: {fileID: 594668534}
+  _audio: {fileID: 1830923581}
 --- !u!4 &1830923580
 Transform:
   m_ObjectHideFlags: 0
@@ -841,7 +842,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 72409e6c7cd8929479df16d4b5e49628, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.43
+  m_Volume: 1
   m_Pitch: 1
   Loop: 0
   Mute: 0

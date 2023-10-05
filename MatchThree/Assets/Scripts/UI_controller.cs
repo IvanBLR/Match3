@@ -3,6 +3,7 @@ using System.Collections;
 using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UI_controller : MonoBehaviour
 {
@@ -11,8 +12,8 @@ public class UI_controller : MonoBehaviour
     public Action RestartGame;
 
     [SerializeField] private SpriteRenderer _background;
-    [SerializeField] private SpriteRenderer _soundOn;
-    [SerializeField] private SpriteRenderer _soundOff;
+    [SerializeField] private Image _soundOn;
+    [SerializeField] private Image _soundOff;
     [SerializeField] private AudioSource _audioSource;
     [SerializeField] private TextMeshProUGUI _rowSizeText;
     [SerializeField] private TextMeshProUGUI _columnSizeText;
@@ -36,7 +37,7 @@ public class UI_controller : MonoBehaviour
     [UsedImplicitly]
     public void IncreaseRowSize() // назначен на кнопку '+' в SettingsCanvas
     {
-        if (_rowSize < 12)
+        if (_rowSize < 13)
             _rowSize++;
         else
         {

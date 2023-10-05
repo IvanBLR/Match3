@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -8,7 +7,8 @@ public class LoadGame : MonoBehaviour
     [SerializeField] private Yandex _yandexSDK;
     [SerializeField] private Slider _slider;
     [SerializeField] private Image _image;
-
+    [SerializeField] private AudioSource _audio;
+    
     private readonly float _loadDuration = 3.5f;
     private float _loadingTime;
 
@@ -32,8 +32,11 @@ public class LoadGame : MonoBehaviour
     private void ChangeLoadsValue(float value)
     {
         _slider.value = value;
+        
         var color = _image.color;
         color.a = value;
         _image.color = color;
+
+        _audio.volume = 1 - value + 0.1f;
     }
 }
