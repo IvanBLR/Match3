@@ -1,75 +1,39 @@
 using System;
-using System.Collections;
-using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class LoadGame : MonoBehaviour
 {
-    [SerializeField] private Canvas _invalidCanvas;
-    [SerializeField] private Canvas _canvas;
-    [SerializeField] private Image _soundOn;
-    [SerializeField] private Image _soundOff;
-    [SerializeField] private AudioSource _audioSource;
-    [SerializeField] private AudioClip _bottonClick;
+    [SerializeField] private Yandex _yandexSDK;
+    [SerializeField] private Slider _slider;
+    [SerializeField] private Image _image;
 
-    private bool _isSoundOn = true;
-
-    [UsedImplicitly]
-    public void StartGame()
-    {
-        _audioSource.PlayOneShot(_bottonClick);
-        int sound = _isSoundOn ? 1 : 0;
-        PlayerPrefs.SetInt(PlayingSettingsConstant.SOUND_ON_OFF, sound);
-        PlayerPrefs.Save();
-        SceneManager.LoadScene(1);
-    }
-
-    [UsedImplicitly]
-    public void SoundTumbler()
-    {
-        _audioSource.mute = _isSoundOn;
-        _soundOff.gameObject.SetActive(_isSoundOn);
-        _soundOn.gameObject.SetActive(!_isSoundOn);
-        _isSoundOn = !_isSoundOn;
-    }
-
-    [UsedImplicitly]
-    public void RestartGame()
-    {
-        SceneManager.LoadScene(0);
-    }
+    private readonly float _loadDuration = 3.5f;
+    private float _loadingTime;
 
     private void Awake()
     {
-        //StartCoroutine(CheckValidateWindowAspect());
+        _slider.gameObject.SetActive(true);
     }
 
-    private IEnumerator CheckValidateWindowAspect()
+    private void Update()
     {
-        double width = Screen.width;
-        double height = Screen.height;
-        double currentSize = Math.Round((width / height), 2);
-        
-        double expectedWidth = PlayingSettingsConstant.SCREEN_ROW;
-        double expectedHeight = PlayingSettingsConstant.SCREEN_COLUMN;
-        double expectedSize = Math.Round((expectedWidth / expectedHeight), 2);
-;
-        if (!(currentSize == expectedSize))
+        _loadingTime += Time.deltaTime;
+        var progress = _loadingTime / _loadDuration;
+        ChangeLoadsValue(progress);
+        if (_loadingTime >= _loadDuration)
         {
-            _invalidCanvas.gameObject.SetActive(true);
-            _canvas.gameObject.SetActive(false);
-            _audioSource.gameObject.SetActive(false);
-            transform.GetComponent<SpriteRenderer>().enabled = false;
+            DontDestroyOnLoad(_yandexSDK);
+            SceneManager.LoadScene(1);
         }
-        else
-        {
-            _invalidCanvas.gameObject.SetActive(false);
-            _canvas.gameObject.SetActive(true);
-            _audioSource.gameObject.SetActive(true);
-        }
+    }
 
-        yield return new WaitUntil(() => currentSize == expectedSize);
+    private void ChangeLoadsValue(float value)
+    {
+        _slider.value = value;
+        var color = _image.color;
+        color.a = value;
+        _image.color = color;
     }
 }

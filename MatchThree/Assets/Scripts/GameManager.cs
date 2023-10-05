@@ -70,6 +70,7 @@ public class GameManager : MonoBehaviour
 
         _advertisementManager.ActivateAutoButton += _gameFieldSettings.ActivateChoosenButton;
         _advertisementManager.CloseAdvCanvas += _UI.RefuseProposition;
+        _advertisementManager.CloseAuthCanvas += _UI.RefuseProposition;
     }
 
     private void Start()
@@ -216,5 +217,6 @@ public class GameManager : MonoBehaviour
 
         _advertisementManager.ActivateAutoButton -= _gameFieldSettings.ActivateChoosenButton;
         _advertisementManager.CloseAdvCanvas -= _UI.RefuseProposition;
+        _advertisementManager.CloseAuthCanvas -= _UI.RefuseProposition;
     }
 }

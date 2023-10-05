@@ -6,9 +6,10 @@ public class AdvertisementManager : MonoBehaviour
 {
     public Action<int> ActivateAutoButton;
     public Action CloseAdvCanvas;
+    public Action CloseAuthCanvas;
 
     [UsedImplicitly]
-    public void ActivateAdvertisement() // будет назначена на "+" в AdvertisementCanvas
+    public void ActivateAdvertisement() // назначен на "+" в AdvertisementCanvas
     {
         int activatedButtonNumber = PrefsManager.GetDataInt(PlayingSettingsConstant.BUTTON_FOR_ACTIVATION);
         ActivateAutoButton?.Invoke(activatedButtonNumber);
@@ -21,5 +22,14 @@ public class AdvertisementManager : MonoBehaviour
         
         
         
+    }
+
+    [UsedImplicitly]
+    public void ActivateGameRate()// назначен на "+" в AuthorizationCanvas
+    {
+        CloseAuthCanvas?.Invoke();
+        /*
+         * TODO: call ysdk.Auth.method and after rate.method
+         */
     }
 }
