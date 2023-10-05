@@ -1,3 +1,4 @@
+using System;
 using JetBrains.Annotations;
 using UnityEngine;
 
@@ -30,5 +31,10 @@ public class SoundsManager : MonoBehaviour
     public void OnSwapBack()
     {
         _audioSource.PlayOneShot(_swapBack, _soundScale);
+    }
+
+    private void Awake()
+    {
+        _audioSource.Play();
     }
 }
