@@ -37,7 +37,7 @@ public class UI_controller : MonoBehaviour
     [UsedImplicitly]
     public void IncreaseRowSize() // назначен на кнопку '+' в SettingsCanvas
     {
-        if (_rowSize < 13)
+        if (_rowSize < 12)
             _rowSize++;
         else
         {
