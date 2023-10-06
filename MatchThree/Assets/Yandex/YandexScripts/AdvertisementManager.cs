@@ -24,8 +24,8 @@ public class AdvertisementManager : MonoBehaviour
     [UsedImplicitly]
     public void ActivateGameRate() // назначен на "+" в AuthorizationCanvas
     {
-       _sdk.Authenticate();
-       CloseAuthCanvas?.Invoke();
+        CloseAuthCanvas?.Invoke();
+        _sdk.Authenticate();
     }
 
     public void ActivateSimpleAdvertisement()

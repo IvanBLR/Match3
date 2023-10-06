@@ -155,6 +155,7 @@ public class UI_controller : MonoBehaviour
         _authorizationCanvas.gameObject.SetActive(true);
         _blurayCanvas.gameObject.SetActive(true);
     }
+    
 
     [UsedImplicitly]
     public void SoundTumbler() // назначен на тоггл со значком звука
