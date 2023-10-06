@@ -1,10 +1,11 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class LoadGame : MonoBehaviour
 {
-    [SerializeField] private Yandex _yandexSDK;
+    //[SerializeField] private YandexSDK _yandexSDK;
     [SerializeField] private Slider _slider;
     [SerializeField] private Image _image;
     [SerializeField] private AudioSource _audio;
@@ -24,7 +25,7 @@ public class LoadGame : MonoBehaviour
         ChangeLoadsValue(progress);
         if (_loadingTime >= _loadDuration)
         {
-            DontDestroyOnLoad(_yandexSDK);
+          //  DontDestroyOnLoad(_yandexSDK);
             SceneManager.LoadScene(1);
         }
     }

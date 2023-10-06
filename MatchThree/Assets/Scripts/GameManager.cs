@@ -136,6 +136,9 @@ public class GameManager : MonoBehaviour
 
             CalculateInputDirectionAndStartSwap(deltaX, deltaY);
         }
+        
+        if (_click >= 22)
+            _advertisementManager.ActivateSimpleAdvertisement();
     }
 
     private void CalculateInputDirectionAndStartSwap(int deltaX, int deltaY)

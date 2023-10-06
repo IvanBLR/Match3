@@ -8,28 +8,34 @@ public class AdvertisementManager : MonoBehaviour
     public Action CloseAdvCanvas;
     public Action CloseAuthCanvas;
 
+    private YandexSDK _sdk;
+
     [UsedImplicitly]
     public void ActivateAdvertisement() // назначен на "+" в AdvertisementCanvas
     {
         int activatedButtonNumber = PrefsManager.GetDataInt(PlayingSettingsConstant.BUTTON_FOR_ACTIVATION);
         ActivateAutoButton?.Invoke(activatedButtonNumber);
         PrefsManager.SaveDataInt(PlayingSettingsConstant.PLAYING_SET, activatedButtonNumber);
-        
+
         CloseAdvCanvas?.Invoke();
-        /*
-         * TODO: add advertisement activation
-         */
-        
-        
-        
+        _sdk.ShowRewardAdvertisement();
     }
 
     [UsedImplicitly]
-    public void ActivateGameRate()// назначен на "+" в AuthorizationCanvas
+    public void ActivateGameRate() // назначен на "+" в AuthorizationCanvas
     {
-        CloseAuthCanvas?.Invoke();
-        /*
-         * TODO: call ysdk.Auth.method and after rate.method
-         */
+       _sdk.Authenticate();
+       CloseAuthCanvas?.Invoke();
     }
+
+    public void ActivateSimpleAdvertisement()
+    {
+        _sdk.ShowCommonAdvertisement();
+    }
+
+    private void Start()
+    {
+        _sdk = YandexSDK.Instance;
+    }
+    
 }
