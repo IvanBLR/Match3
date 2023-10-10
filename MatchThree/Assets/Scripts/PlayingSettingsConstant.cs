@@ -9,10 +9,8 @@ public class PlayingSettingsConstant
     public static readonly string BUTTON_FOR_ACTIVATION = "BUTTON_FOR_ACTIVATION";
     public const float SCREEN_WIDTH = 6.7f;
     public static readonly Vector3 START_GRID_POSITION = new(-3.375f, -4, 0);
-    public const int SCREEN_ROW = 1080;
-    public const int SCREEN_COLUMN = 1920;
     public const float DELAY = 0.1f;
-    public const float MIN_CLICK_INTERVAL = 0.33f;
+    public const float MIN_CLICK_INTERVAL = 0.5f;
     public static readonly string BEST_SCORE = "BEST_SCORE";
     public static readonly string USER_NAME = "USER_NAME";
 }

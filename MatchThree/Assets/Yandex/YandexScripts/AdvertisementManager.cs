@@ -7,7 +7,9 @@ public class AdvertisementManager : MonoBehaviour
     public Action<int> ActivateAutoButton;
     public Action CloseAdvCanvas;
     public Action CloseAuthCanvas;
-
+    public Action AdvStart;
+    public Action AdvFinish;
+    
     private YandexSDK _sdk;
 
     [UsedImplicitly]
@@ -36,6 +38,23 @@ public class AdvertisementManager : MonoBehaviour
     private void Start()
     {
         _sdk = YandexSDK.Instance;
+        _sdk.AdvertisementStarted += AdvStarted;
+        _sdk.AdvertisementFinished += AdvFinished;
     }
-    
+
+    private void AdvFinished()
+    {
+        AdvFinish?.Invoke();
+    }
+
+    private void AdvStarted()
+    {
+        AdvStart?.Invoke();
+    }
+
+    private void OnDestroy()
+    {
+        _sdk.AdvertisementStarted -= AdvStarted;
+        _sdk.AdvertisementFinished -= AdvFinished;
+    }
 }

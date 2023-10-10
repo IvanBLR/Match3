@@ -33,6 +33,16 @@ public class SoundsManager : MonoBehaviour
         _audioSource.PlayOneShot(_swapBack, _soundScale);
     }
 
+    public void Pause()
+    {
+        _audioSource.Pause();
+    }
+
+    public void SoundResume()
+    {
+        _audioSource.Play();
+    }
+
     private void Awake()
     {
         _audioSource.Play();

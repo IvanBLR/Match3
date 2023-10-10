@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class YandexSDK : MonoBehaviour
 {
+    public Action AdvertisementStarted;
+    public Action AdvertisementFinished;
+
     public static YandexSDK Instance
     {
         get
@@ -29,31 +32,35 @@ public class YandexSDK : MonoBehaviour
     [DllImport("__Internal")]
     private static extern void ShowRewardAdv();
 
-    public void RewardVideoStarted() {}
+    [UsedImplicitly]
+    public void AuthenticateSuccessed(string data) // вызывается из index.html при успешной авторизации пользователя
+    {
+        PlayerPrefs.SetString(PlayingSettingsConstant.USER_NAME, data);
+        PlayerPrefs.Save();
+    }
 
-    public void RewardVideoClosed() {}
+    [UsedImplicitly]
+    public void SoundOn() // use in index.html
+    {
+        AdvertisementFinished?.Invoke();
+    }
 
     public void Authenticate()
     {
         Auth();
     }
 
-
     public void ShowCommonAdvertisement()
     {
+        AdvertisementStarted?.Invoke();
         ShowAdv();
     }
 
+
     public void ShowRewardAdvertisement()
     {
+        AdvertisementStarted?.Invoke();
         ShowRewardAdv();
-    }
-
-    [UsedImplicitly]
-    public void AuthenticateSuccessed(string data) // вызывается из index.html при успешной авторизации пользователя
-    {
-        PlayerPrefs.SetString(PlayingSettingsConstant.USER_NAME, data);
-        PlayerPrefs.Save();
     }
 
     private void Awake()

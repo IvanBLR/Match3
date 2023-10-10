@@ -71,6 +71,8 @@ public class GameManager : MonoBehaviour
         _advertisementManager.ActivateAutoButton += _gameFieldSettings.ActivateChoosenButton;
         _advertisementManager.CloseAdvCanvas += _UI.RefuseProposition;
         _advertisementManager.CloseAuthCanvas += _UI.RefuseProposition;
+        _advertisementManager.AdvStart += _soundsManager.Pause;
+        _advertisementManager.AdvFinish += _soundsManager.SoundResume;
     }
 
     private void Start()
@@ -136,7 +138,7 @@ public class GameManager : MonoBehaviour
 
             CalculateInputDirectionAndStartSwap(deltaX, deltaY);
         }
-        
+
         if (_click >= 22)
             _advertisementManager.ActivateSimpleAdvertisement();
     }
@@ -221,5 +223,7 @@ public class GameManager : MonoBehaviour
         _advertisementManager.ActivateAutoButton -= _gameFieldSettings.ActivateChoosenButton;
         _advertisementManager.CloseAdvCanvas -= _UI.RefuseProposition;
         _advertisementManager.CloseAuthCanvas -= _UI.RefuseProposition;
+        _advertisementManager.AdvStart -= _soundsManager.Pause;
+        _advertisementManager.AdvFinish -= _soundsManager.SoundResume;
     }
 }
