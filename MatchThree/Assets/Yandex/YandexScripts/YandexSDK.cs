@@ -8,6 +8,7 @@ public class YandexSDK : MonoBehaviour
     public Action AdvertisementStarted;
     public Action AdvertisementFinished;
 
+    //public Action<int> X;
     public static YandexSDK Instance
     {
         get
@@ -30,6 +31,10 @@ public class YandexSDK : MonoBehaviour
     private static extern void ShowAdv();
 
     [DllImport("__Internal")]
+    private static extern void InitGame();
+
+
+    [DllImport("__Internal")]
     private static extern void ShowRewardAdv();
 
     [UsedImplicitly]
@@ -45,6 +50,12 @@ public class YandexSDK : MonoBehaviour
         AdvertisementFinished?.Invoke();
     }
 
+    [UsedImplicitly]
+    public void SoundOff() // use in index.html
+    {
+        AdvertisementStarted?.Invoke();
+    }
+
     public void Authenticate()
     {
         Auth();
@@ -56,6 +67,7 @@ public class YandexSDK : MonoBehaviour
         ShowAdv();
     }
 
+    
 
     public void ShowRewardAdvertisement()
     {
@@ -65,6 +77,7 @@ public class YandexSDK : MonoBehaviour
 
     private void Awake()
     {
-        DontDestroyOnLoad(gameObject);
+        InitGame();
+        //DontDestroyOnLoad(gameObject);
     }
 }

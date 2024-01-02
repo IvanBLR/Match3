@@ -13,4 +13,10 @@ public class PlayingSettingsConstant
     public const float MIN_CLICK_INTERVAL = 0.5f;
     public static readonly string BEST_SCORE = "BEST_SCORE";
     public static readonly string USER_NAME = "USER_NAME";
+    public static readonly string JAPAN = "JAPAN";
+    public static readonly string USA = "USA";
+    public static readonly string GB = "GB";
+    public static readonly string CHINA = "CHINA";
+    public static readonly string PREMIUM = "PREMIUM";
+    public static readonly string GERMANY = "GERMANY";
 }

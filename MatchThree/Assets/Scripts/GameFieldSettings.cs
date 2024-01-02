@@ -17,7 +17,7 @@ public class GameFieldSettings : MonoBehaviour
     [SerializeField] private Image _premium;
 
     private Coroutine _currentSetActiveAttention;
-
+    private int _x;
 
     [UsedImplicitly]
     public void AcceptSettings() // назначен на кнопку "Старт"
@@ -37,7 +37,7 @@ public class GameFieldSettings : MonoBehaviour
     [UsedImplicitly]
     public void SaveJapan()
     {
-        if (_Japan.color.a != 1)
+        if (PrefsManager.GetDataInt(PlayingSettingsConstant.JAPAN) != 1)
         {
             PrefsManager.SaveDataInt(PlayingSettingsConstant.BUTTON_FOR_ACTIVATION, 1);
             TryingActivateButton?.Invoke();
@@ -51,7 +51,7 @@ public class GameFieldSettings : MonoBehaviour
     [UsedImplicitly]
     public void SaveChina()
     {
-        if (_China.color.a != 1)
+        if (PrefsManager.GetDataInt(PlayingSettingsConstant.CHINA) != 1)
         {
             PrefsManager.SaveDataInt(PlayingSettingsConstant.BUTTON_FOR_ACTIVATION, 2);
             TryingActivateButton?.Invoke();
@@ -65,7 +65,7 @@ public class GameFieldSettings : MonoBehaviour
     [UsedImplicitly]
     public void SaveGB()
     {
-        if (_GB.color.a != 1)
+        if (PrefsManager.GetDataInt(PlayingSettingsConstant.GB) != 1)
         {
             PrefsManager.SaveDataInt(PlayingSettingsConstant.BUTTON_FOR_ACTIVATION, 5);
             TryingActivateButton?.Invoke();
@@ -79,7 +79,7 @@ public class GameFieldSettings : MonoBehaviour
     [UsedImplicitly]
     public void SaveGermany()
     {
-        if (_Germany.color.a != 1)
+        if (PrefsManager.GetDataInt(PlayingSettingsConstant.GERMANY) != 1)
         {
             PrefsManager.SaveDataInt(PlayingSettingsConstant.BUTTON_FOR_ACTIVATION, 6);
             TryingActivateButton?.Invoke();
@@ -93,7 +93,7 @@ public class GameFieldSettings : MonoBehaviour
     [UsedImplicitly]
     public void SavePremium()
     {
-        if (_premium.color.a != 1)
+        if (PrefsManager.GetDataInt(PlayingSettingsConstant.PREMIUM) != 1)
         {
             PrefsManager.SaveDataInt(PlayingSettingsConstant.BUTTON_FOR_ACTIVATION, 3);
             TryingActivateButton?.Invoke();
@@ -107,7 +107,7 @@ public class GameFieldSettings : MonoBehaviour
     [UsedImplicitly]
     public void SaveUSA()
     {
-        if (_USA.color.a != 1)
+        if (PrefsManager.GetDataInt(PlayingSettingsConstant.USA) != 1)
         {
             PrefsManager.SaveDataInt(PlayingSettingsConstant.BUTTON_FOR_ACTIVATION, 4);
             TryingActivateButton?.Invoke();
@@ -120,32 +120,58 @@ public class GameFieldSettings : MonoBehaviour
 
     #endregion
 
-    public void ActivateChoosenButton(int buttonsNumber)
+    public void XXXXX(int x)
     {
-        switch (buttonsNumber)
+        _x = x;
+    }
+    public void ActivateChoosenButton()
+    {
+        switch (_x)
         {
             case 1:
                 ButtonActivation(_Japan);
+                PrefsManager.SaveDataInt(PlayingSettingsConstant.JAPAN, 1);
                 break;
             case 2:
                 ButtonActivation(_China);
+                PrefsManager.SaveDataInt(PlayingSettingsConstant.CHINA, 1);
                 break;
             case 3:
                 ButtonActivation(_premium);
+                PrefsManager.SaveDataInt(PlayingSettingsConstant.PREMIUM, 1);
                 break;
             case 4:
                 ButtonActivation(_USA);
+                PrefsManager.SaveDataInt(PlayingSettingsConstant.USA, 1);
                 break;
             case 5:
                 ButtonActivation(_GB);
+                PrefsManager.SaveDataInt(PlayingSettingsConstant.GB, 1);
                 break;
             case 6:
                 ButtonActivation(_Germany);
+                PrefsManager.SaveDataInt(PlayingSettingsConstant.GERMANY, 1);
                 break;
             default:
                 Debug.LogWarning("<color=red> Some ERROR </color>");
                 break;
         }
+    }
+
+    private void Start()
+    {
+        if (PrefsManager.GetDataInt(PlayingSettingsConstant.USA) == 1)
+            ButtonActivation(_USA);
+        if (PrefsManager.GetDataInt(PlayingSettingsConstant.JAPAN) == 1)
+            ButtonActivation(_Japan);
+        if (PrefsManager.GetDataInt(PlayingSettingsConstant.GB) == 1)
+            ButtonActivation(_GB);
+        if (PrefsManager.GetDataInt(PlayingSettingsConstant.CHINA) == 1)
+            ButtonActivation(_China);
+        if (PrefsManager.GetDataInt(PlayingSettingsConstant.GERMANY) == 1)
+            ButtonActivation(_Germany);
+        if (PrefsManager.GetDataInt(PlayingSettingsConstant.PREMIUM) == 1)
+            ButtonActivation(_premium);
     }
 
     private void ButtonActivation(Image image)

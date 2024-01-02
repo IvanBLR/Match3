@@ -1,6 +1,7 @@
 using System;
 using JetBrains.Annotations;
 using UnityEngine;
+using YG;
 
 public class AdvertisementManager : MonoBehaviour
 {
@@ -26,14 +27,17 @@ public class AdvertisementManager : MonoBehaviour
     [UsedImplicitly]
     public void ActivateGameRate() // назначен на "+" в AuthorizationCanvas
     {
+        YandexGame.ReviewShow(true);
+        
+        
         CloseAuthCanvas?.Invoke();
-        _sdk.Authenticate();
+        //_sdk.Authenticate();
     }
 
-    public void ActivateSimpleAdvertisement()
-    {
-        _sdk.ShowCommonAdvertisement();
-    }
+    // public void ActivateSimpleAdvertisement()
+    // {
+    //     _sdk.ShowCommonAdvertisement();
+    // }
 
     private void Start()
     {
@@ -42,14 +46,14 @@ public class AdvertisementManager : MonoBehaviour
         _sdk.AdvertisementFinished += AdvFinished;
     }
 
-    private void AdvFinished()
-    {
-        AdvFinish?.Invoke();
-    }
-
     private void AdvStarted()
     {
         AdvStart?.Invoke();
+    }
+
+    private void AdvFinished()
+    {
+        AdvFinish?.Invoke();
     }
 
     private void OnDestroy()

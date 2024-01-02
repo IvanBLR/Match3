@@ -10,6 +10,10 @@ mergeInto(LibraryManager.library, {
 
   ShowRewardAdv: function() {
      showRewardedAdvertisement();
+  },
+  
+  InitGame: function() {
+     initGame();
   }
     
 });
