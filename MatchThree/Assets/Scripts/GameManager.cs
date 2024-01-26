@@ -31,6 +31,8 @@ public class GameManager : MonoBehaviour
     private Camera _camera;
     private Grid _grid;
 
+    private void OnEnable() => YandexGame.GetDataEvent += GetData;
+    private void OnDisable() => YandexGame.GetDataEvent -= GetData;
 
     private void Awake()
     {
@@ -51,8 +53,6 @@ public class GameManager : MonoBehaviour
         _gameFieldController.BombUsed += _soundsManager.OnBombActivate;
         _gameFieldController.SimpleBombUsed += _soundsManager.OnBombActivate;
         _gameFieldController.ScoreChanged += UpdateScore;
-
-        YandexGame.CloseFullAdEvent += ResetAdvTimer;
     }
 
     private void Start()
@@ -204,6 +204,7 @@ public class GameManager : MonoBehaviour
     }
 
     private void ResetAdvTimer() => _advTimer = 0;
+    private void GetData() => YandexGame.CloseFullAdEvent += ResetAdvTimer;
 
     private void OnDestroy()
     {
