@@ -50,7 +50,7 @@ public class GameFieldController : MonoBehaviour
         StartCoroutine(RestoreGameField(bombCoordinates));
     }
 
-    public void UseBomb(int x, int y)
+    public void UseBomb(int x, int y)// TODO: rewarded
     {
         List<Vector3Int> bomb = _someTechnicalCalculations.GetBombsCoordinates(x, y);
         HashSet<Vector3Int> bombCoordinates = new();

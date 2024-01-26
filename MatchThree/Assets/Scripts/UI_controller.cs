@@ -4,12 +4,14 @@ using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using YG;
 
 public class UI_controller : MonoBehaviour
 {
     public Action<int, int> GameFieldRawSizeChanged;
     public Action<int, int> GameFieldColumnSizeChanged;
     public Action RestartGame;
+    public Action AcceptProposition;
 
     [SerializeField] private SpriteRenderer _background;
     [SerializeField] private Image _soundOn;
@@ -24,12 +26,19 @@ public class UI_controller : MonoBehaviour
     [SerializeField] private Canvas _blurayCanvas;
     [SerializeField] private Canvas _additionalCanvas;
     [SerializeField] private Canvas _advCanvas;
+    [SerializeField] private Button _rate;
 
     private Coroutine _currentSetActiveAttention;
     private int _previousIndex;
     private int _rowSize = 8;
     private int _columnSize = 6;
     private bool _isSoundOn = true;
+
+    private void Awake()
+    {
+        PrefsManager.SaveDataInt(PlayingSettingsConstant.GAME_FIELD_ROW, _rowSize);
+        PrefsManager.SaveDataInt(PlayingSettingsConstant.GAME_FIELD_COLUMN, _columnSize);
+    }
 
 
     #region public methods setup in Unity Editor. Responsibility: change gameField sizes
@@ -146,6 +155,15 @@ public class UI_controller : MonoBehaviour
         _authorizationCanvas.gameObject.SetActive(false);
     }
 
+    [UsedImplicitly] // назначен на кнопку '+' в рекламе
+    public void AcceptBombActivate()
+    {
+        YandexGame.FullscreenShow();
+        AcceptProposition?.Invoke();
+        _advCanvas.gameObject.SetActive(false);
+        _blurayCanvas.gameObject.SetActive(false);
+    }
+
     [UsedImplicitly]
     public void ChangeVolume(float volumeValue) => _audioSource.volume = volumeValue; // назначен на слайдер звука
 
@@ -155,7 +173,15 @@ public class UI_controller : MonoBehaviour
         _authorizationCanvas.gameObject.SetActive(true);
         _blurayCanvas.gameObject.SetActive(true);
     }
-    
+
+    [UsedImplicitly] // назначен на кнопку '+' при оценки игры
+    public void RateGame()
+    {
+        YandexGame.ReviewShow(true);
+        _authorizationCanvas.gameObject.SetActive(false);
+        _blurayCanvas.gameObject.SetActive(false);
+    }
+
 
     [UsedImplicitly]
     public void SoundTumbler() // назначен на тоггл со значком звука
@@ -177,18 +203,18 @@ public class UI_controller : MonoBehaviour
     {
         _settingsCanvas.gameObject.SetActive(false);
         _additionalCanvas.gameObject.SetActive(true);
+        if (!YandexGame.EnvironmentData.reviewCanShow)
+        {
+            _rate.interactable = false;
+            var canvasRenderer = _rate.GetComponent<CanvasRenderer>();
+            canvasRenderer.SetAlpha(0.4f);
+        }
     }
 
     public void ActivateAdvCanvas()
     {
         _blurayCanvas.gameObject.SetActive(true);
         _advCanvas.gameObject.SetActive(true);
-    }
-
-    private void Awake()
-    {
-        PrefsManager.SaveDataInt(PlayingSettingsConstant.GAME_FIELD_ROW, _rowSize);
-        PrefsManager.SaveDataInt(PlayingSettingsConstant.GAME_FIELD_COLUMN, _columnSize);
     }
 
     private IEnumerator ActivateAttentionText()

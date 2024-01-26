@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using YG;
 
 public class GameManager : MonoBehaviour
 {
@@ -14,8 +15,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Button _restart;
     [SerializeField] private TextMeshProUGUI _score;
     [SerializeField] private TextMeshProUGUI _bestScore;
-    [SerializeField] private AdvertisementManager _advertisementManager;
 
+    private float _advTimer;
     private float _click;
     private Vector2 _offset;
     private Vector3Int _hitPointDown;
@@ -31,36 +32,19 @@ public class GameManager : MonoBehaviour
     private Grid _grid;
 
 
-    [UsedImplicitly]
-    public void SimpleBombActivation()
-    {
-        _isSimpleBombActive = true;
-        _isBombActive = false;
-    }
-
-    [UsedImplicitly]
-    public void BombActivation()
-    {
-        _isBombActive = true;
-        _isSimpleBombActive = false;
-    }
-
-    [UsedImplicitly]
-    public void ActivateRestartButton() => _restart.gameObject.SetActive(true);
-
     private void Awake()
     {
         _gameFieldSettings.GameSettingsAccepted += _gameFieldController.InitializeActualItemsList;
         _gameFieldSettings.GameSettingsAccepted += _gameFieldController.FillGameBoardWithTilesFirstTimeOnly;
         _gameFieldSettings.GameSettingsAccepted += _UI.StartedGame;
         _gameFieldSettings.GameSettingsAccepted += _UI.LowDownBackgroundAlpha;
-        _gameFieldSettings.TryingActivateButton += _UI.ActivateAdvCanvas;
 
         _UI.GameFieldRawSizeChanged += _gameFieldSample.GenerateGameFieldSample;
         _UI.GameFieldColumnSizeChanged += _gameFieldSample.GenerateGameFieldSample;
         _UI.RestartGame += _gameFieldSample.OnRestartInvoke;
         _UI.RestartGame += _gameFieldController.ClearGameBoard;
         _UI.RestartGame += RestartScore;
+        _UI.AcceptProposition += BombActivator;
 
         _gameFieldController.GotMatchTree += _soundsManager.OnDropItems;
         _gameFieldController.WrongMatch3 += _soundsManager.OnSwapBack;
@@ -68,11 +52,7 @@ public class GameManager : MonoBehaviour
         _gameFieldController.SimpleBombUsed += _soundsManager.OnBombActivate;
         _gameFieldController.ScoreChanged += UpdateScore;
 
-        _advertisementManager.ActivateAutoButton += _gameFieldSettings.ActivateChoosenButton;
-        _advertisementManager.CloseAdvCanvas += _UI.RefuseProposition;
-        _advertisementManager.CloseAuthCanvas += _UI.RefuseProposition;
-        _advertisementManager.AdvStart += _soundsManager.Pause;
-        _advertisementManager.AdvFinish += _soundsManager.SoundResume;
+        YandexGame.CloseFullAdEvent += ResetAdvTimer;
     }
 
     private void Start()
@@ -87,6 +67,7 @@ public class GameManager : MonoBehaviour
     private void Update()
     {
         _click += Time.deltaTime;
+        _advTimer += Time.deltaTime;
 
         if (Input.GetMouseButtonDown(0) && _click >= PlayingSettingsConstant.MIN_CLICK_INTERVAL &&
             (!_isSimpleBombActive && !_isBombActive))
@@ -138,10 +119,26 @@ public class GameManager : MonoBehaviour
 
             CalculateInputDirectionAndStartSwap(deltaX, deltaY);
         }
-
-        if (_click >= 22)
-            _advertisementManager.ActivateSimpleAdvertisement();
     }
+
+    [UsedImplicitly]
+    public void SimpleBombActivation()
+    {
+        _isSimpleBombActive = true;
+        _isBombActive = false;
+    }
+
+    [UsedImplicitly]
+    public void BombActivation()
+    {
+        if (_advTimer > 61)
+            _UI.ActivateAdvCanvas();
+        else
+            BombActivator();
+    }
+
+    [UsedImplicitly]
+    public void ActivateRestartButton() => _restart.gameObject.SetActive(true);
 
     private void CalculateInputDirectionAndStartSwap(int deltaX, int deltaY)
     {
@@ -200,9 +197,16 @@ public class GameManager : MonoBehaviour
 
     private void RestartScore() => UpdateScore(0);
 
+    private void BombActivator()
+    {
+        _isBombActive = true;
+        _isSimpleBombActive = false;
+    }
+
+    private void ResetAdvTimer() => _advTimer = 0;
+
     private void OnDestroy()
     {
-        _gameFieldSettings.TryingActivateButton -= _UI.ActivateAdvCanvas;
         _gameFieldSettings.GameSettingsAccepted -= _UI.LowDownBackgroundAlpha;
         _gameFieldSettings.GameSettingsAccepted -= _gameFieldController.InitializeActualItemsList;
         _gameFieldSettings.GameSettingsAccepted -= _gameFieldController.FillGameBoardWithTilesFirstTimeOnly;
@@ -213,6 +217,7 @@ public class GameManager : MonoBehaviour
         _UI.RestartGame -= _gameFieldSample.OnRestartInvoke;
         _UI.RestartGame -= _gameFieldController.ClearGameBoard;
         _UI.RestartGame -= RestartScore;
+        _UI.AcceptProposition -= BombActivator;
 
         _gameFieldController.GotMatchTree -= _soundsManager.OnDropItems;
         _gameFieldController.WrongMatch3 -= _soundsManager.OnSwapBack;
@@ -220,10 +225,6 @@ public class GameManager : MonoBehaviour
         _gameFieldController.SimpleBombUsed -= _soundsManager.OnBombActivate;
         _gameFieldController.ScoreChanged -= UpdateScore;
 
-        _advertisementManager.ActivateAutoButton -= _gameFieldSettings.ActivateChoosenButton;
-        _advertisementManager.CloseAdvCanvas -= _UI.RefuseProposition;
-        _advertisementManager.CloseAuthCanvas -= _UI.RefuseProposition;
-        _advertisementManager.AdvStart -= _soundsManager.Pause;
-        _advertisementManager.AdvFinish -= _soundsManager.SoundResume;
+        YandexGame.CloseFullAdEvent -= ResetAdvTimer;
     }
 }

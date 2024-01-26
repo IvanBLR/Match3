@@ -1,23 +1,10 @@
 using JetBrains.Annotations;
 using System;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class GameFieldSettings : MonoBehaviour
 {
     public Action GameSettingsAccepted;
-    public Action TryingActivateButton; // TODO: add method in AdvertisementManager, and += it in GameManager
-
-
-    [SerializeField] private Image _China;
-    [SerializeField] private Image _Japan;
-    [SerializeField] private Image _USA;
-    [SerializeField] private Image _GB;
-    [SerializeField] private Image _Germany;
-    [SerializeField] private Image _premium;
-
-    private Coroutine _currentSetActiveAttention;
-
 
     [UsedImplicitly]
     public void AcceptSettings() // назначен на кнопку "Старт"
@@ -28,130 +15,53 @@ public class GameFieldSettings : MonoBehaviour
     #region public methods save playing sets, setup in Unity Editor
 
     [UsedImplicitly]
-    public void SaveBlend()
+    public void SaveBlend(int setNumber)
     {
-        PlayerPrefs.SetInt(PlayingSettingsConstant.PLAYING_SET, 0);
+        PlayerPrefs.SetInt(PlayingSettingsConstant.PLAYING_SET, setNumber);
         PlayerPrefs.Save();
     }
 
     [UsedImplicitly]
-    public void SaveJapan()
+    public void SaveJapan(int setNumber)
     {
-        if (_Japan.color.a != 1)
-        {
-            PrefsManager.SaveDataInt(PlayingSettingsConstant.BUTTON_FOR_ACTIVATION, 1);
-            TryingActivateButton?.Invoke();
-        }
-        else
-        {
-            PrefsManager.SaveDataInt(PlayingSettingsConstant.PLAYING_SET, 1);
-        }
+        PlayerPrefs.SetInt(PlayingSettingsConstant.PLAYING_SET, setNumber);
+        PlayerPrefs.Save();
     }
 
     [UsedImplicitly]
-    public void SaveChina()
+    public void SaveChina(int setNumber)
     {
-        if (_China.color.a != 1)
-        {
-            PrefsManager.SaveDataInt(PlayingSettingsConstant.BUTTON_FOR_ACTIVATION, 2);
-            TryingActivateButton?.Invoke();
-        }
-        else
-        {
-            PrefsManager.SaveDataInt(PlayingSettingsConstant.PLAYING_SET, 2);
-        }
+        PlayerPrefs.SetInt(PlayingSettingsConstant.PLAYING_SET, setNumber);
+        PlayerPrefs.Save();
     }
 
     [UsedImplicitly]
-    public void SaveGB()
+    public void SaveGB(int setNumber)
     {
-        if (_GB.color.a != 1)
-        {
-            PrefsManager.SaveDataInt(PlayingSettingsConstant.BUTTON_FOR_ACTIVATION, 5);
-            TryingActivateButton?.Invoke();
-        }
-        else
-        {
-            PrefsManager.SaveDataInt(PlayingSettingsConstant.PLAYING_SET, 5);
-        }
+        PlayerPrefs.SetInt(PlayingSettingsConstant.PLAYING_SET, setNumber);
+        PlayerPrefs.Save();
     }
 
     [UsedImplicitly]
-    public void SaveGermany()
+    public void SaveGermany(int setNumber)
     {
-        if (_Germany.color.a != 1)
-        {
-            PrefsManager.SaveDataInt(PlayingSettingsConstant.BUTTON_FOR_ACTIVATION, 6);
-            TryingActivateButton?.Invoke();
-        }
-        else
-        {
-            PrefsManager.SaveDataInt(PlayingSettingsConstant.PLAYING_SET, 6);
-        }
+        PlayerPrefs.SetInt(PlayingSettingsConstant.PLAYING_SET, setNumber);
+        PlayerPrefs.Save();
     }
 
     [UsedImplicitly]
-    public void SavePremium()
+    public void SavePremium(int setNumber)
     {
-        if (_premium.color.a != 1)
-        {
-            PrefsManager.SaveDataInt(PlayingSettingsConstant.BUTTON_FOR_ACTIVATION, 3);
-            TryingActivateButton?.Invoke();
-        }
-        else
-        {
-            PrefsManager.SaveDataInt(PlayingSettingsConstant.PLAYING_SET, 3);
-        }
+        PlayerPrefs.SetInt(PlayingSettingsConstant.PLAYING_SET, setNumber);
+        PlayerPrefs.Save();
     }
 
     [UsedImplicitly]
-    public void SaveUSA()
+    public void SaveUSA(int setNumber)
     {
-        if (_USA.color.a != 1)
-        {
-            PrefsManager.SaveDataInt(PlayingSettingsConstant.BUTTON_FOR_ACTIVATION, 4);
-            TryingActivateButton?.Invoke();
-        }
-        else
-        {
-            PrefsManager.SaveDataInt(PlayingSettingsConstant.PLAYING_SET, 4);
-        }
+        PlayerPrefs.SetInt(PlayingSettingsConstant.PLAYING_SET, setNumber);
+        PlayerPrefs.Save();
     }
 
     #endregion
-
-    public void ActivateChoosenButton(int buttonsNumber)
-    {
-        switch (buttonsNumber)
-        {
-            case 1:
-                ButtonActivation(_Japan);
-                break;
-            case 2:
-                ButtonActivation(_China);
-                break;
-            case 3:
-                ButtonActivation(_premium);
-                break;
-            case 4:
-                ButtonActivation(_USA);
-                break;
-            case 5:
-                ButtonActivation(_GB);
-                break;
-            case 6:
-                ButtonActivation(_Germany);
-                break;
-            default:
-                Debug.LogWarning("<color=red> Some ERROR </color>");
-                break;
-        }
-    }
-
-    private void ButtonActivation(Image image)
-    {
-        Color targetColor = Color.white;
-        targetColor.a = 1;
-        image.color = targetColor;
-    }
 }
