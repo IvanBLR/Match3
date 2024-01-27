@@ -177,7 +177,7 @@ public class UI_controller : MonoBehaviour
     [UsedImplicitly] // назначен на кнопку '+' при оценки игры
     public void RateGame()
     {
-        YandexGame.ReviewShow(true);
+       // YandexGame.ReviewShow(true);
         _authorizationCanvas.gameObject.SetActive(false);
         _blurayCanvas.gameObject.SetActive(false);
     }
@@ -192,6 +192,9 @@ public class UI_controller : MonoBehaviour
         _isSoundOn = !_isSoundOn;
     }
 
+    [UsedImplicitly] // вызывается после того, как оставили отзыв об игре
+    public void DropRateButton() => _rate.gameObject.SetActive(false);
+    
     public void LowDownBackgroundAlpha()
     {
         var color = _background.color;
@@ -203,12 +206,12 @@ public class UI_controller : MonoBehaviour
     {
         _settingsCanvas.gameObject.SetActive(false);
         _additionalCanvas.gameObject.SetActive(true);
-        if (!YandexGame.EnvironmentData.reviewCanShow)
-        {
-            _rate.interactable = false;
-            var canvasRenderer = _rate.GetComponent<CanvasRenderer>();
-            canvasRenderer.SetAlpha(0.4f);
-        }
+        // if (YandexGame.EnvironmentData.reviewCanShow)
+        // {
+        //     _rate.interactable = false;
+        //     var canvasRenderer = _rate.GetComponent<CanvasRenderer>();
+        //     canvasRenderer.SetAlpha(0.4f);
+        // }
     }
 
     public void ActivateAdvCanvas()
