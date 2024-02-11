@@ -13,6 +13,8 @@ public class UI_controller : MonoBehaviour
     public Action RestartGame;
     public Action AcceptProposition;
 
+    [SerializeField] private ReviewYG _reviewYg;
+    
     [SerializeField] private SpriteRenderer _background;
     [SerializeField] private Image _soundOn;
     [SerializeField] private Image _soundOff;
@@ -132,6 +134,14 @@ public class UI_controller : MonoBehaviour
     [UsedImplicitly]
     public void BackToMainMenu() // назначен на кнопку Рестарт в AdditionalCanvas
     {
+        if (YandexGame.EnvironmentData.reviewCanShow)
+        {
+            _reviewYg.ReviewAvailable?.Invoke();
+        }
+        else
+        {
+            _reviewYg.ReviewNotAvailable?.Invoke();
+        }
         _restartCanvas.gameObject.SetActive(true);
         _blurayCanvas.gameObject.SetActive(true);
     }

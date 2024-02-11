@@ -9,6 +9,6 @@ public class PlayingSettingsConstant
     public const float SCREEN_WIDTH = 6.7f;
     public static readonly Vector3 START_GRID_POSITION = new(-3.375f, -4, 0);
     public const float DELAY = 0.1f;
-    public const float MIN_CLICK_INTERVAL = 0.5f;
+    public const float MIN_CLICK_INTERVAL = 0.4f;
     public static readonly string BEST_SCORE = "BEST_SCORE";
 }
